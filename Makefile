@@ -23,13 +23,13 @@ test: go-test
 # Non-PHONY targets (real files)
 
 go-build: FORCE
-	./script/build.sh $(VERSION)
+	./scripts/build.sh $(VERSION)
 
 go-clean: FORCE
-	./script/clean.sh
+	./scripts/clean.sh
 
 go-lint: FORCE
-	./script/lint.sh
+	./scripts/lint.sh
 
 go-test: FORCE
-	./script/test.sh report
+	./scripts/test.sh report
