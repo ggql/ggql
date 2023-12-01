@@ -10,7 +10,7 @@
 
 ## Introduction
 
-*ggql* is forked from [GQL](https://github.com/AmrDeveloper/GQL) and written in GO.
+*ggql* is forked from [GQL](https://github.com/AmrDeveloper/GQL) and written in Go.
 
 [GQL](https://github.com/AmrDeveloper/GQL) is a query language with a syntax very similar to SQL with a tiny engine to
 perform queries on .git files instance of database files, the engine executes
