@@ -12,7 +12,7 @@
 
 *ggql* is forked from [GQL](https://github.com/AmrDeveloper/GQL) and written in GO.
 
-*GQL* is a query language with a syntax very similar to SQL with a tiny engine to
+[GQL](https://github.com/AmrDeveloper/GQL) is a query language with a syntax very similar to SQL with a tiny engine to
 perform queries on .git files instance of database files, the engine executes
 the query on the fly without the need to create database files or convert .git files
 into any other format, note that all Keywords in GQL are case-insensitive similar to SQL.
