@@ -89,5 +89,5 @@ linters:
 
 run:
   skip-dirs:
-    - external
-    - script
+    - docs
+    - scripts
