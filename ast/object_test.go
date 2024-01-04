@@ -9,6 +9,7 @@ import (
 func TestFlatGQLGroups(t *testing.T) {
 	var group []GQLObject
 	var groups [][]GQLObject
+	var val Value
 
 	err := FlatGQLGroups(&groups)
 	assert.Equal(t, nil, err)
@@ -20,7 +21,7 @@ func TestFlatGQLGroups(t *testing.T) {
 
 	group = append(group, GQLObject{
 		Attributes: map[string]Value{
-			"key": "val",
+			"key": val,
 		},
 	})
 

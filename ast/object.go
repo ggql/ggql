@@ -8,8 +8,6 @@ type GQLObject struct {
 	Attributes map[string]Value
 }
 
-type Value interface{}
-
 var mutex = &sync.Mutex{}
 
 func FlatGQLGroups(groups *[][]GQLObject) error {
