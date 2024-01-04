@@ -54,7 +54,7 @@ func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, paginat
 	// Setup titles
 	for key, val := range (*groups)[0][0].Attributes {
 		if !contains(hiddenSelections, key) {
-			titles = append(titles, val.(string))
+			titles = append(titles, val.Literal())
 		}
 	}
 
@@ -107,7 +107,7 @@ func printGroupAsTable(titles, tableHeaders []string, group []ast.GQLObject) err
 	for _, object := range group {
 		var row []string
 		for _, title := range titles {
-			row = append(row, object.Attributes[title].(string))
+			row = append(row, object.Attributes[title].Literal())
 		}
 		data = append(data, row)
 	}
