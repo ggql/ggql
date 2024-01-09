@@ -18,6 +18,13 @@ type Value interface {
 	Div(Value) (Value, error)
 	Modulus(Value) (Value, error)
 	Literal() string
+	AsInt() int64
+	AsFloat() float64
+	AsText() string
+	AsBool() bool
+	AsDateTime() int64
+	AsDate() int64
+	AsTime() string
 }
 
 // IntegerValue implementation
@@ -68,6 +75,42 @@ func (v IntegerValue) Modulus(other Value) (Value, error) {
 }
 
 func (v IntegerValue) Literal() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v IntegerValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v IntegerValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v IntegerValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v IntegerValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v IntegerValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v IntegerValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v IntegerValue) AsTime() string {
+	// TODO: FIXME
 	return ""
 }
 
@@ -122,6 +165,41 @@ func (v FloatValue) Literal() string {
 	return ""
 }
 
+func (v FloatValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v FloatValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v FloatValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v FloatValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v FloatValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v FloatValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v FloatValue) AsTime() string {
+	// TODO: FIXME
+	return ""
+}
+
 // TextValue implementation
 type TextValue struct {
 	value string
@@ -170,6 +248,41 @@ func (v TextValue) Modulus(other Value) (Value, error) {
 }
 
 func (v TextValue) Literal() string {
+	return ""
+}
+
+func (v TextValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TextValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TextValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v TextValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v TextValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TextValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TextValue) AsTime() string {
+	// TODO: FIXME
 	return ""
 }
 
@@ -224,6 +337,41 @@ func (v BooleanValue) Literal() string {
 	return ""
 }
 
+func (v BooleanValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v BooleanValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v BooleanValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v BooleanValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v BooleanValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v BooleanValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v BooleanValue) AsTime() string {
+	// TODO: FIXME
+	return ""
+}
+
 // DateTimeValue implementation
 type DateTimeValue struct {
 	value int64
@@ -272,6 +420,41 @@ func (v DateTimeValue) Modulus(other Value) (Value, error) {
 }
 
 func (v DateTimeValue) Literal() string {
+	return ""
+}
+
+func (v DateTimeValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateTimeValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateTimeValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v DateTimeValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v DateTimeValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateTimeValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateTimeValue) AsTime() string {
+	// TODO: FIXME
 	return ""
 }
 
@@ -326,6 +509,41 @@ func (v DateValue) Literal() string {
 	return ""
 }
 
+func (v DateValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v DateValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v DateValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v DateValue) AsTime() string {
+	// TODO: FIXME
+	return ""
+}
+
 // TimeValue implementation
 type TimeValue struct {
 	value string
@@ -377,6 +595,41 @@ func (v TimeValue) Literal() string {
 	return ""
 }
 
+func (v TimeValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TimeValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TimeValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v TimeValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v TimeValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TimeValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v TimeValue) AsTime() string {
+	// TODO: FIXME
+	return ""
+}
+
 // NullValue implementation
 type NullValue struct {
 	value interface{}
@@ -425,5 +678,40 @@ func (v NullValue) Modulus(other Value) (Value, error) {
 }
 
 func (v NullValue) Literal() string {
+	return ""
+}
+
+func (v NullValue) AsInt() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v NullValue) AsFloat() float64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v NullValue) AsText() string {
+	// TODO: FIXME
+	return ""
+}
+
+func (v NullValue) AsBool() bool {
+	// TODO: FIXME
+	return false
+}
+
+func (v NullValue) AsDateTime() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v NullValue) AsDate() int64 {
+	// TODO: FIXME
+	return 0
+}
+
+func (v NullValue) AsTime() string {
+	// TODO: FIXME
 	return ""
 }
