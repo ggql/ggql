@@ -158,7 +158,7 @@ func textLen(inputs []Value) Value {
 }
 
 func textAscii(inputs []Value) Value {
-	if len(inputs[0].AsText()) == 0 {
+	if inputs[0].AsText() == "" {
 		return IntegerValue{0}
 	}
 
@@ -284,6 +284,7 @@ func textUnicode(inputs []Value) Value {
 	return IntegerValue{int64(r)}
 }
 
+// nolint: gomnd
 func textSoundex(inputs []Value) Value {
 	text := inputs[0].AsText()
 	if text == "" {
@@ -402,7 +403,7 @@ func numericRound(inputs []Value) Value {
 func numericSquare(inputs []Value) Value {
 	intValue := inputs[0].AsInt()
 
-	return IntergerValue{intValue * intValue}
+	return IntegerValue{intValue * intValue}
 }
 
 func numericSin(inputs []Value) Value {
