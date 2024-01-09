@@ -60,10 +60,58 @@ var functions = map[string]Function{
 	"tan":    numericTan,
 
 	// General functions
-
 	"isnull":    generalIsNull,
 	"isnumeric": generalIsNumeric,
 	"typeof":    generalTypeOf,
+}
+
+var prototypes = map[string]Prototype{
+	// String functions
+	"lower":      {},
+	"upper":      {},
+	"reverse":    {},
+	"replicate":  {},
+	"space":      {},
+	"trim":       {},
+	"ltrim":      {},
+	"rtrim":      {},
+	"len":        {},
+	"ascii":      {},
+	"left":       {},
+	"datalength": {},
+	"char":       {},
+	"nchar":      {},
+	"replace":    {},
+	"substring":  {},
+	"stuff":      {},
+	"right":      {},
+	"translate":  {},
+	"soundex":    {},
+	"concat":     {},
+	"unicode":    {},
+
+	// Date functions
+	"current_date":      {},
+	"current_time":      {},
+	"current_timestamp": {},
+	"now":               {},
+	"makedate":          {},
+
+	// Numeric functions
+	"abs":    {},
+	"pi":     {},
+	"floor":  {},
+	"round":  {},
+	"square": {},
+	"sin":    {},
+	"asin":   {},
+	"cos":    {},
+	"tan":    {},
+
+	// General functions
+	"isnull":    {},
+	"isnumeric": {},
+	"typeof":    {},
 }
 
 // String functions
