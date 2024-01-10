@@ -11,9 +11,9 @@ import (
 type Ordering int
 
 const (
-	Less Ordering = iota
-	Equal
-	Greater
+	Less    = -1
+	Equal   = 0
+	Greater = 1
 )
 
 type Value interface {
