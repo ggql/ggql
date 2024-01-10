@@ -16,7 +16,7 @@ type Prototype struct {
 	Result     DataType
 }
 
-var functions = map[string]Function{
+var Functions = map[string]Function{
 	// String functions
 	"lower":      textLowercase,
 	"upper":      textUppercase,
@@ -65,53 +65,53 @@ var functions = map[string]Function{
 	"typeof":    generalTypeOf,
 }
 
-var prototypes = map[string]Prototype{
+var Prototypes = map[string]Prototype{
 	// String functions
-	"lower":      {},
-	"upper":      {},
-	"reverse":    {},
-	"replicate":  {},
-	"space":      {},
-	"trim":       {},
-	"ltrim":      {},
-	"rtrim":      {},
-	"len":        {},
-	"ascii":      {},
-	"left":       {},
-	"datalength": {},
-	"char":       {},
-	"nchar":      {},
-	"replace":    {},
-	"substring":  {},
-	"stuff":      {},
-	"right":      {},
-	"translate":  {},
-	"soundex":    {},
-	"concat":     {},
-	"unicode":    {},
+	"lower":      {Parameters: []DataType{Text}, Result: Text},
+	"upper":      {Parameters: []DataType{Text}, Result: Text},
+	"reverse":    {Parameters: []DataType{Text}, Result: Text},
+	"replicate":  {Parameters: []DataType{Text, Integer}, Result: Text},
+	"space":      {Parameters: []DataType{Integer}, Result: Text},
+	"trim":       {Parameters: []DataType{Text}, Result: Text},
+	"ltrim":      {Parameters: []DataType{Text}, Result: Text},
+	"rtrim":      {Parameters: []DataType{Text}, Result: Text},
+	"len":        {Parameters: []DataType{Text}, Result: Integer},
+	"ascii":      {Parameters: []DataType{Text}, Result: Integer},
+	"left":       {Parameters: []DataType{Text, Integer}, Result: Text},
+	"datalength": {Parameters: []DataType{Text}, Result: Integer},
+	"char":       {Parameters: []DataType{Integer}, Result: Text},
+	"nchar":      {Parameters: []DataType{Integer}, Result: Text},
+	"replace":    {Parameters: []DataType{Text, Text, Text}, Result: Text},
+	"substring":  {Parameters: []DataType{Text, Integer, Integer}, Result: Text},
+	"stuff":      {Parameters: []DataType{Text, Integer, Integer, Text}, Result: Text},
+	"right":      {Parameters: []DataType{Text, Integer}, Result: Text},
+	"translate":  {Parameters: []DataType{Text, Text, Text}, Result: Text},
+	"soundex":    {Parameters: []DataType{Text}, Result: Text},
+	"concat":     {Parameters: []DataType{Text, Text}, Result: Text},
+	"unicode":    {Parameters: []DataType{Text}, Result: Integer},
 
 	// Date functions
-	"current_date":      {},
-	"current_time":      {},
-	"current_timestamp": {},
-	"now":               {},
-	"makedate":          {},
+	"current_date":      {Parameters: []DataType{}, Result: Date},
+	"current_time":      {Parameters: []DataType{}, Result: Time},
+	"current_timestamp": {Parameters: []DataType{}, Result: DateTime},
+	"now":               {Parameters: []DataType{}, Result: DateTime},
+	"makedate":          {Parameters: []DataType{Integer, Integer}, Result: Date},
 
 	// Numeric functions
-	"abs":    {},
-	"pi":     {},
-	"floor":  {},
-	"round":  {},
-	"square": {},
-	"sin":    {},
-	"asin":   {},
-	"cos":    {},
-	"tan":    {},
+	"abs":    {Parameters: []DataType{Integer}, Result: Integer},
+	"pi":     {Parameters: []DataType{}, Result: Float},
+	"floor":  {Parameters: []DataType{Float}, Result: Integer},
+	"round":  {Parameters: []DataType{Float}, Result: Integer},
+	"square": {Parameters: []DataType{Integer}, Result: Integer},
+	"sin":    {Parameters: []DataType{Float}, Result: Float},
+	"asin":   {Parameters: []DataType{Float}, Result: Float},
+	"cos":    {Parameters: []DataType{Float}, Result: Float},
+	"tan":    {Parameters: []DataType{Float}, Result: Float},
 
 	// General functions
-	"isnull":    {},
-	"isnumeric": {},
-	"typeof":    {},
+	"isnull":    {Parameters: []DataType{Any}, Result: Boolean},
+	"isnumeric": {Parameters: []DataType{Any}, Result: Boolean},
+	"typeof":    {Parameters: []DataType{Any}, Result: Text},
 }
 
 // String functions
