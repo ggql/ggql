@@ -67,7 +67,7 @@ func (v IntegerValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsInt(), other.AsInt()), nil
+	return helper(other.AsInt(), v.AsInt()), nil
 }
 
 func (v IntegerValue) Plus(other Value) (Value, error) {
@@ -217,7 +217,7 @@ func (v FloatValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsFloat(), other.AsFloat()), nil
+	return helper(other.AsFloat(), v.AsFloat()), nil
 }
 
 func (v FloatValue) Plus(other Value) (Value, error) {
@@ -338,7 +338,7 @@ func (v TextValue) Equals(other Value) bool {
 
 func (v TextValue) Compare(other Value) (Ordering, error) {
 	helper := func(a, b string) Ordering {
-		ret := strings.Compare(other.AsText(), other.AsText())
+		ret := strings.Compare(a, b)
 		if ret == -1 {
 			return Less
 		} else if ret == 1 {
@@ -351,7 +351,7 @@ func (v TextValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsText(), other.AsText()), nil
+	return helper(other.AsText(), v.AsText()), nil
 }
 
 func (v TextValue) Plus(other Value) (Value, error) {
@@ -516,7 +516,7 @@ func (v DateTimeValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsDateTime(), other.AsDateTime()), nil
+	return helper(other.AsDateTime(), v.AsDateTime()), nil
 }
 
 func (v DateTimeValue) Plus(other Value) (Value, error) {
@@ -603,7 +603,7 @@ func (v DateValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsDate(), other.AsDate()), nil
+	return helper(other.AsDate(), v.AsDate()), nil
 }
 
 func (v DateValue) Plus(other Value) (Value, error) {
@@ -678,7 +678,7 @@ func (v TimeValue) Equals(other Value) bool {
 
 func (v TimeValue) Compare(other Value) (Ordering, error) {
 	helper := func(a, b string) Ordering {
-		ret := strings.Compare(other.AsText(), other.AsText())
+		ret := strings.Compare(a, b)
 		if ret == -1 {
 			return Less
 		} else if ret == 1 {
@@ -691,7 +691,7 @@ func (v TimeValue) Compare(other Value) (Ordering, error) {
 		return Less, errors.New("invalid data type")
 	}
 
-	return helper(v.AsTime(), other.AsTime()), nil
+	return helper(other.AsTime(), v.AsTime()), nil
 }
 
 func (v TimeValue) Plus(other Value) (Value, error) {
