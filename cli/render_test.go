@@ -42,7 +42,6 @@ func TestPrintGroupAsTable(t *testing.T) {
 	var group []ast.GQLObject
 	var tableHeaders []string
 	var titles []string
-	var val ast.Value
 
 	titles = append(titles, "title1", "title2")
 
@@ -52,8 +51,8 @@ func TestPrintGroupAsTable(t *testing.T) {
 
 	group = append(group, ast.GQLObject{
 		Attributes: map[string]ast.Value{
-			"title1": val,
-			"title2": val,
+			"title1": ast.TextValue{Value: "value1"},
+			"title2": ast.TextValue{Value: "value2"},
 		},
 	})
 

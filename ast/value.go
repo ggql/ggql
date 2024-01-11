@@ -38,7 +38,7 @@ type Value interface {
 // IntegerValue implementation
 
 type IntegerValue struct {
-	value int64
+	Value int64
 }
 
 func (v IntegerValue) DataType() DataType {
@@ -158,11 +158,11 @@ func (v IntegerValue) Literal() string {
 }
 
 func (v IntegerValue) AsInt() int64 {
-	return v.value
+	return v.Value
 }
 
 func (v IntegerValue) AsFloat() float64 {
-	return float64(v.value)
+	return float64(v.Value)
 }
 
 func (v IntegerValue) AsText() string {
@@ -188,7 +188,7 @@ func (v IntegerValue) AsTime() string {
 // FloatValue implementation
 
 type FloatValue struct {
-	value float64
+	Value float64
 }
 
 func (v FloatValue) DataType() DataType {
@@ -291,11 +291,11 @@ func (v FloatValue) Literal() string {
 }
 
 func (v FloatValue) AsInt() int64 {
-	return int64(v.value)
+	return int64(v.Value)
 }
 
 func (v FloatValue) AsFloat() float64 {
-	return v.value
+	return v.Value
 }
 
 func (v FloatValue) AsText() string {
@@ -321,7 +321,7 @@ func (v FloatValue) AsTime() string {
 // TextValue implementation
 
 type TextValue struct {
-	value string
+	Value string
 }
 
 func (v TextValue) DataType() DataType {
@@ -387,7 +387,7 @@ func (v TextValue) AsFloat() float64 {
 }
 
 func (v TextValue) AsText() string {
-	return v.value
+	return v.Value
 }
 
 func (v TextValue) AsBool() bool {
@@ -409,7 +409,7 @@ func (v TextValue) AsTime() string {
 // BooleanValue implementation
 
 type BooleanValue struct {
-	value bool
+	Value bool
 }
 
 func (v BooleanValue) DataType() DataType {
@@ -469,7 +469,7 @@ func (v BooleanValue) AsText() string {
 }
 
 func (v BooleanValue) AsBool() bool {
-	return v.value
+	return v.Value
 }
 
 func (v BooleanValue) AsDateTime() int64 {
@@ -487,7 +487,7 @@ func (v BooleanValue) AsTime() string {
 // DateTimeValue implementation
 
 type DateTimeValue struct {
-	value int64
+	Value int64
 }
 
 func (v DateTimeValue) DataType() DataType {
@@ -560,7 +560,7 @@ func (v DateTimeValue) AsBool() bool {
 }
 
 func (v DateTimeValue) AsDateTime() int64 {
-	return v.value
+	return v.Value
 }
 
 func (v DateTimeValue) AsDate() int64 {
@@ -574,7 +574,7 @@ func (v DateTimeValue) AsTime() string {
 // DateValue implementation
 
 type DateValue struct {
-	value int64
+	Value int64
 }
 
 func (v DateValue) DataType() DataType {
@@ -651,7 +651,7 @@ func (v DateValue) AsDateTime() int64 {
 }
 
 func (v DateValue) AsDate() int64 {
-	return v.value
+	return v.Value
 }
 
 func (v DateValue) AsTime() string {
@@ -661,7 +661,7 @@ func (v DateValue) AsTime() string {
 // TimeValue implementation
 
 type TimeValue struct {
-	value string
+	Value string
 }
 
 func (v TimeValue) DataType() DataType {
@@ -727,7 +727,7 @@ func (v TimeValue) AsFloat() float64 {
 }
 
 func (v TimeValue) AsText() string {
-	return v.value
+	return v.Value
 }
 
 func (v TimeValue) AsBool() bool {
@@ -743,13 +743,13 @@ func (v TimeValue) AsDate() int64 {
 }
 
 func (v TimeValue) AsTime() string {
-	return v.value
+	return v.Value
 }
 
 // Undefined implementation
 
 type UndefinedValue struct {
-	value interface{}
+	Value interface{}
 }
 
 func (v UndefinedValue) DataType() DataType {
@@ -823,7 +823,7 @@ func (v UndefinedValue) AsTime() string {
 // NullValue implementation
 
 type NullValue struct {
-	value interface{}
+	Value interface{}
 }
 
 func (v NullValue) DataType() DataType {
