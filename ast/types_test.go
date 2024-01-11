@@ -5,6 +5,11 @@ import (
 )
 
 func TestDataType(t *testing.T) {
+	// Test Clone method
+	if Integer.Clone() != Integer {
+		t.Error("Integer.Clone() should be Integer")
+	}
+
 	// Test isType method
 	if !Any.isType(Any) {
 		t.Error("Any.isType(Any) should be true")

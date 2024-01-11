@@ -30,6 +30,10 @@ const (
 	UnknownStr   = "Unknown"
 )
 
+func (dt DataType) Clone() DataType {
+	return dt
+}
+
 // isType checks if the data type matches the given type.
 func (dt DataType) isType(dataType DataType) bool {
 	return dt == dataType
