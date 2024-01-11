@@ -299,7 +299,7 @@ func (v FloatValue) AsFloat() float64 {
 }
 
 func (v FloatValue) AsText() string {
-	return strconv.FormatFloat(v.AsFloat(), 'E', -1, 64)
+	return strconv.FormatFloat(v.AsFloat(), 'g', -1, 64)
 }
 
 func (v FloatValue) AsBool() bool {
@@ -753,7 +753,7 @@ type UndefinedValue struct {
 }
 
 func (v UndefinedValue) DataType() DataType {
-	return Null
+	return Undefined
 }
 
 func (v UndefinedValue) Equals(other Value) bool {
