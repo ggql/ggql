@@ -5,35 +5,11 @@ import (
 )
 
 const (
-	TEST_TIME           = "08:30:00"
-	TEST_DATE           = "2024-01-02"
-	TEST_DATE_TIME      = "2024-01-02 08:30:00"
-	TEST_DATE_TIME_FULL = "2024-01-02 08:30:00.000"
+	TestTime         = "08:30:00"
+	TestDate         = "2024-01-02"
+	TestDateTime     = "2024-01-02 08:30:00"
+	TestDateTimeFull = "2024-01-02 08:30:00.000"
 )
-
-func Test_TimeStampFromYearAndDay(t *testing.T) {
-	type args struct {
-		year      int
-		dayOfYear uint
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want int64
-	}{
-		// TODO: Add test cases.
-		{name: "", args: args{year: 2024, dayOfYear: 2}, want: 1704153600},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampFromYearAndDay(tt.args.year, tt.args.dayOfYear); got != tt.want {
-				t.Errorf("timeStampFromYearAndDay() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestTimeStampToDate(t *testing.T) {
 	type args struct {
@@ -45,8 +21,7 @@ func TestTimeStampToDate(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
-		{name: "test1", args: args{timeStamp: 1704153600}, want: TEST_DATE},
+		{name: "test1", args: args{timeStamp: 1704153600}, want: TestDate},
 	}
 
 	for _, tt := range tests {
@@ -68,37 +43,13 @@ func TestTimeStampToDateTime(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
-		{name: "test1", args: args{timeStamp: 1704155400}, want: TEST_DATE_TIME},
+		{name: "test1", args: args{timeStamp: 1704155400}, want: TestDateTime},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TimeStampToDateTime(tt.args.timeStamp); got != tt.want {
 				t.Errorf("TimeStampToDateTime() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestTimeStampToFullDateTime(t *testing.T) {
-	type args struct {
-		timeStamp int64
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		// TODO: Add test cases.
-		{name: "test1", args: args{timeStamp: 1704155400}, want: TEST_DATE_TIME_FULL},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampToFullDateTime(tt.args.timeStamp); got != tt.want {
-				t.Errorf("TimeStampToFullDateTime() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -114,8 +65,7 @@ func TestDateToTimeStamp(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
-		{name: "test1", args: args{date: TEST_DATE}, want: 1704153600},
+		{name: "test1", args: args{date: TestDate}, want: 1704153600},
 	}
 
 	for _, tt := range tests {
@@ -137,9 +87,8 @@ func TestDateTimeToTimeStamp(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
-		{name: "test1", args: args{date: TEST_DATE_TIME}, want: 1704184200},
-		{name: "test2", args: args{date: TEST_DATE_TIME_FULL}, want: 1704184200},
+		{name: "test1", args: args{date: TestDateTime}, want: 1704184200},
+		{name: "test2", args: args{date: TestDateTimeFull}, want: 1704184200},
 	}
 
 	for _, tt := range tests {
@@ -161,7 +110,6 @@ func TestTimeStampToTime(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		{name: "test1", args: args{timeStamp: 1704155400}, want: "08:30:00"},
 	}
 
@@ -185,7 +133,6 @@ func TestTimeStampFromYearAndDay(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
 		{name: "test1", args: args{year: 2024, dayOfYear: 2}, want: 1704153600},
 	}
 
@@ -208,8 +155,7 @@ func TestIsValidTimeFormat(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
-		{name: "test-ok", args: args{timeStr: TEST_TIME}, want: true},
+		{name: "test-ok", args: args{timeStr: TestTime}, want: true},
 		{name: "test-err1", args: args{timeStr: "8:30"}, want: false},
 		{name: "test-err2", args: args{timeStr: "8:70"}, want: false},
 		{name: "test-err3", args: args{timeStr: "33:20:00"}, want: false},
@@ -234,8 +180,7 @@ func TestIsValidDateFormat(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
-		{name: "test-ok", args: args{dateStr: TEST_DATE}, want: true},
+		{name: "test-ok", args: args{dateStr: TestDate}, want: true},
 		{name: "test-err1", args: args{dateStr: "2024-33-04"}, want: false},
 		{name: "test-err2", args: args{dateStr: "2024-01-60"}, want: false},
 	}
@@ -259,9 +204,8 @@ func TestIsValidDateTimeFormat(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
-		{name: "test-ok1", args: args{datetimeStr: TEST_DATE_TIME}, want: true},
-		{name: "test-ok2", args: args{datetimeStr: TEST_DATE_TIME_FULL}, want: true},
+		{name: "test-ok1", args: args{datetimeStr: TestDateTime}, want: true},
+		{name: "test-ok2", args: args{datetimeStr: TestDateTimeFull}, want: true},
 		{name: "test-err1", args: args{datetimeStr: "2024-33-02 08:30:00"}, want: false},
 		{name: "test-err2", args: args{datetimeStr: "2024-01-53 08:30:00"}, want: false},
 		{name: "test-err3", args: args{datetimeStr: "2024-01-02 35:30:00"}, want: false},

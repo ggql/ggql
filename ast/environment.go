@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var TABLES_FIELDS_NAMES = map[string][]string{
+var TablesFieldsNames = map[string][]string{
 	"refs":     {"name", "full_name", "type", "repo"},
 	"commits":  {"commit_id", "title", "message", "name", "email", "datetime", "repo"},
 	"branches": {"name", "commit_count", "is_head", "is_remote", "repo"},
@@ -50,7 +50,7 @@ func (env *Environment) Contains(str string) bool {
 	_, bGlobalsTypesExist := env.GlobalsTypes[str]
 	_, bScopesExist := env.Scopes[str]
 
-	return (bScopesExist || bGlobalsTypesExist)
+	return bScopesExist || bGlobalsTypesExist
 }
 
 func (env *Environment) ResolveType(str string) interface{} {

@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	CHRONO_TIME_FORMAT           = "15:04:05"
-	CHRONO_DATE_FORMAT           = "2006-01-02"
-	CHRONO_DATE_TIME_FORMAT      = "2006-01-02 15:04:05"
-	CHRONO_DATE_TIME_FULL_FORMAT = "2006-01-02 15:04:05.000"
+	ChronoTimeFormat         = "15:04:05"
+	ChronoDateFormat         = "2006-01-02"
+	ChronoDateTimeFormat     = "2006-01-02 15:04:05"
+	ChronoDateTimeFullFormat = "2006-01-02 15:04:05.000"
 )
 
 // nolint:gomnd
@@ -21,38 +21,32 @@ func GetUnixTimestampMs() int64 {
 func TimeStampToDate(timeStamp int64) string {
 	t := time.Unix(timeStamp, 0)
 
-	return t.Format(CHRONO_DATE_FORMAT)
+	return t.Format(ChronoDateFormat)
 }
 
 func TimeStampToTime(timeStamp int64) string {
 	t := time.Unix(timeStamp, 0)
 
-	return t.Format(CHRONO_TIME_FORMAT)
+	return t.Format(ChronoTimeFormat)
 }
 
 func TimeStampToDateTime(timeStamp int64) string {
 	t := time.Unix(timeStamp, 0)
 
-	return t.Format(CHRONO_DATE_TIME_FORMAT)
-}
-
-func TimeStampToFullDateTime(timeStamp int64) string {
-	t := time.Unix(timeStamp, 0)
-
-	return t.Format(CHRONO_DATE_TIME_FULL_FORMAT)
+	return t.Format(ChronoDateTimeFormat)
 }
 
 func DateToTimeStamp(date string) int64 {
-	t, _ := time.Parse(CHRONO_DATE_FORMAT, date)
+	t, _ := time.Parse(ChronoDateFormat, date)
 
 	return t.Unix()
 }
 
 func DateTimeToTimeStamp(date string) int64 {
-	data_format := CHRONO_DATE_TIME_FORMAT
+	data_format := ChronoDateTimeFormat
 
 	if strings.Contains(date, ".") {
-		data_format = CHRONO_DATE_TIME_FULL_FORMAT
+		data_format = ChronoDateTimeFullFormat
 	}
 
 	t, _ := time.Parse(data_format, date)
