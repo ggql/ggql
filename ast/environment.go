@@ -29,40 +29,40 @@ func NewEnvironment() *Environment {
 	}
 }
 
-func (env *Environment) Define(str string, dataType DataType) {
-	env.mutex.Lock()
-	defer env.mutex.Unlock()
+func (e *Environment) Define(str string, dataType DataType) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 
-	env.Scopes[str] = dataType
+	e.Scopes[str] = dataType
 }
 
-func (env *Environment) DefineGlobal(str string, dataType DataType) {
-	env.mutex.Lock()
-	defer env.mutex.Unlock()
+func (e *Environment) DefineGlobal(str string, dataType DataType) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 
-	env.GlobalsTypes[str] = dataType
+	e.GlobalsTypes[str] = dataType
 }
 
-func (env *Environment) Contains(str string) bool {
-	env.mutex.Lock()
-	defer env.mutex.Unlock()
+func (e *Environment) Contains(str string) bool {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 
-	_, bGlobalsTypesExist := env.GlobalsTypes[str]
-	_, bScopesExist := env.Scopes[str]
+	_, bGlobalsTypesExist := e.GlobalsTypes[str]
+	_, bScopesExist := e.Scopes[str]
 
 	return bScopesExist || bGlobalsTypesExist
 }
 
-func (env *Environment) ResolveType(str string) interface{} {
-	env.mutex.Lock()
-	defer env.mutex.Unlock()
+func (e *Environment) ResolveType(str string) interface{} {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 
 	if strings.HasPrefix(str, "@") {
-		if value, bGlobalsTypesExist := env.GlobalsTypes[str]; bGlobalsTypesExist {
+		if value, bGlobalsTypesExist := e.GlobalsTypes[str]; bGlobalsTypesExist {
 			return value
 		}
 	} else {
-		if value, bScopesExist := env.Scopes[str]; bScopesExist {
+		if value, bScopesExist := e.Scopes[str]; bScopesExist {
 			return value
 		}
 	}
@@ -70,9 +70,9 @@ func (env *Environment) ResolveType(str string) interface{} {
 	return nil
 }
 
-func (env *Environment) ClearSession() {
-	env.mutex.Lock()
-	defer env.mutex.Unlock()
+func (e *Environment) ClearSession() {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 
-	env.Scopes = make(map[string]DataType)
+	e.Scopes = make(map[string]DataType)
 }
