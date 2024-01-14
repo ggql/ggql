@@ -346,6 +346,19 @@ type CallExpression struct {
 	IsAggregation bool
 }
 
+func (s *CallExpression) ExpressionKind() ExpressionKind {
+	return ExprCall
+}
+
+func (s *CallExpression) ExprType(scope *Environment) DataType {
+	prototype := Prototypes[s.FunctionName]
+	return prototype.Result.Clone()
+}
+
+func (s *CallExpression) AsAny() interface{} {
+	return s
+}
+
 type BetweenExpression struct {
 	Value      Expression
 	RangeStart Expression

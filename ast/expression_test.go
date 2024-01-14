@@ -310,6 +310,28 @@ func TestBitwiseExpressionKind(t *testing.T) {
 	}
 }
 
+func TestCallExpressionKind(t *testing.T) {
+	testEnvironment := &Environment{
+		Scopes: make(map[string]DataType),
+	}
+
+	callExpr := &CallExpression{
+		FunctionName: "upper",
+	}
+
+	if kind := callExpr.ExpressionKind(); kind != ExprCall {
+		t.Errorf("Expected CallExpression %v, got %v", ExprCall, kind)
+	}
+
+	if dataType := callExpr.ExprType(testEnvironment); dataType != Text {
+		t.Errorf("ExprType() returned %v, expected %v", dataType, Text)
+	}
+
+	if anyValue := callExpr.AsAny(); anyValue != callExpr {
+		t.Errorf("AsAny() returned %v, expected %v", anyValue, callExpr)
+	}
+}
+
 func TestBetweenExpressionKind(t *testing.T) {
 	testEnvironment := &Environment{
 		Scopes: make(map[string]DataType),
