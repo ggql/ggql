@@ -2,7 +2,8 @@ package ast
 
 import (
 	"strings"
-	"sync"
+
+	"github.com/pkg/errors"
 )
 
 var TablesFieldsNames = map[string][]string{
@@ -17,62 +18,39 @@ type Environment struct {
 	Globals      map[string]Value
 	GlobalsTypes map[string]DataType
 	Scopes       map[string]DataType
-	mutex        sync.RWMutex
-}
-
-func NewEnvironment() *Environment {
-	return &Environment{
-		Globals:      make(map[string]Value),
-		GlobalsTypes: make(map[string]DataType),
-		Scopes:       make(map[string]DataType),
-		mutex:        sync.RWMutex{},
-	}
 }
 
 func (e *Environment) Define(str string, dataType DataType) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
 	e.Scopes[str] = dataType
 }
 
 func (e *Environment) DefineGlobal(str string, dataType DataType) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
 	e.GlobalsTypes[str] = dataType
 }
 
 func (e *Environment) Contains(str string) bool {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+	_, globalsTypesOk := e.GlobalsTypes[str]
+	_, scopesOk := e.Scopes[str]
 
-	_, bGlobalsTypesExist := e.GlobalsTypes[str]
-	_, bScopesExist := e.Scopes[str]
-
-	return bScopesExist || bGlobalsTypesExist
+	return scopesOk || globalsTypesOk
 }
 
-func (e *Environment) ResolveType(str string) interface{} {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
+func (e *Environment) ResolveType(str string) (DataType, error) {
 	if strings.HasPrefix(str, "@") {
-		if value, bGlobalsTypesExist := e.GlobalsTypes[str]; bGlobalsTypesExist {
-			return value
-		}
-	} else {
-		if value, bScopesExist := e.Scopes[str]; bScopesExist {
-			return value
+		if val, ok := e.GlobalsTypes[str]; ok {
+			return val, nil
+		} else {
+			return Undefined, errors.New("invalid data type")
 		}
 	}
 
-	return nil
+	if val, ok := e.Scopes[str]; ok {
+		return val, nil
+	} else {
+		return Undefined, errors.New("invalid data type")
+	}
 }
 
 func (e *Environment) ClearSession() {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
 	e.Scopes = make(map[string]DataType)
 }
