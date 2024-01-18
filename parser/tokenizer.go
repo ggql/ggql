@@ -94,12 +94,13 @@ type Token struct {
 }
 
 // nolint:funlen,gocyclo
-func tokenize(script string) ([]Token, GQLError) {
+func Tokenize(script string) ([]Token, GQLError) {
 	var tokens []Token
 
-	characters := []rune(script)
 	position := 0
 	columnStart := 0
+
+	characters := []rune(script)
 	length := len(characters)
 
 	for position < length {
@@ -127,9 +128,10 @@ func tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeHexNumber(characters, &position, &columnStart)
-					if err.Message == "" {
-						tokens = append(tokens, result)
+					if err.Message != "" {
+						return nil, err
 					}
+					tokens = append(tokens, result)
 					continue
 				}
 
@@ -137,9 +139,10 @@ func tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeBinaryNumber(characters, &position, &columnStart)
-					if err.Message == "" {
-						tokens = append(tokens, result)
+					if err.Message != "" {
+						return nil, err
 					}
+					tokens = append(tokens, result)
 					continue
 				}
 
@@ -147,85 +150,277 @@ func tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeOctalNumber(characters, &position, &columnStart)
-					if err.Message == "" {
-						tokens = append(tokens, result)
+					if err.Message != "" {
+						return nil, err
 					}
+					tokens = append(tokens, result)
 					continue
 				}
 			}
 
 			number, err := consumeNumber(characters, &position, &columnStart)
-			if err.Message == "" {
-				tokens = append(tokens, number)
+			if err.Message != "" {
+				return nil, err
 			}
+			tokens = append(tokens, number)
 			continue
 		}
 
 		// String literal
 		if char == '"' {
 			result, err := consumeString(characters, &position, &columnStart)
-			if err.Message == "" {
-				tokens = append(tokens, result)
+			if err.Message != "" {
+				return nil, err
 			}
+			tokens = append(tokens, result)
 			continue
 		}
 
 		// Plus
-		// TODO: FIXME
+		if char == '+' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Plus, Literal: "+"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Minus
-		// TODO: FIXME
+		if char == '-' {
+			// Ignore single line comment which from -- until the end of the current line
+			if (position+1 < len(characters)) && (characters[position+1] == '-') {
+				ignoreSingleLineComment(characters, &position)
+				continue
+			}
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Minus, Literal: "-"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Star
-		// TODO: FIXME
+		if char == '*' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Star, Literal: "*"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Slash
-		// TODO: FIXME
+		if char == '/' {
+			// Ignore C style comment which from /* comment */
+			if (position+1 < len(characters)) && (characters[position+1] == '*') {
+				err := ignoreCStyleComment(characters, &position)
+				if err.Message != "" {
+					return nil, err
+				}
+				continue
+			}
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Slash, Literal: "/"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Percentage
-		// TODO: FIXME
+		if char == '%' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Percentage, Literal: "%"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Or
-		// TODO: FIXME
+		if char == '|' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := BitwiseOr
+			literal := "|"
+			if (position < length) && (characters[position] == '|') {
+				position += 1
+				kind = LogicalOr
+				literal = "||"
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// And
-		// TODO: FIXME
+		if char == '&' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := BitwiseAnd
+			literal := "&"
+			if (position < length) && (characters[position] == '&') {
+				position += 1
+				kind = LogicalAnd
+				literal = "&&"
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// Xor
-		// TODO: FIXME
+		if char == '^' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: LogicalXor, Literal: "^"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Comma
-		// TODO: FIXME
+		if char == ',' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Comma, Literal: ","}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Dot or Range (DotDot)
-		// TODO: FIXME
+		if char == '.' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := Dot
+			literal := "."
+			if (position < length) && (characters[position] == '.') {
+				position += 1
+				kind = DotDot
+				literal = ".."
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// Greater or GreaterEqual
-		// TODO: FIXME
+		if char == '>' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := Greater
+			literal := ">"
+			if (position < length) && (characters[position] == '=') {
+				position += 1
+				kind = GreaterEqual
+				literal = ">="
+			} else if (position < length) && (characters[position] == '>') {
+				position += 1
+				kind = BitwiseRightShift
+				literal = ">>"
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// Less, LessEqual or NULL-safe equal
-		// TODO: FIXME
+		if char == '<' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := Less
+			literal := "<"
+			if (position < length) && (characters[position] == '=') {
+				position += 1
+				if (position < length) && (characters[position] == '>') {
+					position += 1
+					kind = NullSafeEqual
+					literal = "<=>"
+				} else {
+					kind = LessEqual
+					literal = "<="
+				}
+			} else if (position < length) && (characters[position] == '<') {
+				position += 1
+				kind = BitwiseLeftShift
+				literal = "<<"
+			} else if (position < length) && (characters[position] == '>') {
+				position += 1
+				kind = BangEqual
+				literal = "<>"
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// Equal
-		// TODO: FIXME
+		if char == '=' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Equal, Literal: "="}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Colon Equal
-		// TODO: FIXME
+		if char == ':' {
+			if (position+1 < length) && (characters[position+1] == '=') {
+				location := Location{Start: columnStart, End: position}
+				token := Token{Location: location, Kind: ColonEqual, Literal: ":="}
+				tokens = append(tokens, token)
+				position += 2
+				continue
+			}
+			return nil, GQLError{Message: "Expect `=` after `:`", Location: Location{Start: columnStart, End: position}}
+		}
 
 		// Bang or Bang Equal
-		// TODO: FIXME
+		if char == '!' {
+			location := Location{Start: columnStart, End: position}
+			position += 1
+			kind := Bang
+			literal := "!"
+			if (position < length) && (characters[position] == '=') {
+				position += 1
+				kind = BangEqual
+				literal = "!="
+			}
+			token := Token{Location: location, Kind: kind, Literal: literal}
+			tokens = append(tokens, token)
+			continue
+		}
 
 		// Left Paren
-		// TODO: FIXME
+		if char == '(' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: LeftParen, Literal: "("}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Right Paren
-		// TODO: FIXME
+		if char == ')' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: RightParen, Literal: ")"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Semicolon
-		// TODO: FIXME
+		if char == ';' {
+			location := Location{Start: columnStart, End: position}
+			token := Token{Location: location, Kind: Semicolon, Literal: ";"}
+			tokens = append(tokens, token)
+			position += 1
+			continue
+		}
 
 		// Characters to ignoring
-		// TODO: FIXME
+		if char == ' ' || char == '\n' || char == '\t' {
+			position += 1
+			continue
+		}
+
+		return nil, GQLError{Message: "Unexpected character", Location: Location{Start: columnStart, End: position}}
 	}
 
 	return tokens, GQLError{}
