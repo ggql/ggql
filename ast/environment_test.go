@@ -14,7 +14,7 @@ func TestDefine(t *testing.T) {
 	}
 
 	env.Define("key1", Text)
-	assert.Equal(t, true, env.Scopes["key1"].isText())
+	assert.Equal(t, true, env.Scopes["key1"].IsText())
 }
 
 func TestDefineGlobal(t *testing.T) {
@@ -25,7 +25,7 @@ func TestDefineGlobal(t *testing.T) {
 	}
 
 	env.DefineGlobal("key1", Text)
-	assert.Equal(t, true, env.GlobalsTypes["key1"].isText())
+	assert.Equal(t, true, env.GlobalsTypes["key1"].IsText())
 }
 
 func TestContains(t *testing.T) {
@@ -52,12 +52,12 @@ func TestResolveType(t *testing.T) {
 	env.Define("key1", Text)
 	ret, err := env.ResolveType("key1")
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, ret.isText())
+	assert.Equal(t, true, ret.IsText())
 
 	env.DefineGlobal("@key2", Text)
 	ret, err = env.ResolveType("@key2")
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, ret.isText())
+	assert.Equal(t, true, ret.IsText())
 }
 
 func TestClearSession(t *testing.T) {

@@ -34,53 +34,43 @@ func (dt DataType) Clone() DataType {
 	return dt
 }
 
-// isType checks if the data type matches the given type.
-func (dt DataType) isType(dataType DataType) bool {
+func (dt DataType) IsType(dataType DataType) bool {
 	return dt == dataType
 }
 
-// isInt checks if the data type is Integer.
-func (dt DataType) isInt() bool {
-	return dt.isType(Integer)
+func (dt DataType) IsInt() bool {
+	return dt.IsType(Integer)
 }
 
-// isFloat checks if the data type is Float.
-func (dt DataType) isFloat() bool {
-	return dt.isType(Float)
+func (dt DataType) IsFloat() bool {
+	return dt.IsType(Float)
 }
 
-// isNumber checks if the data type is Integer or Float.
-func (dt DataType) isNumber() bool {
-	return dt.isInt() || dt.isFloat()
+func (dt DataType) IsNumber() bool {
+	return dt.IsInt() || dt.IsFloat()
 }
 
-// isText checks if the data type is Text.
-func (dt DataType) isText() bool {
-	return dt.isType(Text)
+func (dt DataType) IsText() bool {
+	return dt.IsType(Text)
 }
 
-// isTime checks if the data type is Time.
-func (dt DataType) isTime() bool {
-	return dt.isType(Time)
+func (dt DataType) IsTime() bool {
+	return dt.IsType(Time)
 }
 
-// isDate checks if the data type is Date.
-func (dt DataType) isDate() bool {
-	return dt.isType(Date)
+func (dt DataType) IsDate() bool {
+	return dt.IsType(Date)
 }
 
-// isDateTime checks if the data type is DateTime.
-func (dt DataType) isDateTime() bool {
-	return dt.isType(DateTime)
+func (dt DataType) IsDateTime() bool {
+	return dt.IsType(DateTime)
 }
 
-// isUndefined checks if the data type is Undefined.
-func (dt DataType) isUndefined() bool {
-	return dt.isType(Undefined)
+func (dt DataType) IsUndefined() bool {
+	return dt.IsType(Undefined)
 }
 
-// literal returns the string representation of the data type.
-func (dt DataType) literal() string {
+func (dt DataType) Literal() string {
 	switch dt {
 	case Any:
 		return AnyStr

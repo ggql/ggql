@@ -12,7 +12,7 @@ import (
 func TestIntegerValueDataType(t *testing.T) {
 	value := IntegerValue{1}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isInt())
+	assert.Equal(t, true, ret.IsInt())
 }
 
 func TestIntegerValueEquals(t *testing.T) {
@@ -202,7 +202,7 @@ func TestIntegerValueAsTime(t *testing.T) {
 func TestFloatValueDataType(t *testing.T) {
 	value := FloatValue{1.0}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isFloat())
+	assert.Equal(t, true, ret.IsFloat())
 }
 
 func TestFloatValueEquals(t *testing.T) {
@@ -391,7 +391,7 @@ func TestFloatValueAsTime(t *testing.T) {
 func TestTextValueDataType(t *testing.T) {
 	value := TextValue{"hello"}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isText())
+	assert.Equal(t, true, ret.IsText())
 }
 
 func TestTextValueEquals(t *testing.T) {
@@ -482,7 +482,7 @@ func TestTextValueAsTime(t *testing.T) {
 func TestBooleanValueDataType(t *testing.T) {
 	value := BooleanValue{false}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isType(Boolean))
+	assert.Equal(t, true, ret.IsType(Boolean))
 }
 
 func TestBooleanValueEquals(t *testing.T) {
@@ -569,7 +569,7 @@ func TestBooleanValueAsTime(t *testing.T) {
 func TestDateTimeValueDataType(t *testing.T) {
 	value := DateTimeValue{1704890191}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isDateTime())
+	assert.Equal(t, true, ret.IsDateTime())
 }
 
 func TestDateTimeValueEquals(t *testing.T) {
@@ -661,7 +661,7 @@ func TestDateTimeValueAsTime(t *testing.T) {
 func TestDateValueDataType(t *testing.T) {
 	value := DateValue{1704890191}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isDate())
+	assert.Equal(t, true, ret.IsDate())
 }
 
 func TestDateValueEquals(t *testing.T) {
@@ -753,7 +753,7 @@ func TestDateValueAsTime(t *testing.T) {
 func TestTimeValueDataType(t *testing.T) {
 	value := TimeValue{"12:36:31"}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isTime())
+	assert.Equal(t, true, ret.IsTime())
 }
 
 func TestTimeValueEquals(t *testing.T) {
@@ -845,7 +845,7 @@ func TestTimeValueAsTime(t *testing.T) {
 func TestUndefinedValueDataType(t *testing.T) {
 	value := UndefinedValue{}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isType(Undefined))
+	assert.Equal(t, true, ret.IsType(Undefined))
 }
 
 func TestUndefinedValueEquals(t *testing.T) {
@@ -925,7 +925,7 @@ func TestUndefinedValueAsTime(t *testing.T) {
 func TestNullValueDataType(t *testing.T) {
 	value := NullValue{}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.isType(Null))
+	assert.Equal(t, true, ret.IsType(Null))
 }
 
 func TestNullValueEquals(t *testing.T) {

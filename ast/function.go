@@ -433,12 +433,12 @@ func numericTan(inputs []Value) Value {
 // General functions
 
 func generalIsNull(inputs []Value) Value {
-	return BooleanValue{inputs[0].DataType().isType(Null)}
+	return BooleanValue{inputs[0].DataType().IsType(Null)}
 }
 
 func generalIsNumeric(inputs []Value) Value {
 	inputType := inputs[0].DataType()
-	isNumber := inputType.isInt() || inputType.isFloat()
+	isNumber := inputType.IsInt() || inputType.IsFloat()
 
 	return BooleanValue{isNumber}
 }
@@ -446,5 +446,5 @@ func generalIsNumeric(inputs []Value) Value {
 func generalTypeOf(inputs []Value) Value {
 	inputType := inputs[0].DataType()
 
-	return TextValue{inputType.literal()}
+	return TextValue{inputType.Literal()}
 }

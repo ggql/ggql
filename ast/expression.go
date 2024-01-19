@@ -208,7 +208,7 @@ func (s *ArithmeticExpression) ExprType(scope *Environment) DataType {
 	lhs := s.Left.ExprType(scope)
 	rhs := s.Right.ExprType(scope)
 
-	if lhs.isInt() && rhs.isInt() {
+	if lhs.IsInt() && rhs.IsInt() {
 		return Integer
 	}
 
