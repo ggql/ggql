@@ -19,7 +19,7 @@ const (
 )
 
 type Statement interface {
-	GetStatementKind() StatementKind
+	Kind() StatementKind
 	AsAny() reflect.Value
 }
 
@@ -47,7 +47,7 @@ func (s *SelectStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *SelectStatement) GetStatementKind() StatementKind {
+func (s *SelectStatement) Kind() StatementKind {
 	return Select
 }
 
@@ -59,7 +59,7 @@ func (s *WhereStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *WhereStatement) GetStatementKind() StatementKind {
+func (s *WhereStatement) Kind() StatementKind {
 	return Where
 }
 
@@ -71,7 +71,7 @@ func (s *HavingStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *HavingStatement) GetStatementKind() StatementKind {
+func (s *HavingStatement) Kind() StatementKind {
 	return Having
 }
 
@@ -83,7 +83,7 @@ func (s *LimitStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *LimitStatement) GetStatementKind() StatementKind {
+func (s *LimitStatement) Kind() StatementKind {
 	return Limit
 }
 
@@ -95,7 +95,7 @@ func (s *OffsetStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *OffsetStatement) GetStatementKind() StatementKind {
+func (s *OffsetStatement) Kind() StatementKind {
 	return Offset
 }
 
@@ -115,7 +115,7 @@ func (s *OrderByStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *OrderByStatement) GetStatementKind() StatementKind {
+func (s *OrderByStatement) Kind() StatementKind {
 	return OrderBy
 }
 
@@ -127,24 +127,27 @@ func (s *GroupByStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *GroupByStatement) GetStatementKind() StatementKind {
+func (s *GroupByStatement) Kind() StatementKind {
 	return GroupBy
 }
 
-type AggregateFunctions struct {
-	FunctionName string
-	Argument     string
+type AggregateValue struct {
+	Expression *Expression
+	Function   struct {
+		First  string
+		Second string
+	}
 }
 
-type AggregationFunctionsStatement struct {
-	Aggregations map[string]*AggregateFunctions
+type AggregationsStatement struct {
+	Aggregations map[string]AggregateValue
 }
 
-func (s *AggregationFunctionsStatement) AsAny() reflect.Value {
+func (s *AggregationsStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *AggregationFunctionsStatement) GetStatementKind() StatementKind {
+func (s *AggregationsStatement) Kind() StatementKind {
 	return AggregateFunction
 }
 
@@ -157,6 +160,6 @@ func (s *GlobalVariableStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
-func (s *GlobalVariableStatement) GetStatementKind() StatementKind {
+func (s *GlobalVariableStatement) Kind() StatementKind {
 	return GlobalVariable
 }

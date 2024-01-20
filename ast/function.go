@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -32,6 +33,7 @@ var Functions = map[string]Function{
 	"datalength": textDataLength,
 	"char":       textChar,
 	"nchar":      textChar,
+	"charindex":  textCharIndex,
 	"replace":    textReplace,
 	"substring":  textSubstring,
 	"stuff":      textStuff,
@@ -40,6 +42,7 @@ var Functions = map[string]Function{
 	"soundex":    textSoundex,
 	"concat":     textConcat,
 	"unicode":    textUnicode,
+	"strcmp":     textStrcmp,
 
 	// Date functions
 	"current_date":      dateCurrentDate,
@@ -47,6 +50,11 @@ var Functions = map[string]Function{
 	"current_timestamp": dateCurrentTimestamp,
 	"now":               dateCurrentTimestamp,
 	"makedate":          dateMakeDate,
+	"maketime":          dateMakeTime,
+	"dayname":           dateDayname,
+	"monthname":         dateMonthname,
+	"hour":              dateHour,
+	"isdate":            dateIsDate,
 
 	// Numeric functions
 	"abs":    numericAbs,
@@ -57,61 +65,80 @@ var Functions = map[string]Function{
 	"sin":    numericSin,
 	"asin":   numericAsin,
 	"cos":    numericCos,
+	"acos":   numericAcos,
 	"tan":    numericTan,
+	"atan":   numericAtan,
+	"atn2":   numericAtn2,
+	"sign":   numericSign,
 
 	// General functions
 	"isnull":    generalIsNull,
 	"isnumeric": generalIsNumeric,
 	"typeof":    generalTypeOf,
+	"greatest":  generalGreatest,
+	"least":     generalLeast,
 }
 
 var Prototypes = map[string]Prototype{
 	// String functions
-	"lower":      {Parameters: []DataType{Text}, Result: Text},
-	"upper":      {Parameters: []DataType{Text}, Result: Text},
-	"reverse":    {Parameters: []DataType{Text}, Result: Text},
-	"replicate":  {Parameters: []DataType{Text, Integer}, Result: Text},
-	"space":      {Parameters: []DataType{Integer}, Result: Text},
-	"trim":       {Parameters: []DataType{Text}, Result: Text},
-	"ltrim":      {Parameters: []DataType{Text}, Result: Text},
-	"rtrim":      {Parameters: []DataType{Text}, Result: Text},
-	"len":        {Parameters: []DataType{Text}, Result: Integer},
-	"ascii":      {Parameters: []DataType{Text}, Result: Integer},
-	"left":       {Parameters: []DataType{Text, Integer}, Result: Text},
-	"datalength": {Parameters: []DataType{Text}, Result: Integer},
-	"char":       {Parameters: []DataType{Integer}, Result: Text},
-	"nchar":      {Parameters: []DataType{Integer}, Result: Text},
-	"replace":    {Parameters: []DataType{Text, Text, Text}, Result: Text},
-	"substring":  {Parameters: []DataType{Text, Integer, Integer}, Result: Text},
-	"stuff":      {Parameters: []DataType{Text, Integer, Integer, Text}, Result: Text},
-	"right":      {Parameters: []DataType{Text, Integer}, Result: Text},
-	"translate":  {Parameters: []DataType{Text, Text, Text}, Result: Text},
-	"soundex":    {Parameters: []DataType{Text}, Result: Text},
-	"concat":     {Parameters: []DataType{Text, Text}, Result: Text},
-	"unicode":    {Parameters: []DataType{Text}, Result: Integer},
+	"lower":      {Parameters: []DataType{Text{}}, Result: Text{}},
+	"upper":      {Parameters: []DataType{Text{}}, Result: Text{}},
+	"reverse":    {Parameters: []DataType{Text{}}, Result: Text{}},
+	"replicate":  {Parameters: []DataType{Text{}, Integer{}}, Result: Text{}},
+	"space":      {Parameters: []DataType{Integer{}}, Result: Text{}},
+	"trim":       {Parameters: []DataType{Text{}}, Result: Text{}},
+	"ltrim":      {Parameters: []DataType{Text{}}, Result: Text{}},
+	"rtrim":      {Parameters: []DataType{Text{}}, Result: Text{}},
+	"len":        {Parameters: []DataType{Text{}}, Result: Integer{}},
+	"ascii":      {Parameters: []DataType{Text{}}, Result: Integer{}},
+	"left":       {Parameters: []DataType{Text{}, Integer{}}, Result: Text{}},
+	"datalength": {Parameters: []DataType{Text{}}, Result: Integer{}},
+	"char":       {Parameters: []DataType{Integer{}}, Result: Text{}},
+	"nchar":      {Parameters: []DataType{Integer{}}, Result: Text{}},
+	"charindex":  {Parameters: []DataType{Text{}, Text{}}, Result: Integer{}},
+	"replace":    {Parameters: []DataType{Text{}, Text{}, Text{}}, Result: Text{}},
+	"substring":  {Parameters: []DataType{Text{}, Integer{}, Integer{}}, Result: Text{}},
+	"stuff":      {Parameters: []DataType{Text{}, Integer{}, Integer{}, Text{}}, Result: Text{}},
+	"right":      {Parameters: []DataType{Text{}, Integer{}}, Result: Text{}},
+	"translate":  {Parameters: []DataType{Text{}, Text{}, Text{}}, Result: Text{}},
+	"soundex":    {Parameters: []DataType{Text{}}, Result: Text{}},
+	"concat":     {Parameters: []DataType{Any{}, Any{}, Varargs{Any{}}}, Result: Text{}},
+	"unicode":    {Parameters: []DataType{Text{}}, Result: Integer{}},
+	"strcmp":     {Parameters: []DataType{Text{}, Text{}}, Result: Integer{}},
 
 	// Date functions
-	"current_date":      {Parameters: []DataType{}, Result: Date},
-	"current_time":      {Parameters: []DataType{}, Result: Time},
-	"current_timestamp": {Parameters: []DataType{}, Result: DateTime},
-	"now":               {Parameters: []DataType{}, Result: DateTime},
-	"makedate":          {Parameters: []DataType{Integer, Integer}, Result: Date},
+	"current_date":      {Parameters: []DataType{}, Result: Date{}},
+	"current_time":      {Parameters: []DataType{}, Result: Time{}},
+	"current_timestamp": {Parameters: []DataType{}, Result: DateTime{}},
+	"now":               {Parameters: []DataType{}, Result: DateTime{}},
+	"makedate":          {Parameters: []DataType{Integer{}, Integer{}}, Result: Date{}},
+	"maketime":          {Parameters: []DataType{Integer{}, Integer{}, Integer{}}, Result: Time{}},
+	"dayname":           {Parameters: []DataType{Date{}}, Result: Text{}},
+	"monthname":         {Parameters: []DataType{Date{}}, Result: Text{}},
+	"hour":              {Parameters: []DataType{DateTime{}}, Result: Integer{}},
+	"isdate":            {Parameters: []DataType{Any{}}, Result: Boolean{}},
 
 	// Numeric functions
-	"abs":    {Parameters: []DataType{Integer}, Result: Integer},
-	"pi":     {Parameters: []DataType{}, Result: Float},
-	"floor":  {Parameters: []DataType{Float}, Result: Integer},
-	"round":  {Parameters: []DataType{Float}, Result: Integer},
-	"square": {Parameters: []DataType{Integer}, Result: Integer},
-	"sin":    {Parameters: []DataType{Float}, Result: Float},
-	"asin":   {Parameters: []DataType{Float}, Result: Float},
-	"cos":    {Parameters: []DataType{Float}, Result: Float},
-	"tan":    {Parameters: []DataType{Float}, Result: Float},
+	"abs":    {Parameters: []DataType{Integer{}}, Result: Integer{}},
+	"pi":     {Parameters: []DataType{}, Result: Float{}},
+	"floor":  {Parameters: []DataType{Float{}}, Result: Integer{}},
+	"round":  {Parameters: []DataType{Float{}}, Result: Integer{}},
+	"square": {Parameters: []DataType{Integer{}}, Result: Integer{}},
+	"sin":    {Parameters: []DataType{Float{}}, Result: Float{}},
+	"asin":   {Parameters: []DataType{Float{}}, Result: Float{}},
+	"cos":    {Parameters: []DataType{Float{}}, Result: Float{}},
+	"acos":   {Parameters: []DataType{Float{}}, Result: Float{}},
+	"tan":    {Parameters: []DataType{Float{}}, Result: Float{}},
+	"atan":   {Parameters: []DataType{Float{}}, Result: Float{}},
+	"atn2":   {Parameters: []DataType{Float{}, Float{}}, Result: Float{}},
+	"sign":   {Parameters: []DataType{Float{}}, Result: Integer{}},
 
 	// General functions
-	"isnull":    {Parameters: []DataType{Any}, Result: Boolean},
-	"isnumeric": {Parameters: []DataType{Any}, Result: Boolean},
-	"typeof":    {Parameters: []DataType{Any}, Result: Text},
+	"isnull":    {Parameters: []DataType{Any{}}, Result: Boolean{}},
+	"isnumeric": {Parameters: []DataType{Any{}}, Result: Boolean{}},
+	"typeof":    {Parameters: []DataType{Any{}}, Result: Text{}},
+	"greatest":  {Parameters: []DataType{Any{}, Any{}, Varargs{Any{}}}, Result: Any{}},
+	"least":     {Parameters: []DataType{Any{}, Any{}, Varargs{Any{}}}, Result: Any{}},
 }
 
 // String functions
@@ -130,6 +157,7 @@ func textReverse(inputs []Value) Value {
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
 	}
+
 	return TextValue{string(runes)}
 }
 
@@ -177,6 +205,7 @@ func textLeft(inputs []Value) Value {
 	}
 
 	substring := text[:numberOfChars]
+
 	return TextValue{substring}
 }
 
@@ -189,7 +218,20 @@ func textChar(inputs []Value) Value {
 	if code >= 0 && code <= 0x10FFFF {
 		return TextValue{string(rune(code))}
 	}
+
 	return TextValue{""}
+}
+
+func textCharIndex(inputs []Value) Value {
+	substr := inputs[0].AsText()
+	input := inputs[1].AsText()
+
+	index := strings.Index(strings.ToLower(input), strings.ToLower(substr))
+	if index == -1 {
+		return IntegerValue{0}
+	}
+
+	return IntegerValue{int64(index + 1)}
 }
 
 func textReplace(inputs []Value) Value {
@@ -210,6 +252,7 @@ func textSubstring(inputs []Value) Value {
 	if start > len(text) || length > len(text) {
 		return TextValue{text}
 	}
+
 	if length < 0 {
 		return TextValue{""}
 	}
@@ -343,6 +386,20 @@ func textConcat(inputs []Value) Value {
 	return TextValue{strings.Join(text, "")}
 }
 
+func textStrcmp(inputs []Value) Value {
+	comparison := strings.Compare(inputs[0].AsText(), inputs[1].AsText())
+	switch {
+	case comparison < 0:
+		return IntegerValue{1}
+	case comparison == 0:
+		return IntegerValue{2}
+	case comparison > 0:
+		return IntegerValue{0}
+	default:
+		return IntegerValue{}
+	}
+}
+
 // Date functions
 
 func dateCurrentDate(inputs []Value) Value {
@@ -372,6 +429,39 @@ func dateMakeDate(inputs []Value) Value {
 	timestamp := t.UnixNano() / int64(time.Millisecond)
 
 	return DateValue{timestamp}
+}
+
+func dateMakeTime(inputs []Value) Value {
+	hour := inputs[0].AsInt()
+	minute := inputs[1].AsInt()
+	second := inputs[2].AsInt()
+
+	return TimeValue{fmt.Sprintf("%d:%02d:%02d", hour, minute, second)}
+}
+
+func dateDayname(inputs []Value) Value {
+	date := inputs[0].AsDate()
+	dateStr := DateToDayName(date)
+
+	return TextValue{dateStr}
+}
+
+func dateMonthname(inputs []Value) Value {
+	date := inputs[0].AsDate()
+	monthStr := DateToMonthName(date)
+
+	return TextValue{monthStr}
+}
+
+func dateHour(inputs []Value) Value {
+	date := inputs[0].AsDateTime()
+	hour := DateTimeToHour(date)
+
+	return IntegerValue{hour}
+}
+
+func dateIsDate(inputs []Value) Value {
+	return BooleanValue{inputs[0].DataType().IsDate()}
 }
 
 // Numeric functions
@@ -424,16 +514,46 @@ func numericCos(inputs []Value) Value {
 	return FloatValue{math.Cos(floatValue)}
 }
 
+func numericAcos(inputs []Value) Value {
+	floatValue := inputs[0].AsFloat()
+	return FloatValue{math.Acos(floatValue)}
+}
+
 func numericTan(inputs []Value) Value {
 	floatValue := inputs[0].AsFloat()
 
 	return FloatValue{math.Tan(floatValue)}
 }
 
+func numericAtan(inputs []Value) Value {
+	floatValue := inputs[0].AsFloat()
+
+	return FloatValue{math.Atan(floatValue)}
+}
+
+func numericAtn2(inputs []Value) Value {
+	first := inputs[0].AsFloat()
+	other := inputs[1].AsFloat()
+
+	return FloatValue{math.Atan2(first, other)}
+}
+
+func numericSign(inputs []Value) Value {
+	floatValue := inputs[0].AsFloat()
+
+	if floatValue == 0.0 {
+		return IntegerValue{0}
+	} else if floatValue > 0.0 {
+		return IntegerValue{1}
+	}
+
+	return IntegerValue{-1}
+}
+
 // General functions
 
 func generalIsNull(inputs []Value) Value {
-	return BooleanValue{inputs[0].DataType().IsType(Null)}
+	return BooleanValue{inputs[0].DataType().IsNull()}
 }
 
 func generalIsNumeric(inputs []Value) Value {
@@ -446,5 +566,29 @@ func generalIsNumeric(inputs []Value) Value {
 func generalTypeOf(inputs []Value) Value {
 	inputType := inputs[0].DataType()
 
-	return TextValue{inputType.Literal()}
+	return TextValue{inputType.Fmt()}
+}
+
+func generalGreatest(inputs []Value) Value {
+	maxValue := inputs[0]
+
+	for _, value := range inputs[1:] {
+		if ret := maxValue.Compare(value); ret == Greater {
+			maxValue = value
+		}
+	}
+
+	return maxValue
+}
+
+func generalLeast(inputs []Value) Value {
+	minValue := inputs[0]
+
+	for _, value := range inputs[1:] {
+		if ret := minValue.Compare(value); ret == Less {
+			minValue = value
+		}
+	}
+
+	return minValue
 }

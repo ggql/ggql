@@ -40,14 +40,14 @@ func (e *Environment) ResolveType(str string) (DataType, error) {
 		if val, ok := e.GlobalsTypes[str]; ok {
 			return val, nil
 		} else {
-			return Undefined, errors.New("invalid data type")
+			return Undefined{}, errors.New("invalid data type")
 		}
 	}
 
 	if val, ok := e.Scopes[str]; ok {
 		return val, nil
 	} else {
-		return Undefined, errors.New("invalid data type")
+		return Undefined{}, errors.New("invalid data type")
 	}
 }
 

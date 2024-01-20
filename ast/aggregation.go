@@ -1,6 +1,10 @@
 package ast
 
-type Aggregation func(string, []GQLObject) Value
+import (
+	"strings"
+)
+
+type Aggregation func(string, []string, *Group) Value
 
 type AggregationPrototype struct {
 	Parameter DataType
@@ -16,20 +20,48 @@ var Aggregations = map[string]Aggregation{
 }
 
 var AggregationsProtos = map[string]AggregationPrototype{
-	"max":   {Parameter: Integer, Result: Integer},
-	"min":   {Parameter: Integer, Result: Integer},
-	"sum":   {Parameter: Any, Result: Integer},
-	"avg":   {Parameter: Any, Result: Integer},
-	"count": {Parameter: Any, Result: Integer},
+	"max": {
+		Parameter: Variant{
+			Integer{},
+			Float{},
+			Text{},
+			Date{},
+			Time{},
+			DateTime{},
+		},
+		Result: Integer{},
+	},
+	"min": {
+		Parameter: Variant{
+			Integer{},
+			Float{},
+			Text{},
+			Date{},
+			Time{},
+			DateTime{},
+		},
+		Result: Integer{},
+	},
+	"sum":   {Parameter: Integer{}, Result: Integer{}},
+	"avg":   {Parameter: Integer{}, Result: Integer{}},
+	"count": {Parameter: Any{}, Result: Integer{}},
 }
 
-func aggregationMax(fieldName string, objects []GQLObject) Value {
-	maxValue := objects[0].Attributes[fieldName]
+func aggregationMax(fieldName string, titles []string, objects *Group) Value {
+	var columnIndex int
 
-	for _, object := range objects[1:] {
-		fieldValue := object.Attributes[fieldName]
-		ret, _ := maxValue.Compare(fieldValue)
-		if ret == Greater {
+	for i, v := range titles {
+		if strings.Compare(v, fieldName) == 0 {
+			columnIndex = i
+			break
+		}
+	}
+
+	maxValue := objects.Rows[0].Values[columnIndex]
+
+	for _, row := range objects.Rows {
+		fieldValue := row.Values[columnIndex]
+		if ret := maxValue.Compare(fieldValue); ret == Greater {
 			maxValue = fieldValue
 		}
 	}
@@ -37,13 +69,21 @@ func aggregationMax(fieldName string, objects []GQLObject) Value {
 	return maxValue
 }
 
-func aggregationMin(fieldName string, objects []GQLObject) Value {
-	minValue := objects[0].Attributes[fieldName]
+func aggregationMin(fieldName string, titles []string, objects *Group) Value {
+	var columnIndex int
 
-	for _, object := range objects[1:] {
-		fieldValue := object.Attributes[fieldName]
-		ret, _ := minValue.Compare(fieldValue)
-		if ret == Less {
+	for i, v := range titles {
+		if strings.Compare(v, fieldName) == 0 {
+			columnIndex = i
+			break
+		}
+	}
+
+	minValue := objects.Rows[0].Values[columnIndex]
+
+	for _, row := range objects.Rows {
+		fieldValue := row.Values[columnIndex]
+		if ret := minValue.Compare(fieldValue); ret == Less {
 			minValue = fieldValue
 		}
 	}
@@ -51,31 +91,48 @@ func aggregationMin(fieldName string, objects []GQLObject) Value {
 	return minValue
 }
 
-func aggregationSum(fieldName string, objects []GQLObject) Value {
+func aggregationSum(fieldName string, titles []string, objects *Group) Value {
 	var sum int64
+	var columnIndex int
 
-	for _, object := range objects {
-		fieldValue := object.Attributes[fieldName]
+	for i, v := range titles {
+		if strings.Compare(v, fieldName) == 0 {
+			columnIndex = i
+			break
+		}
+	}
+
+	for _, row := range objects.Rows {
+		fieldValue := row.Values[columnIndex]
 		sum += fieldValue.AsInt()
 	}
 
-	return IntegerValue{sum}
+	return IntegerValue{Value: sum}
 }
 
-func aggregationAverage(fieldName string, objects []GQLObject) Value {
+func aggregationAverage(fieldName string, titles []string, objects *Group) Value {
 	var sum int64
-	count := int64(len(objects))
+	var columnIndex int
 
-	for _, object := range objects {
-		fieldValue := object.Attributes[fieldName]
+	for i, v := range titles {
+		if strings.Compare(v, fieldName) == 0 {
+			columnIndex = i
+			break
+		}
+	}
+
+	count := int64(len(objects.Rows))
+
+	for _, row := range objects.Rows {
+		fieldValue := row.Values[columnIndex]
 		sum += fieldValue.AsInt()
 	}
 
 	avg := sum / count
 
-	return IntegerValue{avg}
+	return IntegerValue{Value: avg}
 }
 
-func aggregationCount(_ string, objects []GQLObject) Value {
-	return IntegerValue{int64(len(objects))}
+func aggregationCount(_ string, _ []string, objects *Group) Value {
+	return IntegerValue{int64(objects.Len())}
 }

@@ -1,27 +1,42 @@
 package ast
 
-import (
-	"sync"
-)
-
-type GQLObject struct {
-	Attributes map[string]Value
+type Row struct {
+	Values []Value
 }
 
-var mutex = &sync.Mutex{}
+type Group struct {
+	Rows []Row
+}
 
-func FlatGQLGroups(groups *[][]GQLObject) error {
-	var mainGroup []GQLObject
+func (g *Group) IsEmpty() bool {
+	return len(g.Rows) == 0
+}
 
-	for _, group := range *groups {
-		mainGroup = append(mainGroup, group...)
+func (g *Group) Len() int {
+	return len(g.Rows)
+}
+
+type GitQLObject struct {
+	Titles []string
+	Groups []Group
+}
+
+func (g *GitQLObject) Flat() {
+	var rows []Row
+
+	for i := range g.Groups {
+		rows = append(rows, g.Groups[i].Rows...)
+		g.Groups[i].Rows = nil
 	}
 
-	mutex.Lock()
-	*groups = (*groups)[:0] // clear the groups slice
-	mutex.Unlock()
+	g.Groups = g.Groups[:0]
+	g.Groups = append(g.Groups, Group{Rows: rows})
+}
 
-	*groups = append(*groups, mainGroup)
+func (g *GitQLObject) IsEmpty() bool {
+	return len(g.Groups) == 0
+}
 
-	return nil
+func (g *GitQLObject) Len() int {
+	return len(g.Groups)
 }

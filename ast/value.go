@@ -18,14 +18,14 @@ const (
 
 type Value interface {
 	DataType() DataType
+	Fmt() string
 	Equals(Value) bool
-	Compare(Value) (Ordering, error)
-	Plus(Value) (Value, error)
-	Minus(Value) (Value, error)
+	Compare(Value) Ordering
+	Plus(Value) Value
+	Minus(Value) Value
 	Mul(Value) (Value, error)
 	Div(Value) (Value, error)
 	Modulus(Value) (Value, error)
-	Literal() string
 	AsInt() int64
 	AsFloat() float64
 	AsText() string
@@ -42,18 +42,22 @@ type IntegerValue struct {
 }
 
 func (v IntegerValue) DataType() DataType {
-	return Integer
+	return Integer{}
+}
+
+func (v IntegerValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v IntegerValue) Equals(other Value) bool {
-	if other.DataType() != Integer {
+	if !other.DataType().IsInt() {
 		return false
 	}
 
 	return v.AsInt() == other.AsInt()
 }
 
-func (v IntegerValue) Compare(other Value) (Ordering, error) {
+func (v IntegerValue) Compare(other Value) Ordering {
 	helper := func(a, b int64) Ordering {
 		if a < b {
 			return Less
@@ -63,43 +67,35 @@ func (v IntegerValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != Integer {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsInt() {
+		return Equal
 	}
 
-	return helper(other.AsInt(), v.AsInt()), nil
+	return helper(other.AsInt(), v.AsInt())
 }
 
-func (v IntegerValue) Plus(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
-		return nil, errors.New("invalid data type")
+func (v IntegerValue) Plus(other Value) Value {
+	if other.DataType().IsFloat() {
+		return FloatValue{float64(v.AsInt()) + other.AsFloat()}
 	}
 
-	if other.DataType() == Float {
-		return FloatValue{float64(v.AsInt()) + other.AsFloat()}, nil
-	}
-
-	return IntegerValue{v.AsInt() + other.AsInt()}, nil
+	return IntegerValue{v.AsInt() + other.AsInt()}
 }
 
-func (v IntegerValue) Minus(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
-		return nil, errors.New("invalid data type")
+func (v IntegerValue) Minus(other Value) Value {
+	if other.DataType().IsFloat() {
+		return FloatValue{float64(v.AsInt()) - other.AsFloat()}
 	}
 
-	if other.DataType() == Float {
-		return FloatValue{float64(v.AsInt()) - other.AsFloat()}, nil
-	}
-
-	return IntegerValue{v.AsInt() - other.AsInt()}, nil
+	return IntegerValue{v.AsInt() - other.AsInt()}
 }
 
 func (v IntegerValue) Mul(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Float {
+	if other.DataType().IsFloat() {
 		return FloatValue{float64(v.AsInt()) * other.AsFloat()}, nil
 	}
 
@@ -118,17 +114,17 @@ func (v IntegerValue) Mul(other Value) (Value, error) {
 }
 
 func (v IntegerValue) Div(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Integer {
+	if other.DataType().IsInt() {
 		if other.AsInt() == 0 {
-			return nil, errors.Errorf("Attempt to divide %s by zero", v.Literal())
+			return nil, errors.Errorf("Attempt to divide %s by zero", v.Fmt())
 		}
 	}
 
-	if other.DataType() == Float {
+	if other.DataType().IsFloat() {
 		return FloatValue{float64(v.AsInt()) / other.AsFloat()}, nil
 	}
 
@@ -136,25 +132,21 @@ func (v IntegerValue) Div(other Value) (Value, error) {
 }
 
 func (v IntegerValue) Modulus(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Integer {
+	if other.DataType().IsInt() {
 		if other.AsInt() == 0 {
-			return nil, errors.Errorf("Attempt to calculate the remainder of %s with a divisor of zero", v.Literal())
+			return nil, errors.Errorf("Attempt to calculate the remainder of %s with a divisor of zero", v.Fmt())
 		}
 	}
 
-	if other.DataType() == Float {
+	if other.DataType().IsFloat() {
 		return FloatValue{math.Mod(float64(v.AsInt()), other.AsFloat())}, nil
 	}
 
 	return IntegerValue{v.AsInt() % other.AsInt()}, nil
-}
-
-func (v IntegerValue) Literal() string {
-	return v.AsText()
 }
 
 func (v IntegerValue) AsInt() int64 {
@@ -192,18 +184,22 @@ type FloatValue struct {
 }
 
 func (v FloatValue) DataType() DataType {
-	return Float
+	return Float{}
+}
+
+func (v FloatValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v FloatValue) Equals(other Value) bool {
-	if other.DataType() != Float {
+	if !other.DataType().IsFloat() {
 		return false
 	}
 
 	return v.AsFloat() == other.AsFloat()
 }
 
-func (v FloatValue) Compare(other Value) (Ordering, error) {
+func (v FloatValue) Compare(other Value) Ordering {
 	helper := func(a, b float64) Ordering {
 		if a < b {
 			return Less
@@ -213,43 +209,35 @@ func (v FloatValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != Float {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsFloat() {
+		return Equal
 	}
 
-	return helper(other.AsFloat(), v.AsFloat()), nil
+	return helper(other.AsFloat(), v.AsFloat())
 }
 
-func (v FloatValue) Plus(other Value) (Value, error) {
-	if other.DataType() != Float && other.DataType() != Integer {
-		return nil, errors.New("invalid data type")
+func (v FloatValue) Plus(other Value) Value {
+	if other.DataType().IsInt() {
+		return FloatValue{v.AsFloat() + float64(other.AsInt())}
 	}
 
-	if other.DataType() == Integer {
-		return FloatValue{v.AsFloat() + float64(other.AsInt())}, nil
-	}
-
-	return FloatValue{v.AsFloat() + other.AsFloat()}, nil
+	return FloatValue{v.AsFloat() + other.AsFloat()}
 }
 
-func (v FloatValue) Minus(other Value) (Value, error) {
-	if other.DataType() != Float && other.DataType() != Integer {
-		return nil, errors.New("invalid data type")
+func (v FloatValue) Minus(other Value) Value {
+	if other.DataType().IsInt() {
+		return FloatValue{v.AsFloat() - float64(other.AsInt())}
 	}
 
-	if other.DataType() == Integer {
-		return FloatValue{v.AsFloat() - float64(other.AsInt())}, nil
-	}
-
-	return FloatValue{v.AsFloat() - other.AsFloat()}, nil
+	return FloatValue{v.AsFloat() - other.AsFloat()}
 }
 
 func (v FloatValue) Mul(other Value) (Value, error) {
-	if other.DataType() != Float && other.DataType() != Integer {
+	if !other.DataType().IsFloat() && !other.DataType().IsInt() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Integer {
+	if other.DataType().IsInt() {
 		return FloatValue{v.AsFloat() * float64(other.AsInt())}, nil
 	}
 
@@ -257,13 +245,13 @@ func (v FloatValue) Mul(other Value) (Value, error) {
 }
 
 func (v FloatValue) Div(other Value) (Value, error) {
-	if other.DataType() != Float && other.DataType() != Integer {
+	if !other.DataType().IsFloat() && !other.DataType().IsInt() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Integer {
+	if other.DataType().IsInt() {
 		if other.AsInt() == 0 {
-			return nil, errors.Errorf("Attempt to divide %s by zero", v.Literal())
+			return nil, errors.Errorf("Attempt to divide %s by zero", v.Fmt())
 		}
 		return FloatValue{v.AsFloat() / float64(other.AsInt())}, nil
 	}
@@ -272,22 +260,18 @@ func (v FloatValue) Div(other Value) (Value, error) {
 }
 
 func (v FloatValue) Modulus(other Value) (Value, error) {
-	if other.DataType() != Integer && other.DataType() != Float {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
 		return nil, errors.New("invalid data type")
 	}
 
-	if other.DataType() == Integer {
+	if other.DataType().IsInt() {
 		if other.AsInt() == 0 {
-			return nil, errors.Errorf("Attempt to calculate the remainder of %s with a divisor of zero", v.Literal())
+			return nil, errors.Errorf("Attempt to calculate the remainder of %s with a divisor of zero", v.Fmt())
 		}
 		return FloatValue{math.Mod(v.AsFloat(), float64(other.AsInt()))}, nil
 	}
 
 	return FloatValue{math.Mod(v.AsFloat(), other.AsFloat())}, nil
-}
-
-func (v FloatValue) Literal() string {
-	return v.AsText()
 }
 
 func (v FloatValue) AsInt() int64 {
@@ -325,18 +309,22 @@ type TextValue struct {
 }
 
 func (v TextValue) DataType() DataType {
-	return Text
+	return Text{}
+}
+
+func (v TextValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v TextValue) Equals(other Value) bool {
-	if other.DataType() != Text {
+	if !other.DataType().IsText() {
 		return false
 	}
 
 	return v.AsText() == other.AsText()
 }
 
-func (v TextValue) Compare(other Value) (Ordering, error) {
+func (v TextValue) Compare(other Value) Ordering {
 	helper := func(a, b string) Ordering {
 		ret := strings.Compare(a, b)
 		if ret == -1 {
@@ -347,19 +335,19 @@ func (v TextValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != Text {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsText() {
+		return Equal
 	}
 
-	return helper(other.AsText(), v.AsText()), nil
+	return helper(other.AsText(), v.AsText())
 }
 
-func (v TextValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v TextValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v TextValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v TextValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v TextValue) Mul(other Value) (Value, error) {
@@ -372,10 +360,6 @@ func (v TextValue) Div(other Value) (Value, error) {
 
 func (v TextValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
-}
-
-func (v TextValue) Literal() string {
-	return v.AsText()
 }
 
 func (v TextValue) AsInt() int64 {
@@ -413,31 +397,31 @@ type BooleanValue struct {
 }
 
 func (v BooleanValue) DataType() DataType {
-	return Boolean
+	return Boolean{}
+}
+
+func (v BooleanValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v BooleanValue) Equals(other Value) bool {
-	if other.DataType() != Boolean {
+	if !other.DataType().IsBool() {
 		return false
 	}
 
 	return v.AsBool() == other.AsBool()
 }
 
-func (v BooleanValue) Compare(other Value) (Ordering, error) {
-	if other.DataType() != Boolean {
-		return Less, errors.New("invalid data type")
-	}
-
-	return Equal, nil
+func (v BooleanValue) Compare(other Value) Ordering {
+	return Equal
 }
 
-func (v BooleanValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v BooleanValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v BooleanValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v BooleanValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v BooleanValue) Mul(other Value) (Value, error) {
@@ -450,10 +434,6 @@ func (v BooleanValue) Div(other Value) (Value, error) {
 
 func (v BooleanValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
-}
-
-func (v BooleanValue) Literal() string {
-	return v.AsText()
 }
 
 func (v BooleanValue) AsInt() int64 {
@@ -491,18 +471,22 @@ type DateTimeValue struct {
 }
 
 func (v DateTimeValue) DataType() DataType {
-	return DateTime
+	return DateTime{}
+}
+
+func (v DateTimeValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v DateTimeValue) Equals(other Value) bool {
-	if other.DataType() != DateTime {
+	if !other.DataType().IsDateTime() {
 		return false
 	}
 
 	return v.AsDateTime() == other.AsDateTime()
 }
 
-func (v DateTimeValue) Compare(other Value) (Ordering, error) {
+func (v DateTimeValue) Compare(other Value) Ordering {
 	helper := func(a, b int64) Ordering {
 		if a < b {
 			return Less
@@ -512,19 +496,19 @@ func (v DateTimeValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != DateTime {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsDateTime() {
+		return Equal
 	}
 
-	return helper(other.AsDateTime(), v.AsDateTime()), nil
+	return helper(other.AsDateTime(), v.AsDateTime())
 }
 
-func (v DateTimeValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v DateTimeValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v DateTimeValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v DateTimeValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v DateTimeValue) Mul(other Value) (Value, error) {
@@ -537,10 +521,6 @@ func (v DateTimeValue) Div(other Value) (Value, error) {
 
 func (v DateTimeValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
-}
-
-func (v DateTimeValue) Literal() string {
-	return v.AsText()
 }
 
 func (v DateTimeValue) AsInt() int64 {
@@ -578,18 +558,22 @@ type DateValue struct {
 }
 
 func (v DateValue) DataType() DataType {
-	return Date
+	return Date{}
+}
+
+func (v DateValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v DateValue) Equals(other Value) bool {
-	if other.DataType() != Date {
+	if !other.DataType().IsDate() {
 		return false
 	}
 
 	return v.AsDate() == other.AsDate()
 }
 
-func (v DateValue) Compare(other Value) (Ordering, error) {
+func (v DateValue) Compare(other Value) Ordering {
 	helper := func(a, b int64) Ordering {
 		if a < b {
 			return Less
@@ -599,19 +583,19 @@ func (v DateValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != Date {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsDate() {
+		return Equal
 	}
 
-	return helper(other.AsDate(), v.AsDate()), nil
+	return helper(other.AsDate(), v.AsDate())
 }
 
-func (v DateValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v DateValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v DateValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v DateValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v DateValue) Mul(other Value) (Value, error) {
@@ -624,10 +608,6 @@ func (v DateValue) Div(other Value) (Value, error) {
 
 func (v DateValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
-}
-
-func (v DateValue) Literal() string {
-	return v.AsText()
 }
 
 func (v DateValue) AsInt() int64 {
@@ -665,18 +645,22 @@ type TimeValue struct {
 }
 
 func (v TimeValue) DataType() DataType {
-	return Time
+	return Time{}
+}
+
+func (v TimeValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v TimeValue) Equals(other Value) bool {
-	if other.DataType() != Time {
+	if !other.DataType().IsTime() {
 		return false
 	}
 
 	return v.AsTime() == other.AsTime()
 }
 
-func (v TimeValue) Compare(other Value) (Ordering, error) {
+func (v TimeValue) Compare(other Value) Ordering {
 	helper := func(a, b string) Ordering {
 		ret := strings.Compare(a, b)
 		if ret == -1 {
@@ -687,19 +671,19 @@ func (v TimeValue) Compare(other Value) (Ordering, error) {
 		return Equal
 	}
 
-	if other.DataType() != Time {
-		return Less, errors.New("invalid data type")
+	if !other.DataType().IsTime() {
+		return Equal
 	}
 
-	return helper(other.AsTime(), v.AsTime()), nil
+	return helper(other.AsTime(), v.AsTime())
 }
 
-func (v TimeValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v TimeValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v TimeValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v TimeValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v TimeValue) Mul(other Value) (Value, error) {
@@ -712,10 +696,6 @@ func (v TimeValue) Div(other Value) (Value, error) {
 
 func (v TimeValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
-}
-
-func (v TimeValue) Literal() string {
-	return v.AsText()
 }
 
 func (v TimeValue) AsInt() int64 {
@@ -753,27 +733,27 @@ type UndefinedValue struct {
 }
 
 func (v UndefinedValue) DataType() DataType {
-	return Undefined
+	return Undefined{}
+}
+
+func (v UndefinedValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v UndefinedValue) Equals(other Value) bool {
 	return true
 }
 
-func (v UndefinedValue) Compare(other Value) (Ordering, error) {
-	if other.DataType() != Undefined {
-		return Less, errors.New("invalid data type")
-	}
-
-	return Equal, nil
+func (v UndefinedValue) Compare(other Value) Ordering {
+	return Equal
 }
 
-func (v UndefinedValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v UndefinedValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v UndefinedValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v UndefinedValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v UndefinedValue) Mul(other Value) (Value, error) {
@@ -788,10 +768,6 @@ func (v UndefinedValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
 }
 
-func (v UndefinedValue) Literal() string {
-	return v.AsText()
-}
-
 func (v UndefinedValue) AsInt() int64 {
 	return 0
 }
@@ -801,7 +777,7 @@ func (v UndefinedValue) AsFloat() float64 {
 }
 
 func (v UndefinedValue) AsText() string {
-	return UndefinedStr
+	return "Undefined"
 }
 
 func (v UndefinedValue) AsBool() bool {
@@ -827,27 +803,27 @@ type NullValue struct {
 }
 
 func (v NullValue) DataType() DataType {
-	return Null
+	return Null{}
+}
+
+func (v NullValue) Fmt() string {
+	return v.AsText()
 }
 
 func (v NullValue) Equals(other Value) bool {
 	return true
 }
 
-func (v NullValue) Compare(other Value) (Ordering, error) {
-	if other.DataType() != Null {
-		return Less, errors.New("invalid data type")
-	}
-
-	return Equal, nil
+func (v NullValue) Compare(other Value) Ordering {
+	return Equal
 }
 
-func (v NullValue) Plus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v NullValue) Plus(other Value) Value {
+	return IntegerValue{0}
 }
 
-func (v NullValue) Minus(other Value) (Value, error) {
-	return IntegerValue{0}, nil
+func (v NullValue) Minus(other Value) Value {
+	return IntegerValue{0}
 }
 
 func (v NullValue) Mul(other Value) (Value, error) {
@@ -862,10 +838,6 @@ func (v NullValue) Modulus(other Value) (Value, error) {
 	return IntegerValue{0}, nil
 }
 
-func (v NullValue) Literal() string {
-	return v.AsText()
-}
-
 func (v NullValue) AsInt() int64 {
 	return 0
 }
@@ -875,7 +847,7 @@ func (v NullValue) AsFloat() float64 {
 }
 
 func (v NullValue) AsText() string {
-	return NullStr
+	return "Null"
 }
 
 func (v NullValue) AsBool() bool {

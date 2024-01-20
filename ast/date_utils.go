@@ -54,6 +54,70 @@ func DateTimeToTimeStamp(date string) int64 {
 	return t.Unix()
 }
 
+func DateTimeToHour(date int64) int64 {
+	t := time.Unix(date, 0)
+
+	return int64(t.Hour())
+}
+
+func DateToDayName(date int64) string {
+	t := time.Unix(date, 0)
+	dayName := ""
+
+	switch t.Weekday() {
+	case time.Monday:
+		dayName = "Monday"
+	case time.Tuesday:
+		dayName = "Tuesday"
+	case time.Wednesday:
+		dayName = "Wednesday"
+	case time.Thursday:
+		dayName = "Thursday"
+	case time.Friday:
+		dayName = "Friday"
+	case time.Saturday:
+		dayName = "Saturday"
+	case time.Sunday:
+		dayName = "Sunday"
+	}
+
+	return dayName
+}
+
+func DateToMonthName(date int64) string {
+	t := time.Unix(date, 0)
+	monthName := ""
+
+	switch t.Month() {
+	case time.January:
+		monthName = "January"
+	case time.February:
+		monthName = "February"
+	case time.March:
+		monthName = "March"
+	case time.April:
+		monthName = "April"
+	case time.May:
+		monthName = "May"
+	case time.June:
+		monthName = "June"
+	case time.July:
+		monthName = "July"
+	case time.August:
+		monthName = "August"
+	case time.September:
+		monthName = "September"
+	case time.October:
+		monthName = "October"
+	case time.November:
+		monthName = "November"
+	case time.December:
+		monthName = "December"
+	}
+
+	return monthName
+}
+
 func TimeStampFromYearAndDay(year int, dayOfYear uint) int64 {
 	t := time.Date(year, 1, 0, 0, 0, 0, 0, time.UTC)
 	t = t.AddDate(0, 0, int(dayOfYear))
