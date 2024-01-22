@@ -94,7 +94,7 @@ type Token struct {
 }
 
 // nolint:funlen,gocyclo
-func Tokenize(script string) ([]Token, GQLError) {
+func Tokenize(script string) ([]Token, *Diagnostic) {
 	var tokens []Token
 
 	position := 0
@@ -109,15 +109,17 @@ func Tokenize(script string) ([]Token, GQLError) {
 
 		// Symbol
 		if unicode.IsLetter(char) {
-			identifier := consumeIdentifier(characters, &position, &columnStart)
-			tokens = append(tokens, identifier)
+			tokens = append(tokens, consumeIdentifier(characters, &position, &columnStart))
 			continue
 		}
 
 		// Global Variable Symbol
 		if char == '@' {
-			identifier := consumeGlobalVariableName(characters, &position, &columnStart)
-			tokens = append(tokens, identifier)
+			result, err := consumeGlobalVariableName(characters, &position, &columnStart)
+			if err.Message() != "" {
+				return nil, err
+			}
+			tokens = append(tokens, result)
 			continue
 		}
 
@@ -128,7 +130,7 @@ func Tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeHexNumber(characters, &position, &columnStart)
-					if err.Message != "" {
+					if err.Message() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -139,7 +141,7 @@ func Tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeBinaryNumber(characters, &position, &columnStart)
-					if err.Message != "" {
+					if err.Message() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -150,7 +152,7 @@ func Tokenize(script string) ([]Token, GQLError) {
 					position += 2
 					columnStart += 2
 					result, err := consumeOctalNumber(characters, &position, &columnStart)
-					if err.Message != "" {
+					if err.Message() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -159,7 +161,7 @@ func Tokenize(script string) ([]Token, GQLError) {
 			}
 
 			number, err := consumeNumber(characters, &position, &columnStart)
-			if err.Message != "" {
+			if err.Message() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, number)
@@ -169,7 +171,17 @@ func Tokenize(script string) ([]Token, GQLError) {
 		// String literal
 		if char == '"' {
 			result, err := consumeString(characters, &position, &columnStart)
-			if err.Message != "" {
+			if err.Message() != "" {
+				return nil, err
+			}
+			tokens = append(tokens, result)
+			continue
+		}
+
+		// All chars between two backticks should be consumed as identifier
+		if char == '`' {
+			result, err := consumeBackticksIdentifier(characters, &position, &columnStart)
+			if err.Message() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, result)
@@ -213,7 +225,7 @@ func Tokenize(script string) ([]Token, GQLError) {
 			// Ignore C style comment which from /* comment */
 			if (position+1 < len(characters)) && (characters[position+1] == '*') {
 				err := ignoreCStyleComment(characters, &position)
-				if err.Message != "" {
+				if err.Message() != "" {
 					return nil, err
 				}
 				continue
@@ -368,7 +380,9 @@ func Tokenize(script string) ([]Token, GQLError) {
 				position += 2
 				continue
 			}
-			return nil, GQLError{Message: "Expect `=` after `:`", Location: Location{Start: columnStart, End: position}}
+			return nil, NewError("Expect `=` after `:`").
+				AddHelp("Only token that has `:` is `:=` so make sure you add `=` after `:`").
+				WithLocationSpan(columnStart, position)
 		}
 
 		// Bang or Bang Equal
@@ -420,15 +434,15 @@ func Tokenize(script string) ([]Token, GQLError) {
 			continue
 		}
 
-		return nil, GQLError{Message: "Unexpected character", Location: Location{Start: columnStart, End: position}}
+		return nil, NewError("Unexpected character").WithLocationSpan(columnStart, position)
 	}
 
-	return tokens, GQLError{}
+	return tokens, nil
 }
 
-func consumeGlobalVariableName(chars []rune, pos, start *int) Token {
+func consumeGlobalVariableName(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}
+	return Token{}, nil
 }
 
 func consumeIdentifier(chars []rune, pos, start *int) Token {
@@ -436,38 +450,43 @@ func consumeIdentifier(chars []rune, pos, start *int) Token {
 	return Token{}
 }
 
-func consumeNumber(chars []rune, pos, start *int) (Token, GQLError) {
+func consumeNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}, GQLError{}
+	return Token{}, nil
 }
 
-func consumeBinaryNumber(chars []rune, pos, start *int) (Token, GQLError) {
+func consumeBackticksIdentifier(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}, GQLError{}
+	return Token{}, nil
 }
 
-func consumeOctalNumber(chars []rune, pos, start *int) (Token, GQLError) {
+func consumeBinaryNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}, GQLError{}
+	return Token{}, nil
 }
 
-func consumeHexNumber(chars []rune, pos, start *int) (Token, GQLError) {
+func consumeOctalNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}, GQLError{}
+	return Token{}, nil
 }
 
-func consumeString(chars []rune, pos, start *int) (Token, GQLError) {
+func consumeHexNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
 	// TODO: FIXME
-	return Token{}, GQLError{}
+	return Token{}, nil
+}
+
+func consumeString(chars []rune, pos, start *int) (Token, *Diagnostic) {
+	// TODO: FIXME
+	return Token{}, nil
 }
 
 func ignoreSingleLineComment(chars []rune, pos *int) {
 	// TODO: FIXME
 }
 
-func ignoreCStyleComment(chars []rune, pos *int) GQLError {
+func ignoreCStyleComment(chars []rune, pos *int) *Diagnostic {
 	// TODO: FIXME
-	return GQLError{}
+	return nil
 }
 
 func resolveSymbolKind(literal string) TokenKind {
