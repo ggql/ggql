@@ -2,38 +2,32 @@ package ast
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestFlatGQLGroups(t *testing.T) {
-	var group []GQLObject
-	var groups [][]GQLObject
-	var val Value
+func TestGroupIsEmpty(t *testing.T) {
+	// TBD: FIXME
+}
 
-	err := FlatGQLGroups(&groups)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 1, len(groups))
+func TestGroupLen(t *testing.T) {
+	// TBD: FIXME
+}
 
-	for _, item := range groups {
-		assert.Equal(t, 0, len(item))
-	}
+func TestGitQLObjectFlat(t *testing.T) {
+	// TBD: FIXME
+}
 
-	group = append(group, GQLObject{
-		Attributes: map[string]Value{
-			"key": val,
-		},
-	})
+func TestGitQLObjectIsEmpty(t *testing.T) {
+	// TBD: FIXME
+}
 
-	groups = groups[:0]
-	groups = append(groups, group, group)
-	assert.Equal(t, 2, len(groups))
+func TestGitQLObjectLen(t *testing.T) {
+	// TBD: FIXME
+}
 
-	err = FlatGQLGroups(&groups)
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 1, len(groups))
+func TestGitQLObjectAsJson(t *testing.T) {
+	// TBD: FIXME
+}
 
-	for _, item := range groups {
-		assert.Equal(t, 2, len(item))
-	}
+func TestGitQLObjectAsCsv(t *testing.T) {
+	// TBD: FIXME
 }

@@ -2,6 +2,8 @@ package ast
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -10,6 +12,11 @@ const (
 	TestDateTime     = "2024-01-02 08:30:00"
 	TestDateTimeFull = "2024-01-02 08:30:00.000"
 )
+
+func TestGetUnixTimestampMs(t *testing.T) {
+	ret := GetUnixTimestampMs()
+	assert.NotEqual(t, 0, ret)
+}
 
 func TestTimeStampToDate(t *testing.T) {
 	type args struct {
@@ -28,6 +35,28 @@ func TestTimeStampToDate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := TimeStampToDate(tt.args.timeStamp); got != tt.want {
 				t.Errorf("TimeStampToDate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTimeStampToTime(t *testing.T) {
+	type args struct {
+		timeStamp int64
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "test1", args: args{timeStamp: 1704155400}, want: "08:30:00"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := TimeStampToTime(tt.args.timeStamp); got != tt.want {
+				t.Logf("TimeStampToTime() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -100,26 +129,20 @@ func TestDateTimeToTimeStamp(t *testing.T) {
 	}
 }
 
-func TestTimeStampToTime(t *testing.T) {
-	type args struct {
-		timeStamp int64
-	}
+func TestDateTimeToHour(t *testing.T) {
+	// TBD: FIXME
+}
 
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "test1", args: args{timeStamp: 1704155400}, want: "08:30:00"},
-	}
+func TestDateToDayNumberInMonth(t *testing.T) {
+	// TBD: FIXME
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampToTime(tt.args.timeStamp); got != tt.want {
-				t.Logf("TimeStampToTime() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+func TestDateToDayName(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDateToMonthName(t *testing.T) {
+	// TBD: FIXME
 }
 
 func TestTimeStampFromYearAndDay(t *testing.T) {

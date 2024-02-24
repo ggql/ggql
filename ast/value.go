@@ -21,8 +21,8 @@ type Value interface {
 	Fmt() string
 	Equals(Value) bool
 	Compare(Value) Ordering
-	Plus(Value) Value
-	Minus(Value) Value
+	Plus(Value) (Value, error)
+	Minus(Value) (Value, error)
 	Mul(Value) (Value, error)
 	Div(Value) (Value, error)
 	Modulus(Value) (Value, error)
@@ -74,20 +74,42 @@ func (v IntegerValue) Compare(other Value) Ordering {
 	return helper(other.AsInt(), v.AsInt())
 }
 
-func (v IntegerValue) Plus(other Value) Value {
+func (v IntegerValue) Plus(other Value) (Value, error) {
 	if other.DataType().IsFloat() {
-		return FloatValue{float64(v.AsInt()) + other.AsFloat()}
+		return FloatValue{float64(v.AsInt()) + other.AsFloat()}, nil
 	}
 
-	return IntegerValue{v.AsInt() + other.AsInt()}
+	lhs := v.AsInt()
+	rhs := other.AsInt()
+
+	if lhs > 0 && rhs > 0 && lhs > math.MaxInt64-rhs {
+		return nil, errors.New("integer overflow")
+	}
+
+	if lhs < 0 && rhs < 0 && lhs < math.MinInt64-rhs {
+		return nil, errors.New("integer underflow")
+	}
+
+	return IntegerValue{lhs + rhs}, nil
 }
 
-func (v IntegerValue) Minus(other Value) Value {
+func (v IntegerValue) Minus(other Value) (Value, error) {
 	if other.DataType().IsFloat() {
-		return FloatValue{float64(v.AsInt()) - other.AsFloat()}
+		return FloatValue{float64(v.AsInt()) - other.AsFloat()}, nil
 	}
 
-	return IntegerValue{v.AsInt() - other.AsInt()}
+	lhs := v.AsInt()
+	rhs := other.AsInt()
+
+	if lhs < 0 && rhs > 0 && lhs < math.MinInt64+rhs {
+		return nil, errors.New("integer underflow")
+	}
+
+	if lhs > 0 && rhs < 0 && lhs > math.MaxInt64+rhs {
+		return nil, errors.New("integer underflow")
+	}
+
+	return IntegerValue{lhs - rhs}, nil
 }
 
 func (v IntegerValue) Mul(other Value) (Value, error) {
@@ -216,20 +238,20 @@ func (v FloatValue) Compare(other Value) Ordering {
 	return helper(other.AsFloat(), v.AsFloat())
 }
 
-func (v FloatValue) Plus(other Value) Value {
+func (v FloatValue) Plus(other Value) (Value, error) {
 	if other.DataType().IsInt() {
-		return FloatValue{v.AsFloat() + float64(other.AsInt())}
+		return FloatValue{v.AsFloat() + float64(other.AsInt())}, nil
 	}
 
-	return FloatValue{v.AsFloat() + other.AsFloat()}
+	return FloatValue{v.AsFloat() + other.AsFloat()}, nil
 }
 
-func (v FloatValue) Minus(other Value) Value {
+func (v FloatValue) Minus(other Value) (Value, error) {
 	if other.DataType().IsInt() {
-		return FloatValue{v.AsFloat() - float64(other.AsInt())}
+		return FloatValue{v.AsFloat() - float64(other.AsInt())}, nil
 	}
 
-	return FloatValue{v.AsFloat() - other.AsFloat()}
+	return FloatValue{v.AsFloat() - other.AsFloat()}, nil
 }
 
 func (v FloatValue) Mul(other Value) (Value, error) {
@@ -342,12 +364,12 @@ func (v TextValue) Compare(other Value) Ordering {
 	return helper(other.AsText(), v.AsText())
 }
 
-func (v TextValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v TextValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v TextValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v TextValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v TextValue) Mul(other Value) (Value, error) {
@@ -416,12 +438,12 @@ func (v BooleanValue) Compare(other Value) Ordering {
 	return Equal
 }
 
-func (v BooleanValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v BooleanValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v BooleanValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v BooleanValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v BooleanValue) Mul(other Value) (Value, error) {
@@ -503,12 +525,12 @@ func (v DateTimeValue) Compare(other Value) Ordering {
 	return helper(other.AsDateTime(), v.AsDateTime())
 }
 
-func (v DateTimeValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v DateTimeValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v DateTimeValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v DateTimeValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v DateTimeValue) Mul(other Value) (Value, error) {
@@ -590,12 +612,12 @@ func (v DateValue) Compare(other Value) Ordering {
 	return helper(other.AsDate(), v.AsDate())
 }
 
-func (v DateValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v DateValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v DateValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v DateValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v DateValue) Mul(other Value) (Value, error) {
@@ -678,12 +700,12 @@ func (v TimeValue) Compare(other Value) Ordering {
 	return helper(other.AsTime(), v.AsTime())
 }
 
-func (v TimeValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v TimeValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v TimeValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v TimeValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v TimeValue) Mul(other Value) (Value, error) {
@@ -748,12 +770,12 @@ func (v UndefinedValue) Compare(other Value) Ordering {
 	return Equal
 }
 
-func (v UndefinedValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v UndefinedValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v UndefinedValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v UndefinedValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v UndefinedValue) Mul(other Value) (Value, error) {
@@ -818,12 +840,12 @@ func (v NullValue) Compare(other Value) Ordering {
 	return Equal
 }
 
-func (v NullValue) Plus(other Value) Value {
-	return IntegerValue{0}
+func (v NullValue) Plus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
-func (v NullValue) Minus(other Value) Value {
-	return IntegerValue{0}
+func (v NullValue) Minus(other Value) (Value, error) {
+	return IntegerValue{0}, nil
 }
 
 func (v NullValue) Mul(other Value) (Value, error) {

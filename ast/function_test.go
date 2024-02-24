@@ -139,6 +139,10 @@ func TestTextChar(t *testing.T) {
 	assert.Equal(t, "a", ret.AsText())
 }
 
+func TestTextCharIndex(t *testing.T) {
+	// TBD: FIXME
+}
+
 func TestTextReplace(t *testing.T) {
 	var buf []Value
 
@@ -258,6 +262,14 @@ func TestTextConcat(t *testing.T) {
 	assert.Equal(t, "helloworld", ret.AsText())
 }
 
+func TestTextConcatWs(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestTextStrcmp(t *testing.T) {
+	// TBD: FIXME
+}
+
 // Date functions
 
 func TestDateCurrentDate(t *testing.T) {
@@ -291,6 +303,30 @@ func TestDateMakeDate(t *testing.T) {
 	ret := dateMakeDate(buf)
 	fmt.Printf("date_make_date: %d", ret.AsDate())
 	assert.NotEqual(t, 0, ret.AsDate())
+}
+
+func TestDateMakeTime(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDateDay(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDatename(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDateMonthname(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDateHour(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestDateIsDate(t *testing.T) {
+	// TBD: FIXME
 }
 
 // Numeric functions
@@ -388,12 +424,28 @@ func TestNumericCos(t *testing.T) {
 	assert.Equal(t, float64(1), ret.AsFloat())
 }
 
+func TestNumericAcos(t *testing.T) {
+	// TBD: FIXME
+}
+
 func TestNumericTan(t *testing.T) {
 	var buf []Value
 
 	buf = append(buf, FloatValue{0})
 	ret := numericTan(buf)
 	assert.Equal(t, float64(0), ret.AsFloat())
+}
+
+func TestNumericAtan(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestNumericAtn2(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestNumericSign(t *testing.T) {
+	// TBD: FIXME
 }
 
 // General functions
@@ -435,4 +487,12 @@ func TestGeneralTypeOf(t *testing.T) {
 	buf = append(buf, IntegerValue{1})
 	ret = generalTypeOf(buf)
 	assert.Equal(t, "Integer", ret.AsText())
+}
+
+func TestGeneralGreatest(t *testing.T) {
+	// TBD: FIXME
+}
+
+func TestGeneralLeast(t *testing.T) {
+	// TBD: FIXME
 }

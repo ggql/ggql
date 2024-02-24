@@ -41,6 +41,7 @@ var Functions = map[string]Function{
 	"translate":  textTranslate,
 	"soundex":    textSoundex,
 	"concat":     textConcat,
+	"concat_ws":  textConcatWs,
 	"unicode":    textUnicode,
 	"strcmp":     textStrcmp,
 
@@ -51,6 +52,7 @@ var Functions = map[string]Function{
 	"now":               dateCurrentTimestamp,
 	"makedate":          dateMakeDate,
 	"maketime":          dateMakeTime,
+	"day":               dateDay,
 	"dayname":           dateDayname,
 	"monthname":         dateMonthname,
 	"hour":              dateHour,
@@ -103,6 +105,7 @@ var Prototypes = map[string]Prototype{
 	"translate":  {Parameters: []DataType{Text{}, Text{}, Text{}}, Result: Text{}},
 	"soundex":    {Parameters: []DataType{Text{}}, Result: Text{}},
 	"concat":     {Parameters: []DataType{Any{}, Any{}, Varargs{Any{}}}, Result: Text{}},
+	"concat_ws":  {Parameters: []DataType{Text{}, Any{}, Any{}, Varargs{Any{}}}, Result: Text{}},
 	"unicode":    {Parameters: []DataType{Text{}}, Result: Integer{}},
 	"strcmp":     {Parameters: []DataType{Text{}, Text{}}, Result: Integer{}},
 
@@ -113,6 +116,7 @@ var Prototypes = map[string]Prototype{
 	"now":               {Parameters: []DataType{}, Result: DateTime{}},
 	"makedate":          {Parameters: []DataType{Integer{}, Integer{}}, Result: Date{}},
 	"maketime":          {Parameters: []DataType{Integer{}, Integer{}, Integer{}}, Result: Time{}},
+	"day":               {Parameters: []DataType{Date{}}, Result: Integer{}},
 	"dayname":           {Parameters: []DataType{Date{}}, Result: Text{}},
 	"monthname":         {Parameters: []DataType{Date{}}, Result: Text{}},
 	"hour":              {Parameters: []DataType{DateTime{}}, Result: Integer{}},
@@ -131,7 +135,7 @@ var Prototypes = map[string]Prototype{
 	"tan":    {Parameters: []DataType{Float{}}, Result: Float{}},
 	"atan":   {Parameters: []DataType{Float{}}, Result: Float{}},
 	"atn2":   {Parameters: []DataType{Float{}, Float{}}, Result: Float{}},
-	"sign":   {Parameters: []DataType{Float{}}, Result: Integer{}},
+	"sign":   {Parameters: []DataType{Variant{Integer{}, Float{}}}, Result: Integer{}},
 
 	// General functions
 	"isnull":    {Parameters: []DataType{Any{}}, Result: Boolean{}},
@@ -386,6 +390,18 @@ func textConcat(inputs []Value) Value {
 	return TextValue{strings.Join(text, "")}
 }
 
+func textConcatWs(inputs []Value) Value {
+	var text []string
+
+	for _, v := range inputs[1:] {
+		text = append(text, v.AsText())
+	}
+
+	separator := inputs[0].AsText()
+
+	return TextValue{strings.Join(text, separator)}
+}
+
 func textStrcmp(inputs []Value) Value {
 	comparison := strings.Compare(inputs[0].AsText(), inputs[1].AsText())
 	switch {
@@ -437,6 +453,13 @@ func dateMakeTime(inputs []Value) Value {
 	second := inputs[2].AsInt()
 
 	return TimeValue{fmt.Sprintf("%d:%02d:%02d", hour, minute, second)}
+}
+
+func dateDay(inputs []Value) Value {
+	date := inputs[0].AsDate()
+	dateNum := DateToDayNumberInMonth(date)
+
+	return IntegerValue{int64(dateNum)}
 }
 
 func dateDayname(inputs []Value) Value {
@@ -539,7 +562,24 @@ func numericAtn2(inputs []Value) Value {
 }
 
 func numericSign(inputs []Value) Value {
-	floatValue := inputs[0].AsFloat()
+	helper := func(x int64) int64 {
+		switch {
+		case x < 0:
+			return -1
+		case x > 0:
+			return 1
+		}
+		return 0
+	}
+
+	value := inputs[0]
+
+	if value.DataType().IsInt() {
+		intValue := value.AsInt()
+		return IntegerValue{helper(intValue)}
+	}
+
+	floatValue := value.AsFloat()
 
 	if floatValue == 0.0 {
 		return IntegerValue{0}

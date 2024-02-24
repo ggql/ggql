@@ -60,6 +60,12 @@ func DateTimeToHour(date int64) int64 {
 	return int64(t.Hour())
 }
 
+func DateToDayNumberInMonth(date int64) int {
+	t := time.Unix(date, 0)
+
+	return t.Day()
+}
+
 func DateToDayName(date int64) string {
 	t := time.Unix(date, 0)
 	dayName := ""
