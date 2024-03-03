@@ -63,4 +63,6 @@ func TestParseArguments(t *testing.T) {
 	if !reflect.DeepEqual(got7.ReplMode.PageSize, want7.ReplMode.PageSize) {
 		t.Errorf("want: %v  got: %v", want7, got7)
 	}
+
+	// TBD: FIXME
 }

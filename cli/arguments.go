@@ -4,14 +4,28 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
+)
+
+// Represent the different type of available formats
+type OutputFormat int
+
+const (
+	// Render the output as table
+	Render OutputFormat = iota
+	// Print the output in json format
+	JSON
+	// Print the output in csv format
+	CSV
 )
 
 // Arguments for GitQL
 type Arguments struct {
-	Repos      []string
-	Analysis   bool
-	Pagination bool
-	PageSize   int
+	Repos        []string
+	Analysis     bool
+	Pagination   bool
+	PageSize     int
+	outputFormat OutputFormat
 }
 
 // Command represents the possible GitQL commands
@@ -29,10 +43,11 @@ type Command struct {
 // NewArguments creates a new instance of Arguments with default settings
 func NewArguments() Arguments {
 	return Arguments{
-		Repos:      []string{},
-		Analysis:   false,
-		Pagination: false,
-		PageSize:   10,
+		Repos:        []string{},
+		Analysis:     false,
+		Pagination:   false,
+		PageSize:     10,
+		outputFormat: Render,
 	}
 }
 
@@ -55,18 +70,15 @@ func ParseArguments(args []string) Command {
 	argIndex := 1
 	for argIndex < argsLen {
 		arg := args[argIndex]
-
 		if arg[0] != '-' {
 			return Command{Error: fmt.Sprintf("Unknown argument %s", arg)}
 		}
-
 		switch arg {
 		case "--repos", "-r":
 			argIndex++
 			if argIndex >= argsLen {
 				return Command{Error: fmt.Sprintf("Argument %s must be followed by one or more paths", arg)}
 			}
-
 			for argIndex < argsLen {
 				repo := args[argIndex]
 				if repo[0] != '-' {
@@ -74,7 +86,6 @@ func ParseArguments(args []string) Command {
 					argIndex++
 					continue
 				}
-
 				break
 			}
 		case "--query", "-q":
@@ -82,7 +93,6 @@ func ParseArguments(args []string) Command {
 			if argIndex >= argsLen {
 				return Command{Error: fmt.Sprintf("Argument %s must be followed by the query", arg)}
 			}
-
 			optionalQuery = args[argIndex]
 			argIndex++
 		case "--analysis", "-a":
@@ -96,14 +106,27 @@ func ParseArguments(args []string) Command {
 			if argIndex >= argsLen {
 				return Command{Error: fmt.Sprintf("Argument %s must be followed by the page size", arg)}
 			}
-
 			pageSize, err := strconv.Atoi(args[argIndex])
 			if err != nil {
 				return Command{Error: "Invalid page size"}
 			}
-
 			arguments.PageSize = pageSize
 			argIndex++
+		case "--output", "-o":
+			argIndex++
+			if argIndex >= len(args) {
+				return Command{Error: fmt.Sprintf("argument %s must be followed by output format", arg)}
+			}
+			switch strings.ToLower(args[argIndex]) {
+			case "csv":
+				arguments.outputFormat = CSV
+			case "json":
+				arguments.outputFormat = JSON
+			case "render":
+				arguments.outputFormat = Render
+			default:
+				return Command{Error: "invalid output format"}
+			}
 		default:
 			return Command{Error: fmt.Sprintf("Unknown command %s", arg)}
 		}
@@ -138,13 +161,14 @@ func ParseArguments(args []string) Command {
 func PrintHelpList() {
 	fmt.Println("GitQL is a SQL like query language to run on local repositories")
 	fmt.Println()
-	fmt.Println("Usage: gitql.exe [OPTIONS]")
+	fmt.Println("Usage: gitql [OPTIONS]")
 	fmt.Println()
 	fmt.Println("Options:")
 	fmt.Println("-r,  --repos <REPOS>        Path for local repositories to run query on")
 	fmt.Println("-q,  --query <GQL Query>    GitQL query to run on selected repositories")
 	fmt.Println("-p,  --pagination           Enable print result with pagination")
 	fmt.Println("-ps, --pagesize             Set pagination page size [default: 10]")
+	fmt.Println("-o,  --output               Set output format [render, json, csv]")
 	fmt.Println("-a,  --analysis             Print Query analysis")
 	fmt.Println("-h,  --help                 Print GitQL help")
 	fmt.Println("-v,  --version              Print GitQL Current Version")

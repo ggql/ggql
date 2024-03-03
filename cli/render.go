@@ -23,7 +23,7 @@ const (
 )
 
 // nolint: gocyclo
-func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, pagination bool, pageSize int) error {
+func RenderObjects(groups *ast.GitQLObject, hiddenSelections []string, pagination bool, pageSize int) error {
 	contains := func(slice []string, item string) bool {
 		for _, a := range slice {
 			if a == item {
@@ -38,23 +38,21 @@ func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, paginat
 	var tableHeaders []string
 	var titles []string
 
-	if len(*groups) > 1 {
-		if e := ast.FlatGQLGroups(groups); e != nil {
-			return errors.Wrap(e, "failed to run FlatGQLGroups")
-		}
+	if groups.Len() > 1 {
+		groups.Flat()
 	}
 
-	if len(*groups) == 0 || len((*groups)[0]) == 0 {
+	if groups.IsEmpty() || groups.Groups[0].IsEmpty() {
 		return nil
 	}
 
-	gqlGroup := (*groups)[0]
-	gqlGroupLen := len(gqlGroup)
+	gqlGroup := groups.Groups[0]
+	gqlGroupLen := gqlGroup.Len()
 
 	// Setup titles
-	for key, val := range (*groups)[0][0].Attributes {
-		if !contains(hiddenSelections, key) {
-			titles = append(titles, val.Literal())
+	for _, title := range groups.Titles {
+		if !contains(hiddenSelections, title) {
+			titles = append(titles, title)
 		}
 	}
 
@@ -65,7 +63,7 @@ func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, paginat
 
 	// Print all data without pagination
 	if !pagination || pageSize >= gqlGroupLen {
-		return printGroupAsTable(titles, tableHeaders, gqlGroup)
+		return printGroupAsTable(titles, tableHeaders, gqlGroup.Rows)
 	}
 
 	// Setup the pagination mode
@@ -78,7 +76,7 @@ func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, paginat
 		startIndex := (currentPage - 1) * pageSize
 		endIndex := min(startIndex+pageSize, gqlGroupLen)
 
-		currentPageGroups := gqlGroup[startIndex:endIndex]
+		currentPageGroups := gqlGroup.Rows[startIndex:endIndex]
 
 		fmt.Printf("Page %d/%d\n", currentPage, numberOfPages)
 		err = printGroupAsTable(titles, tableHeaders, currentPageGroups)
@@ -100,16 +98,16 @@ func RenderObjects(groups *[][]ast.GQLObject, hiddenSelections []string, paginat
 	return err
 }
 
-func printGroupAsTable(titles, tableHeaders []string, group []ast.GQLObject) error {
+func printGroupAsTable(titles, tableHeaders []string, rows []ast.Row) error {
 	data := pterm.TableData{}
 	data = append(data, tableHeaders)
 
-	for _, object := range group {
-		var row []string
-		for _, title := range titles {
-			row = append(row, object.Attributes[title].Literal())
+	for _, row := range rows {
+		var buf []string
+		for index, _ := range titles {
+			buf = append(buf, row.Values[index].AsText())
 		}
-		data = append(data, row)
+		data = append(data, buf)
 	}
 
 	if err := pterm.DefaultTable.WithHasHeader().WithRowSeparator("-").WithHeaderRowSeparator("-").WithData(data).Render(); err != nil {

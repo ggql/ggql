@@ -15,7 +15,7 @@ func TestSetColor(t *testing.T) {
 	}
 }
 
-func TestReSet(t *testing.T) {
+func TestReset(t *testing.T) {
 	var tmp = NewColoredStream()
 	var wantColor = WHITE
 	tmp.Reset()

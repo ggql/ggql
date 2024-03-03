@@ -1,16 +1,17 @@
 package cli
 
 import (
-	"strings"
-
 	"github.com/fatih/color"
+	"strings"
 )
 
 const (
-	GREEN  = color.FgGreen
-	RED    = color.FgRed
-	YELLOW = color.FgYellow
-	WHITE  = color.FgWhite
+	Blue   = color.FgBlue
+	Cyan   = color.FgCyan
+	Green  = color.FgGreen
+	Red    = color.FgRed
+	Yellow = color.FgYellow
+	White  = color.FgWhite
 )
 
 type ColoredStream struct {
@@ -25,13 +26,13 @@ func NewColoredStream() *ColoredStream {
 
 func (cs *ColoredStream) Printf(format string, value ...interface{}) {
 	switch cs.outColor {
-	case GREEN:
+	case Green:
 		color.Green(format, value...)
-	case RED:
+	case Red:
 		color.Red(format, value...)
-	case YELLOW:
+	case Yellow:
 		color.Yellow(format, value...)
-	case WHITE:
+	case White:
 		color.White(format, value...)
 	}
 }
