@@ -1,9 +1,8 @@
 #!/bin/bash
 
-build=$(date +%FT%T%z)
 version="$1"
 
-ldflags="-s -w -X github.com/ggql/ggql/config.Build=$build -X github.com/ggql/ggql/config.Version=$version"
+ldflags="-s -w -X github.com/ggql/ggql/cli.Version=$version"
 target="ggql"
 
 go env -w GOPROXY=https://goproxy.cn,direct
