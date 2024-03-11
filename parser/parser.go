@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/ggql/ggql/ast"
 )
@@ -57,7 +58,7 @@ func ParseSetQuery(env *ast.Environment, tokens *[]Token, position *int) (ast.Qu
 	// Consume variable name
 	*position += 1
 
-	if *position >= lentokens || IsAssignmentOperator(&(*tokens)[*position]) {
+	if *position >= lentokens || !IsAssignmentOperator(&(*tokens)[*position]) {
 		return ast.Query{}, *NewError("Expect `=` or `:=` and Value after Variable name").WithLocation(GetSafeLocation(tokens, *position-1))
 	}
 
@@ -143,7 +144,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 
 				// Report clear error for Integer parsing
 				if err != nil {
-					return ast.Query{}, *NewError("`OFFSET` integer value is invalid").AddNote(fmt.Sprintf("`OFFSET` value must be between 0 and ", math.MaxInt)).WithLocation(token.Location)
+					return ast.Query{}, *NewError("`OFFSET` integer value is invalid").AddNote(fmt.Sprintf("`OFFSET` value must be between 0 and %d", math.MaxInt)).WithLocation(token.Location)
 				}
 
 				*position += 1
@@ -221,15 +222,13 @@ func ParseSelectStatement(context *ParserContext, env *ast.Environment, tokens *
 	} else {
 		for *position < len(*tokens) && (*tokens)[*position].Kind != From {
 			expression, _ := ParseExpression(context, env, tokens, position)
+			fmt.Println("==========1")
 			expr_type := expression.ExprType(env)
+			fmt.Println("===expr_type:", expr_type)
+			fmt.Println("==========2")
 			expression_name, _ := GetExpressionName(expression)
 
 			field_name := expression_name
-			// if expression_name != "" {
-			// 	field_name := expression_name
-			// } else {
-			// 	field_name := context.GenerateColumnName()
-			// }
 
 			// Assert that each selected field is unique
 			if contains(fields_names, field_name) {
@@ -402,7 +401,7 @@ func ParseLimitStatement(tokens *[]Token, position *int) (ast.Statement, Diagnos
 
 	// Report clear error for Integer parsing
 	if err != nil {
-		return &ast.OffsetStatement{}, *NewError("`OFFSET` integer value is invalid").AddNote(fmt.Sprintf("`LIMIT` value must be between 0 and ", math.MaxInt)).WithLocation(GetSafeLocation(tokens, *position))
+		return &ast.OffsetStatement{}, *NewError("`OFFSET` integer value is invalid").AddNote(fmt.Sprintf("`LIMIT` value must be between 0 and %d", math.MaxInt)).WithLocation(GetSafeLocation(tokens, *position))
 	}
 
 	*position += 1
@@ -421,7 +420,7 @@ func ParseOffsetStatement(tokens *[]Token, position *int) (ast.Statement, Diagno
 
 	// Report clear error for Integer parsing
 	if err != nil {
-		return &ast.OffsetStatement{}, *NewError("`LIMIT` integer value is invalid").AddNote(fmt.Sprintf("`OFFSET` value must be between 0 and ", math.MaxInt)).WithLocation(GetSafeLocation(tokens, *position))
+		return &ast.OffsetStatement{}, *NewError("`LIMIT` integer value is invalid").AddNote(fmt.Sprintf("`OFFSET` value must be between 0 and %d", math.MaxInt)).WithLocation(GetSafeLocation(tokens, *position))
 	}
 
 	*position += 1
@@ -485,7 +484,7 @@ func ParseExpression(context *ParserContext, env *ast.Environment, tokens *[]Tok
 			context.HiddenSelections = append(context.HiddenSelections, column_name)
 		}
 		context.Aggregations[column_name] = ast.AggregateValue{Expression: &expression}
-		return ast.SymbolExpression{
+		return &ast.SymbolExpression{
 			Value: column_name,
 		}, Diagnostic{}
 	}
@@ -515,29 +514,6 @@ func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tok
 	}
 
 	return expression, Diagnostic{}
-}
-
-// // getExpressionName 函数翻译
-// func getExpressionName(expression Expression) (string, error) {
-// 	switch expr := expression.asAny().(type) {
-// 	case *SymbolExpression:
-// 		return expr.value, nil
-// 	case *GlobalVariableExpression:
-// 		return expr.name, nil
-// 	default:
-// 		return "", fmt.Errorf("Invalid expression type")
-// 	}
-// }
-
-/// Remove last token if it semicolon, because it's optional
-func ConsumeOptionalSemicolonIfExists(tokens *[]Token) {
-	if len(*tokens) == 0 {
-		return
-	}
-	lastToken := (*tokens)[len(*tokens)-1]
-	if lastToken.Kind == Semicolon {
-		*tokens = (*tokens)[:len(*tokens)-1]
-	}
 }
 
 func ParseIsNullExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
@@ -590,7 +566,7 @@ func ParseInExpression(context *ParserContext, env *ast.Environment, tokens *[]T
 
 		values, _ := ParseArgumentsExpressions(context, env, tokens, position)
 		if len(values) == 0 {
-			return ast.BooleanExpression{IsTrue: has_not_keyword}, Diagnostic{}
+			return &ast.BooleanExpression{IsTrue: has_not_keyword}, Diagnostic{}
 		}
 
 		values_type_result := CheckAllValuesAreSameType(env, values)
@@ -683,7 +659,7 @@ func ParseLogicalOrExpression(context *ParserContext, env *ast.Environment, toke
 			)
 		}
 
-		lhs = ast.LogicalExpression{
+		lhs = &ast.LogicalExpression{
 			Left:     lhs,
 			Operator: ast.Or,
 			Right:    rhs,
@@ -719,7 +695,7 @@ func ParseLogicalAndExpression(context *ParserContext, env *ast.Environment, tok
 			)
 		}
 
-		lhs = ast.LogicalExpression{
+		lhs = &ast.LogicalExpression{
 			Left:     lhs,
 			Operator: ast.And,
 			Right:    rhs,
@@ -728,6 +704,7 @@ func ParseLogicalAndExpression(context *ParserContext, env *ast.Environment, tok
 
 	return lhs, Diagnostic{}
 }
+
 func ParseBitwiseOrExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseLogicalXorExpression(context, env, tokens, position)
 	if err.message != "" || *position >= len(*tokens) {
@@ -793,7 +770,7 @@ func ParseLogicalXorExpression(context *ParserContext, env *ast.Environment, tok
 			)
 		}
 
-		lhs = ast.LogicalExpression{
+		lhs = &ast.LogicalExpression{
 			Left:     lhs,
 			Operator: ast.Xor,
 			Right:    rhs,
@@ -830,7 +807,7 @@ func ParseBitwiseAndExpression(context *ParserContext, env *ast.Environment, tok
 			)
 		}
 
-		lhs = ast.BitwiseExpression{
+		lhs = &ast.BitwiseExpression{
 			Left:     lhs,
 			Operator: ast.BOAnd,
 			Right:    rhs,
@@ -886,7 +863,7 @@ func ParseEqualityExpression(context *ParserContext, env *ast.Environment, token
 			return nil, *NewError("").WithLocation(GetSafeLocation(tokens, *position-2))
 		}
 
-		return ast.ComparisonExpression{
+		return &ast.ComparisonExpression{
 			Left:     lhs,
 			Operator: comparison_operator,
 			Right:    rhs,
@@ -895,6 +872,7 @@ func ParseEqualityExpression(context *ParserContext, env *ast.Environment, token
 
 	return lhs, Diagnostic{}
 }
+
 func ParseComparisonExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseBitwiseShiftExpression(context, env, tokens, position)
 	if err.message != "" || *position >= len(*tokens) {
@@ -956,6 +934,7 @@ func ParseComparisonExpression(context *ParserContext, env *ast.Environment, tok
 
 	return lhs, Diagnostic{}
 }
+
 func ParseBitwiseShiftExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	lhs, _ := ParseTermExpression(context, env, tokens, position)
 
@@ -1308,7 +1287,7 @@ func ParsePrimaryExpression(context *ParserContext, env *ast.Environment, tokens
 	switch (*tokens)[*position].Kind {
 	case String:
 		*position += 1
-		return ast.StringExpression{
+		return &ast.StringExpression{
 			Value:     (*tokens)[*position-1].Literal,
 			ValueType: ast.StringValueText,
 		}, Diagnostic{}
@@ -1318,36 +1297,36 @@ func ParsePrimaryExpression(context *ParserContext, env *ast.Environment, tokens
 		if !contains(context.SelectedFields, value) {
 			context.HiddenSelections = append(context.HiddenSelections, value)
 		}
-		return ast.SymbolExpression{Value: value}, Diagnostic{}
+		return &ast.SymbolExpression{Value: value}, Diagnostic{}
 	case GlobalVariable:
 		name := (*tokens)[*position-1].Literal
 		*position += 1
-		return ast.GlobalVariableExpression{Name: name}, Diagnostic{}
+		return &ast.GlobalVariableExpression{Name: name}, Diagnostic{}
 	case Integer:
 		if integer, err := strconv.ParseInt((*tokens)[*position-1].Literal, 10, 64); err == nil {
 			*position += 1
 			value := ast.IntegerValue{Value: integer}
-			return ast.NumberExpression{Value: value}, Diagnostic{}
+			return &ast.NumberExpression{Value: value}, Diagnostic{}
 		}
 
-		return nil, *NewError("Too big Integer value").AddHelp(fmt.Sprintf("Integer value must be between %s and %s", math.MinInt64, math.MaxInt64)).WithLocation((*tokens)[*position].Location)
+		return nil, *NewError("Too big Integer value").AddHelp(fmt.Sprintf("Integer value must be between %d and %d", math.MinInt64, math.MaxInt64)).WithLocation((*tokens)[*position].Location)
 	case Float:
 		if float, err := strconv.ParseFloat((*tokens)[*position-1].Literal, 64); err == nil {
 			*position += 1
 			value := ast.FloatValue{Value: float}
-			return ast.NumberExpression{Value: value}, Diagnostic{}
+			return &ast.NumberExpression{Value: value}, Diagnostic{}
 		}
 
-		return nil, *NewError("Too big Float value").AddHelp("Try to use smaller value").AddNote(fmt.Sprintf("Float value must be between %s and %s", -math.MaxFloat64, math.MaxFloat64)).WithLocation((*tokens)[*position].Location)
+		return nil, *NewError("Too big Float value").AddHelp("Try to use smaller value").AddNote(fmt.Sprintf("Float value must be between %f and %f", -math.MaxFloat64, math.MaxFloat64)).WithLocation((*tokens)[*position].Location)
 	case True:
 		*position += 1
-		return ast.BooleanExpression{IsTrue: true}, Diagnostic{}
+		return &ast.BooleanExpression{IsTrue: true}, Diagnostic{}
 	case False:
 		*position += 1
-		return ast.BooleanExpression{IsTrue: false}, Diagnostic{}
+		return &ast.BooleanExpression{IsTrue: false}, Diagnostic{}
 	case Null:
 		*position += 1
-		return ast.NullExpression{}, Diagnostic{}
+		return &ast.NullExpression{}, Diagnostic{}
 	case LeftParen:
 		return ParseGroupExpression(context, env, tokens, position)
 	case Case:
@@ -1442,11 +1421,11 @@ func ParseCaseExpression(context *ParserContext, env *ast.Environment, tokens *[
 	values_type := values[0].ExprType(env)
 	for i, value := range values[1:] {
 		if values_type != value.ExprType(env) {
-			return nil, *NewError(fmt.Sprintf("Case value in branch %s has different type than the last branch", i+1)).AddNote("All values in `CASE` expression must has the same Type").WithLocation(case_location)
+			return nil, *NewError(fmt.Sprintf("Case value in branch %d has different type than the last branch", i+1)).AddNote("All values in `CASE` expression must has the same Type").WithLocation(case_location)
 		}
 	}
 
-	return ast.CaseExpression{
+	return &ast.CaseExpression{
 		Conditions:   conditions,
 		Values:       values,
 		DefaultValue: default_value,
@@ -1476,20 +1455,20 @@ func CheckFunctionCallArguments(
 	if has_optional_parameter {
 		// If function last parameter is optional make sure it at least has
 		if arguments_len < parameters_len-1 {
-			return nil, *NewError(fmt.Sprintf("Function `%s` expects at least `%s` arguments but got `%s`", functionname, parameters_len-1, arguments_len)).WithLocation(location)
+			return nil, *NewError(fmt.Sprintf("Function `%s` expects at least `%d` arguments but got `%d`", functionname, parameters_len-1, arguments_len)).WithLocation(location)
 		}
 
 		// Make sure function with optional parameter not called with too much arguments
 		if arguments_len > parameters_len {
-			return nil, *NewError(fmt.Sprintf("Function `%s` expects at most `%s` arguments but got `%s`", functionname, parameters_len, arguments_len)).WithLocation(location)
+			return nil, *NewError(fmt.Sprintf("Function `%s` expects at most `%d` arguments but got `%d`", functionname, parameters_len, arguments_len)).WithLocation(location)
 		}
 	} else if has_varargs_parameter {
 		// If function last parameter is optional make sure it at least has
 		if arguments_len < parameters_len-1 {
-			return nil, *NewError(fmt.Sprintf("Function `%s` expects at least `%s` arguments but got `%s`", functionname, parameters_len-1, arguments_len)).WithLocation(location)
+			return nil, *NewError(fmt.Sprintf("Function `%s` expects at least `%d` arguments but got `%d`", functionname, parameters_len-1, arguments_len)).WithLocation(location)
 		}
 	} else if arguments_len != parameters_len {
-		return nil, *NewError(fmt.Sprintf("Function `%s` expects `%s` arguments but got `%s`", functionname, parameters_len, arguments_len)).WithLocation(location)
+		return nil, *NewError(fmt.Sprintf("Function `%s` expects `%d` arguments but got `%d`", functionname, parameters_len, arguments_len)).WithLocation(location)
 	}
 
 	last_required_parameter_index := parameters_len
@@ -1511,7 +1490,7 @@ func CheckFunctionCallArguments(
 			(*arguments)[index] = argument
 		case NotEqualAndCantImplicitCast{}:
 			argument_type := argument.ExprType(env)
-			return nil, *NewError(fmt.Sprintf("Function `%s` argument number %s with type `%s` don't match expected type `%s`", functionname, index, argument_type, parameter_type)).WithLocation(location)
+			return nil, *NewError(fmt.Sprintf("Function `%s` argument number %d with type `%s` don't match expected type `%s`", functionname, index, argument_type, parameter_type)).WithLocation(location)
 		case Error{}:
 			return nil, *NewError("")
 		}
@@ -1531,7 +1510,7 @@ func CheckFunctionCallArguments(
 				(*arguments)[index] = argument
 			case NotEqualAndCantImplicitCast{}:
 				argument_type := (*arguments)[index]
-				return nil, *NewError(fmt.Sprintf("Function `%s` argument number %s with type `%s` don't match expected type `%s`", functionname, index, argument_type, last_parameter_type)).WithLocation(location)
+				return nil, *NewError(fmt.Sprintf("Function `%s` argument number %d with type `%s` don't match expected type `%s`", functionname, index, argument_type, last_parameter_type)).WithLocation(location)
 			case Error{}:
 				return nil, *NewError("")
 			}
@@ -1612,7 +1591,7 @@ func UnExpectedExpressionError(tokens *[]Token, position *int) Diagnostic {
 }
 
 func UnExpectedContentAfterCorrectStatement(statementname *string, tokens *[]Token, position *int) Diagnostic {
-	error_message := fmt.Sprintf("Unexpected content after the end of `%s` statement", statementname)
+	error_message := fmt.Sprintf("Unexpected content after the end of `%s` statement", strings.ToUpper(*statementname))
 	location_of_extra_content := Location{
 		Start: (*tokens)[*position].Location.Start,
 		End:   (*tokens)[len(*tokens)-1].Location.End,
@@ -1703,7 +1682,7 @@ func IsAscOrDesc(token *Token) bool {
 }
 
 func TypeMismatchError(location Location, expected ast.DataType, actual ast.DataType) Diagnostic {
-	return *NewError(fmt.Sprintf("Type mismatch expected `%s`, got `%s`", expected, actual)).WithLocation(location)
+	return *NewError(fmt.Sprintf("Type mismatch expected `%s`, got `%s`", expected.Fmt(), actual.Fmt())).WithLocation(location)
 }
 
 func contains(arr []string, items ...string) bool {
