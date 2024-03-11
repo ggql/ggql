@@ -326,7 +326,7 @@ func TestParseHavingStatement(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 	context := ParserContext{}
-	
+
 	// Test: Having is_head = "true"
 	tokens := []Token{
 		{
@@ -436,7 +436,7 @@ func TestParseOrderByStatement(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 	context := ParserContext{}
-	
+
 	// Test: ORDER BY name
 	tokens := []Token{
 		{
@@ -688,7 +688,7 @@ func TestParseBetweenExpression(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 	context := ParserContext{}
-	
+
 	// Test: "One" IN ("One", "Two")
 	tokens := []Token{
 		{
@@ -764,7 +764,7 @@ func TestParseLogicalOrExpression(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 	context := ParserContext{}
-	
+
 	// Test: commit_count > 0 || commit_count < 0
 	tokens := []Token{
 		{
