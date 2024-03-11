@@ -7,24 +7,28 @@ import (
 	"strings"
 )
 
-// Represent the different type of available formats
-type OutputFormat int
-
 const (
 	// Render the output as table
 	Render OutputFormat = iota
-	// Print the output in json format
+	// JSON Print the output in json format
 	JSON
-	// Print the output in csv format
+	// CSV Print the output in csv format
 	CSV
 )
 
+var (
+	Version string
+)
+
+// OutputFormat Represent the different type of available formats
+type OutputFormat int
+
 // Arguments for GitQL
 type Arguments struct {
-	Repos        []string
-	Analysis     bool
-	Pagination   bool
-	PageSize     int
+	repos        []string
+	analysis     bool
+	pagination   bool
+	pageSize     int
 	outputFormat OutputFormat
 }
 
@@ -43,16 +47,16 @@ type Command struct {
 // NewArguments creates a new instance of Arguments with default settings
 func NewArguments() Arguments {
 	return Arguments{
-		Repos:        []string{},
-		Analysis:     false,
-		Pagination:   false,
-		PageSize:     10,
+		repos:        []string{},
+		analysis:     false,
+		pagination:   false,
+		pageSize:     10,
 		outputFormat: Render,
 	}
 }
 
-// nolint: funlen,gocyclo
 // ParseArguments parses the command-line arguments and returns the corresponding Command
+// nolint: funlen,gocyclo
 func ParseArguments(args []string) Command {
 	argsLen := len(args)
 
@@ -61,7 +65,7 @@ func ParseArguments(args []string) Command {
 	}
 
 	if contains(args, "--version", "-v") {
-		return Command{Version: "1.0.0"}
+		return Command{Version: Version}
 	}
 
 	var optionalQuery string
@@ -82,7 +86,7 @@ func ParseArguments(args []string) Command {
 			for argIndex < argsLen {
 				repo := args[argIndex]
 				if repo[0] != '-' {
-					arguments.Repos = append(arguments.Repos, repo)
+					arguments.repos = append(arguments.repos, repo)
 					argIndex++
 					continue
 				}
@@ -96,10 +100,10 @@ func ParseArguments(args []string) Command {
 			optionalQuery = args[argIndex]
 			argIndex++
 		case "--analysis", "-a":
-			arguments.Analysis = true
+			arguments.analysis = true
 			argIndex++
 		case "--pagination", "-p":
-			arguments.Pagination = true
+			arguments.pagination = true
 			argIndex++
 		case "--pagesize", "-ps":
 			argIndex++
@@ -110,7 +114,7 @@ func ParseArguments(args []string) Command {
 			if err != nil {
 				return Command{Error: "Invalid page size"}
 			}
-			arguments.PageSize = pageSize
+			arguments.pageSize = pageSize
 			argIndex++
 		case "--output", "-o":
 			argIndex++
@@ -133,13 +137,13 @@ func ParseArguments(args []string) Command {
 	}
 
 	// Add the current directory if no repository is passed
-	if len(arguments.Repos) == 0 {
+	if len(arguments.repos) == 0 {
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return Command{Error: "Missing repository paths"}
 		}
 
-		arguments.Repos = append(arguments.Repos, currentDir)
+		arguments.repos = append(arguments.repos, currentDir)
 	}
 
 	if optionalQuery != "" {
@@ -161,7 +165,7 @@ func ParseArguments(args []string) Command {
 func PrintHelpList() {
 	fmt.Println("GitQL is a SQL like query language to run on local repositories")
 	fmt.Println()
-	fmt.Println("Usage: gitql [OPTIONS]")
+	fmt.Println("Usage: ggql [OPTIONS]")
 	fmt.Println()
 	fmt.Println("Options:")
 	fmt.Println("-r,  --repos <REPOS>        Path for local repositories to run query on")

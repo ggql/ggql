@@ -104,7 +104,7 @@ func printGroupAsTable(titles, tableHeaders []string, rows []ast.Row) error {
 
 	for _, row := range rows {
 		var buf []string
-		for index, _ := range titles {
+		for index := range titles {
 			buf = append(buf, row.Values[index].AsText())
 		}
 		data = append(data, buf)

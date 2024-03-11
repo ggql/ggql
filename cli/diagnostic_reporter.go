@@ -52,9 +52,11 @@ func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic Diagnosti
 
 func (d *DiagnosticReporter) repeat(s string, count int) string {
 	str := ""
+
 	for i := 0; i < count; i++ {
 		str += s
 	}
+
 	return str
 }
 
@@ -62,5 +64,6 @@ func (d *DiagnosticReporter) max(a, b int) int {
 	if a > b {
 		return a
 	}
+
 	return b
 }

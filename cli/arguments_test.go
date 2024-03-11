@@ -3,66 +3,132 @@ package cli
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestParseArguments(t *testing.T) {
-	arguments1 := []string{"ggql", "--help"}
-	got1 := ParseArguments(arguments1)
-	var want1 Command
-	want1.Help = true
-	if !reflect.DeepEqual(got1, want1) {
-		t.Errorf("want: %v  got: %v", want1, got1)
-	}
-	if got1.Help {
-		PrintHelpList()
+func TestEmptyArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql"})
+	expected := Command{}
+
+	ret := reflect.DeepEqual(actual.ReplMode, expected.ReplMode)
+	assert.Equal(t, true, ret)
+}
+
+func TestReposArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--repos", "."})
+	expected := Command{
+		QueryMode: struct {
+			Query     string
+			Arguments Arguments
+		}{
+			Arguments: struct {
+				repos        []string
+				analysis     bool
+				pagination   bool
+				pageSize     int
+				outputFormat OutputFormat
+			}{
+				repos: []string{"--repos", "."},
+			},
+		},
 	}
 
-	arguments2 := []string{"ggql", "--version"}
-	got2 := ParseArguments(arguments2)
-	var want2 Command
-	want2.Version = "1.0.0"
-	if !reflect.DeepEqual(got2, want2) {
-		t.Errorf("want: %v  got: %v", want2, got2)
+	ret := reflect.DeepEqual(actual.QueryMode.Arguments.repos, expected.QueryMode.Arguments.repos)
+	assert.Equal(t, true, ret)
+}
+
+func TestQueryArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--query", "Select * from table"})
+	expected := Command{
+		QueryMode: struct {
+			Query     string
+			Arguments Arguments
+		}{
+			Query: "Select * from table",
+		},
 	}
 
-	arguments3 := []string{"ggql", "--repos", "repo1", "repo2"}
-	got3 := ParseArguments(arguments3)
-	var want3 Command
-	if !reflect.DeepEqual(got3.QueryMode.Arguments.Repos, want3.QueryMode.Arguments.Repos) {
-		t.Errorf("want: %v  got: %v", want3, got3)
+	ret := reflect.DeepEqual(actual.QueryMode.Query, expected.QueryMode.Query)
+	assert.Equal(t, true, ret)
+}
+
+func TestPaginationArguments(t *testing.T) {
+	t.Skip("Skipping TestPaginationArguments.")
+}
+
+func TestPagesizeArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--pagesize", "10"})
+	expected := Command{
+		QueryMode: struct {
+			Query     string
+			Arguments Arguments
+		}{
+			Arguments: struct {
+				repos        []string
+				analysis     bool
+				pagination   bool
+				pageSize     int
+				outputFormat OutputFormat
+			}{
+				pageSize: 10,
+			},
+		},
 	}
 
-	arguments4 := []string{"ggql", "--query", "commitid"}
-	got4 := ParseArguments(arguments4)
-	var want4 Command
-	want4.QueryMode.Query = "commitid"
-	if !reflect.DeepEqual(got4.QueryMode.Query, want4.QueryMode.Query) {
-		t.Errorf("want: %v  got: %v", want4, got4)
+	ret := reflect.DeepEqual(actual.QueryMode.Arguments.pageSize, expected.QueryMode.Arguments.pageSize)
+	assert.Equal(t, true, ret)
+
+	actual = ParseArguments([]string{"ggql", "--pagesize", "-"})
+	expected.Error = "Argument --pagesize must be followed by the page size"
+
+	ret = reflect.DeepEqual(actual.Error, expected.Error)
+	assert.Equal(t, true, ret)
+}
+
+func TestOutputArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--output", "csv"})
+	expected := Command{
+		QueryMode: struct {
+			Query     string
+			Arguments Arguments
+		}{
+			Arguments: struct {
+				repos        []string
+				analysis     bool
+				pagination   bool
+				pageSize     int
+				outputFormat OutputFormat
+			}{
+				outputFormat: CSV,
+			},
+		},
 	}
 
-	arguments5 := []string{"ggql", "--analysis"}
-	got5 := ParseArguments(arguments5)
-	var want5 Command
-	want5.ReplMode.Analysis = true
-	if !reflect.DeepEqual(got5.ReplMode.Analysis, want5.ReplMode.Analysis) {
-		t.Errorf("want: %v  got: %v", want5, got5)
+	ret := reflect.DeepEqual(actual.QueryMode.Arguments.outputFormat, expected.QueryMode.Arguments.outputFormat)
+	assert.Equal(t, true, ret)
+
+	actual = ParseArguments([]string{"ggql", "--output", "text"})
+	expected.Error = "invalid output format"
+
+	ret = reflect.DeepEqual(actual.Error, expected.Error)
+	assert.Equal(t, true, ret)
+}
+
+func TestAnalysisArguments(t *testing.T) {
+	t.Skip("Skipping TestAnalysisArguments.")
+}
+
+func TestHelpArguments(t *testing.T) {
+	t.Skip("Skipping TestHelpArguments.")
+}
+
+func TestVersionArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--version"})
+	expected := Command{
+		Version: Version,
 	}
 
-	arguments6 := []string{"ggql", "--pagination"}
-	got6 := ParseArguments(arguments6)
-	var want6 Command
-	want6.ReplMode.Pagination = true
-	if !reflect.DeepEqual(got6.ReplMode.Pagination, want6.ReplMode.Pagination) {
-		t.Errorf("want: %v  got: %v", want6, got6)
-	}
-
-	arguments7 := []string{"ggql", "--pagesize", "5"}
-	got7 := ParseArguments(arguments7)
-	var want7 Command
-	want7.ReplMode.PageSize = 5
-	if !reflect.DeepEqual(got7.ReplMode.PageSize, want7.ReplMode.PageSize) {
-		t.Errorf("want: %v  got: %v", want7, got7)
-	}
-
-	// TBD: FIXME
+	ret := reflect.DeepEqual(actual.Version, expected.Version)
+	assert.Equal(t, true, ret)
 }

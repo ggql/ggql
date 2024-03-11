@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/fatih/color"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 const (
@@ -20,7 +21,7 @@ type ColoredStream struct {
 
 func NewColoredStream() *ColoredStream {
 	return &ColoredStream{
-		outColor: color.FgWhite,
+		outColor: White,
 	}
 }
 
@@ -49,5 +50,5 @@ func (cs *ColoredStream) SetColor(c color.Attribute) {
 }
 
 func (cs *ColoredStream) Reset() {
-	cs.outColor = color.FgWhite
+	cs.outColor = White
 }

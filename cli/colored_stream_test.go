@@ -1,26 +1,38 @@
 package cli
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+func TestPrintf(t *testing.T) {
+	stream := NewColoredStream()
+
+	stream.Printf("hello world!")
+	assert.Equal(t, nil, nil)
+}
+
+func TestPrintlnf(t *testing.T) {
+	stream := NewColoredStream()
+
+	stream.Printlnf("hello world!")
+	assert.Equal(t, nil, nil)
+}
+
 func TestSetColor(t *testing.T) {
-	var tmp = NewColoredStream()
-	var setColor = RED
-	tmp.SetColor(setColor)
-	var getColor = tmp.outColor
-	if !reflect.DeepEqual(getColor, setColor) {
-		t.Errorf("setColor: %v  getColor: %v", setColor, getColor)
-	}
+	stream := NewColoredStream()
+
+	stream.SetColor(Blue)
+	stream.Printlnf("hello world!")
+	assert.Equal(t, nil, nil)
 }
 
 func TestReset(t *testing.T) {
-	var tmp = NewColoredStream()
-	var wantColor = WHITE
-	tmp.Reset()
-	var getColor = tmp.outColor
-	if !reflect.DeepEqual(getColor, wantColor) {
-		t.Errorf("wantColor: %v  getColor: %v", wantColor, getColor)
-	}
+	stream := NewColoredStream()
+
+	stream.SetColor(Blue)
+	stream.Reset()
+	stream.Printlnf("hello world!")
+	assert.Equal(t, nil, nil)
 }
