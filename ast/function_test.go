@@ -140,7 +140,16 @@ func TestTextChar(t *testing.T) {
 }
 
 func TestTextCharIndex(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, TextValue{"h"}, TextValue{"hello"})
+	ret := textCharIndex(buf)
+	assert.Equal(t, 1, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, TextValue{"w"}, TextValue{"hello"})
+	ret = textCharIndex(buf)
+	assert.Equal(t, 0, ret.AsInt())
 }
 
 func TestTextReplace(t *testing.T) {
@@ -263,11 +272,24 @@ func TestTextConcat(t *testing.T) {
 }
 
 func TestTextConcatWs(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, TextValue{" "}, TextValue{"hello"}, TextValue{"world"})
+	ret := textConcatWs(buf)
+	assert.Equal(t, "hello world", ret.AsText())
 }
 
 func TestTextStrcmp(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, TextValue{"hello"}, TextValue{"hello"})
+	ret := textStrcmp(buf)
+	assert.Equal(t, 2, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, TextValue{"hello"}, TextValue{"world"})
+	ret = textStrcmp(buf)
+	assert.Equal(t, 1, ret.AsInt())
 }
 
 // Date functions
@@ -276,7 +298,7 @@ func TestDateCurrentDate(t *testing.T) {
 	var buf []Value
 
 	ret := dateCurrentDate(buf)
-	fmt.Printf("date_current_date: %d", ret.AsDate())
+	fmt.Printf("dateCurrentDate: %d", ret.AsDate())
 	assert.NotEqual(t, 0, ret.AsDate())
 }
 
@@ -284,7 +306,7 @@ func TestDateCurrentTime(t *testing.T) {
 	var buf []Value
 
 	ret := dateCurrentTime(buf)
-	fmt.Printf("date_current_time: %s", ret.AsTime())
+	fmt.Printf("dateCurrentTime: %s", ret.AsTime())
 	assert.NotEqual(t, "", ret.AsTime())
 }
 
@@ -292,7 +314,7 @@ func TestDateCurrentTimestamp(t *testing.T) {
 	var buf []Value
 
 	ret := dateCurrentTimestamp(buf)
-	fmt.Printf("date_current_timestamp: %d", ret.AsDateTime())
+	fmt.Printf("dateCurrentTimestamp: %d", ret.AsDateTime())
 	assert.NotEqual(t, 0, ret.AsDateTime())
 }
 
@@ -301,32 +323,62 @@ func TestDateMakeDate(t *testing.T) {
 
 	buf = append(buf, IntegerValue{2024}, IntegerValue{1})
 	ret := dateMakeDate(buf)
-	fmt.Printf("date_make_date: %d", ret.AsDate())
+	fmt.Printf("dateMakeDate: %d", ret.AsDate())
 	assert.NotEqual(t, 0, ret.AsDate())
 }
 
 func TestDateMakeTime(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, IntegerValue{23}, IntegerValue{59}, IntegerValue{59})
+	ret := dateMakeTime(buf)
+	fmt.Printf("dateMakeTime: %s", ret.AsTime())
+	assert.NotEqual(t, "", ret.AsTime())
 }
 
 func TestDateDay(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, DateValue{1705117592})
+	ret := dateDay(buf)
+	fmt.Printf("dateDay: %d", ret.AsInt())
+	assert.NotEqual(t, 0, ret.AsInt())
 }
 
-func TestDatename(t *testing.T) {
-	// TBD: FIXME
+func TestDateDayname(t *testing.T) {
+	var buf []Value
+
+	buf = append(buf, IntegerValue{1705117592})
+	ret := dateDayname(buf)
+	fmt.Printf("dateDayname: %s", ret.AsText())
+	assert.NotEqual(t, "", ret.AsText())
 }
 
 func TestDateMonthname(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, IntegerValue{1705117592})
+	ret := dateMonthname(buf)
+	fmt.Printf("dateMonthname: %s", ret.AsText())
+	assert.NotEqual(t, "", ret.AsText())
 }
 
 func TestDateHour(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, DateTimeValue{1705117592})
+	ret := dateHour(buf)
+	fmt.Printf("dateHour: %d", ret.AsInt())
+	assert.NotEqual(t, 0, ret.AsInt())
 }
 
 func TestDateIsDate(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, DateValue{1705117592})
+	ret := dateIsDate(buf)
+	fmt.Printf("dateIsDate: %t", ret.AsBool())
+	assert.Equal(t, true, ret.AsBool())
 }
 
 // Numeric functions
@@ -425,7 +477,11 @@ func TestNumericCos(t *testing.T) {
 }
 
 func TestNumericAcos(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, FloatValue{0})
+	ret := numericAcos(buf)
+	assert.NotEqual(t, float64(0), ret.AsFloat())
 }
 
 func TestNumericTan(t *testing.T) {
@@ -437,15 +493,52 @@ func TestNumericTan(t *testing.T) {
 }
 
 func TestNumericAtan(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, FloatValue{0})
+	ret := numericAtan(buf)
+	assert.Equal(t, float64(0), ret.AsFloat())
 }
 
 func TestNumericAtn2(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, FloatValue{0}, FloatValue{0})
+	ret := numericAtn2(buf)
+	assert.Equal(t, float64(0), ret.AsFloat())
 }
 
 func TestNumericSign(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, IntegerValue{0})
+	ret := numericSign(buf)
+	assert.Equal(t, 0, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, IntegerValue{1})
+	ret = numericSign(buf)
+	assert.Equal(t, 1, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, IntegerValue{-1})
+	ret = numericSign(buf)
+	assert.Equal(t, -1, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, FloatValue{0})
+	ret = numericSign(buf)
+	assert.Equal(t, 0, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, FloatValue{1})
+	ret = numericSign(buf)
+	assert.Equal(t, 1, ret.AsInt())
+
+	buf = nil
+	buf = append(buf, FloatValue{-1})
+	ret = numericSign(buf)
+	assert.Equal(t, -1, ret.AsInt())
 }
 
 // General functions
@@ -490,9 +583,17 @@ func TestGeneralTypeOf(t *testing.T) {
 }
 
 func TestGeneralGreatest(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, IntegerValue{1}, IntegerValue{2}, IntegerValue{3})
+	ret := generalGreatest(buf)
+	assert.Equal(t, 3, ret.AsInt())
 }
 
 func TestGeneralLeast(t *testing.T) {
-	// TBD: FIXME
+	var buf []Value
+
+	buf = append(buf, IntegerValue{1}, IntegerValue{2}, IntegerValue{3})
+	ret := generalLeast(buf)
+	assert.Equal(t, 1, ret.AsInt())
 }

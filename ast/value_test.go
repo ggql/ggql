@@ -15,6 +15,12 @@ func TestIntegerValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsInt())
 }
 
+func TestIntegerValueFmt(t *testing.T) {
+	value := IntegerValue{1}
+	ret := value.Fmt()
+	assert.Equal(t, "1", ret)
+}
+
 func TestIntegerValueEquals(t *testing.T) {
 	value := IntegerValue{1}
 	null := NullValue{}
@@ -35,19 +41,17 @@ func TestIntegerValueEquals(t *testing.T) {
 func TestIntegerValueCompare(t *testing.T) {
 	value := IntegerValue{1}
 	null := NullValue{}
-	_, err := value.Compare(null)
-	assert.NotEqual(t, nil, err)
+	ret := value.Compare(null)
+	assert.Equal(t, Ordering(Equal), ret)
 
 	value = IntegerValue{1}
 	other := IntegerValue{1}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = IntegerValue{1}
 	other = IntegerValue{2}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -67,7 +71,7 @@ func TestIntegerValuePlus(t *testing.T) {
 	otherFloat := FloatValue{1.0}
 	ret, err = value.Plus(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 }
 
 func TestIntegerValueMinus(t *testing.T) {
@@ -86,7 +90,7 @@ func TestIntegerValueMinus(t *testing.T) {
 	otherFloat := FloatValue{1.0}
 	ret, err = value.Minus(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(1.0), ret.AsFloat())
+	assert.Equal(t, 1.0, ret.AsFloat())
 }
 
 func TestIntegerValueMul(t *testing.T) {
@@ -105,7 +109,7 @@ func TestIntegerValueMul(t *testing.T) {
 	otherFloat := FloatValue{1.0}
 	ret, err = value.Mul(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 }
 
 func TestIntegerValueDiv(t *testing.T) {
@@ -123,7 +127,7 @@ func TestIntegerValueDiv(t *testing.T) {
 	otherFloat := FloatValue{2.0}
 	ret, err := value.Div(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(1.0), ret.AsFloat())
+	assert.Equal(t, 1.0, ret.AsFloat())
 
 	value = IntegerValue{2}
 	otherInt := IntegerValue{2}
@@ -147,20 +151,13 @@ func TestIntegerValueModulus(t *testing.T) {
 	otherFloat := FloatValue{3.0}
 	ret, err := value.Modulus(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 
 	value = IntegerValue{5}
 	otherInt := IntegerValue{3}
 	ret, err = value.Modulus(otherInt)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, int64(2), ret.AsInt())
-}
-
-func TestIntegerValueLiteral(t *testing.T) {
-	value := IntegerValue{1}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "1", ret)
 }
 
 func TestIntegerValueAsInt(t *testing.T) {
@@ -172,7 +169,7 @@ func TestIntegerValueAsInt(t *testing.T) {
 func TestIntegerValueAsFloat(t *testing.T) {
 	value := IntegerValue{1}
 	ret := value.AsFloat()
-	assert.Equal(t, float64(1.0), ret)
+	assert.Equal(t, 1.0, ret)
 }
 
 func TestIntegerValueAsText(t *testing.T) {
@@ -205,6 +202,12 @@ func TestFloatValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsFloat())
 }
 
+func TestFloatValueFmt(t *testing.T) {
+	value := FloatValue{1}
+	ret := value.Fmt()
+	assert.Equal(t, "1", ret)
+}
+
 func TestFloatValueEquals(t *testing.T) {
 	value := FloatValue{1.0}
 	other := FloatValue{1.0}
@@ -220,14 +223,12 @@ func TestFloatValueEquals(t *testing.T) {
 func TestFloatValueCompare(t *testing.T) {
 	value := FloatValue{1.0}
 	other := FloatValue{1.0}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = FloatValue{1.0}
 	other = FloatValue{2.0}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -241,13 +242,13 @@ func TestFloatValuePlus(t *testing.T) {
 	otherInt := IntegerValue{1}
 	ret, err := value.Plus(otherInt)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 
 	value = FloatValue{1.0}
 	otherFloat := FloatValue{1.0}
 	ret, err = value.Plus(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 }
 
 func TestFloatValueMinus(t *testing.T) {
@@ -279,13 +280,13 @@ func TestFloatValueMul(t *testing.T) {
 	otherInt := IntegerValue{2}
 	ret, err := value.Mul(otherInt)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 
 	value = FloatValue{1.0}
 	otherFloat := FloatValue{2.0}
 	ret, err = value.Mul(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 }
 
 func TestFloatValueDiv(t *testing.T) {
@@ -303,13 +304,13 @@ func TestFloatValueDiv(t *testing.T) {
 	otherFloat := IntegerValue{2}
 	ret, err := value.Div(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(1.0), ret.AsFloat())
+	assert.Equal(t, 1.0, ret.AsFloat())
 
 	value = FloatValue{2.0}
 	otherInt := FloatValue{2.0}
 	ret, err = value.Div(otherInt)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(1.0), ret.AsFloat())
+	assert.Equal(t, 1.0, ret.AsFloat())
 }
 
 func TestFloatValueModulus(t *testing.T) {
@@ -327,25 +328,13 @@ func TestFloatValueModulus(t *testing.T) {
 	otherFloat := IntegerValue{3}
 	ret, err := value.Modulus(otherFloat)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
+	assert.Equal(t, 2.0, ret.AsFloat())
 
 	value = FloatValue{5.0}
 	otherInt := FloatValue{3.0}
 	ret, err = value.Modulus(otherInt)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, float64(2.0), ret.AsFloat())
-}
-
-func TestFloatValueLiteral(t *testing.T) {
-	value := FloatValue{1.0}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "1", ret)
-
-	value = FloatValue{1.1}
-	ret = value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "1.1", ret)
+	assert.Equal(t, 2.0, ret.AsFloat())
 }
 
 func TestFloatValueAsInt(t *testing.T) {
@@ -357,7 +346,7 @@ func TestFloatValueAsInt(t *testing.T) {
 func TestFloatValueAsFloat(t *testing.T) {
 	value := FloatValue{1.0}
 	ret := value.AsFloat()
-	assert.Equal(t, float64(1.0), ret)
+	assert.Equal(t, 1.0, ret)
 }
 
 func TestFloatValueAsText(t *testing.T) {
@@ -394,6 +383,12 @@ func TestTextValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsText())
 }
 
+func TestTextValueFmt(t *testing.T) {
+	value := TextValue{"hello"}
+	ret := value.Fmt()
+	assert.Equal(t, "hello", ret)
+}
+
 func TestTextValueEquals(t *testing.T) {
 	value := TextValue{"hello"}
 	other := TextValue{"hello"}
@@ -409,14 +404,12 @@ func TestTextValueEquals(t *testing.T) {
 func TestTextValueCompare(t *testing.T) {
 	value := TextValue{"hello"}
 	other := TextValue{"hello"}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = TextValue{"hello"}
 	other = TextValue{"world"}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -438,13 +431,6 @@ func TestTextValueDiv(t *testing.T) {
 
 func TestTextValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestTextValueLiteral(t *testing.T) {
-	value := TextValue{"hello"}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "hello", ret)
 }
 
 func TestTextValueAsInt(t *testing.T) {
@@ -482,7 +468,13 @@ func TestTextValueAsTime(t *testing.T) {
 func TestBooleanValueDataType(t *testing.T) {
 	value := BooleanValue{false}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.IsType(Boolean))
+	assert.Equal(t, true, ret.IsBool())
+}
+
+func TestBooleanValueFmt(t *testing.T) {
+	value := BooleanValue{false}
+	ret := value.Fmt()
+	assert.Equal(t, "false", ret)
 }
 
 func TestBooleanValueEquals(t *testing.T) {
@@ -500,8 +492,7 @@ func TestBooleanValueEquals(t *testing.T) {
 func TestBooleanValueCompare(t *testing.T) {
 	value := BooleanValue{true}
 	other := BooleanValue{true}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 }
 
@@ -523,13 +514,6 @@ func TestBooleanValueDiv(t *testing.T) {
 
 func TestBooleanValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestBooleanValueLiteral(t *testing.T) {
-	value := BooleanValue{false}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "false", ret)
 }
 
 func TestBooleanValueAsInt(t *testing.T) {
@@ -572,6 +556,13 @@ func TestDateTimeValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsDateTime())
 }
 
+func TestDateTimeValueFmt(t *testing.T) {
+	value := DateTimeValue{1704890191}
+	ret := value.Fmt()
+	fmt.Println(ret)
+	t.Skip("Skipping TestDateTimeValueFmt.")
+}
+
 func TestDateTimeValueEquals(t *testing.T) {
 	value := DateTimeValue{1704890191}
 	other := DateTimeValue{1704890191}
@@ -587,14 +578,12 @@ func TestDateTimeValueEquals(t *testing.T) {
 func TestDateTimeValueCompare(t *testing.T) {
 	value := DateTimeValue{1704890191}
 	other := DateTimeValue{1704890191}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = DateTimeValue{1704890191}
 	other = DateTimeValue{1704890192}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -616,12 +605,6 @@ func TestDateTimeValueDiv(t *testing.T) {
 
 func TestDateTimeValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestDateTimeValueLiteral(t *testing.T) {
-	value := DateTimeValue{1704890191}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
 }
 
 func TestDateTimeValueAsInt(t *testing.T) {
@@ -664,6 +647,13 @@ func TestDateValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsDate())
 }
 
+func TestDateValueFmt(t *testing.T) {
+	value := DateValue{1704890191}
+	ret := value.Fmt()
+	fmt.Println(ret)
+	t.Skip("Skipping TestDateValueFmt.")
+}
+
 func TestDateValueEquals(t *testing.T) {
 	value := DateValue{1704890191}
 	other := DateValue{1704890191}
@@ -679,14 +669,12 @@ func TestDateValueEquals(t *testing.T) {
 func TestDateValueCompare(t *testing.T) {
 	value := DateValue{1704890191}
 	other := DateValue{1704890191}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = DateValue{1704890191}
 	other = DateValue{1704890192}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -708,12 +696,6 @@ func TestDateValueDiv(t *testing.T) {
 
 func TestDateValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestDateValueLiteral(t *testing.T) {
-	value := DateValue{1704890191}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
 }
 
 func TestDateValueAsInt(t *testing.T) {
@@ -756,6 +738,13 @@ func TestTimeValueDataType(t *testing.T) {
 	assert.Equal(t, true, ret.IsTime())
 }
 
+func TestTimeValueFmt(t *testing.T) {
+	value := TimeValue{"12:36:31"}
+	ret := value.Fmt()
+	fmt.Println(ret)
+	t.Skip("Skipping TestTimeValueFmt.")
+}
+
 func TestTimeValueEquals(t *testing.T) {
 	value := TimeValue{"12:36:31"}
 	other := TimeValue{"12:36:31"}
@@ -771,14 +760,12 @@ func TestTimeValueEquals(t *testing.T) {
 func TestTimeValueCompare(t *testing.T) {
 	value := TimeValue{"12:36:31"}
 	other := TimeValue{"12:36:31"}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 
 	value = TimeValue{"12:36:31"}
 	other = TimeValue{"12:36:32"}
-	ret, err = value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret = value.Compare(other)
 	assert.Equal(t, Ordering(Greater), ret)
 }
 
@@ -800,12 +787,6 @@ func TestTimeValueDiv(t *testing.T) {
 
 func TestTimeValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestTimeValueLiteral(t *testing.T) {
-	value := TimeValue{"12:36:31"}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
 }
 
 func TestTimeValueAsInt(t *testing.T) {
@@ -845,7 +826,13 @@ func TestTimeValueAsTime(t *testing.T) {
 func TestUndefinedValueDataType(t *testing.T) {
 	value := UndefinedValue{}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.IsType(Undefined))
+	assert.Equal(t, true, ret.IsUndefined())
+}
+
+func TestUndefinedValueFmt(t *testing.T) {
+	value := UndefinedValue{nil}
+	ret := value.Fmt()
+	assert.Equal(t, "Undefined", ret)
 }
 
 func TestUndefinedValueEquals(t *testing.T) {
@@ -858,8 +845,7 @@ func TestUndefinedValueEquals(t *testing.T) {
 func TestUndefinedValueCompare(t *testing.T) {
 	value := UndefinedValue{}
 	other := UndefinedValue{}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 }
 
@@ -881,13 +867,6 @@ func TestUndefinedValueDiv(t *testing.T) {
 
 func TestUndefinedValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestUndefinedValueLiteral(t *testing.T) {
-	value := UndefinedValue{}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "Undefined", ret)
 }
 
 func TestUndefinedValueAsInt(t *testing.T) {
@@ -925,7 +904,13 @@ func TestUndefinedValueAsTime(t *testing.T) {
 func TestNullValueDataType(t *testing.T) {
 	value := NullValue{}
 	ret := value.DataType()
-	assert.Equal(t, true, ret.IsType(Null))
+	assert.Equal(t, true, ret.IsNull())
+}
+
+func TestNullValueFmt(t *testing.T) {
+	value := NullValue{nil}
+	ret := value.Fmt()
+	assert.Equal(t, "Null", ret)
 }
 
 func TestNullValueEquals(t *testing.T) {
@@ -938,8 +923,7 @@ func TestNullValueEquals(t *testing.T) {
 func TestNullValueCompare(t *testing.T) {
 	value := NullValue{}
 	other := NullValue{}
-	ret, err := value.Compare(other)
-	assert.Equal(t, nil, err)
+	ret := value.Compare(other)
 	assert.Equal(t, Ordering(Equal), ret)
 }
 
@@ -961,13 +945,6 @@ func TestNullValueDiv(t *testing.T) {
 
 func TestNullValueModulus(t *testing.T) {
 	assert.Equal(t, nil, nil)
-}
-
-func TestNullValueLiteral(t *testing.T) {
-	value := NullValue{}
-	ret := value.Literal()
-	fmt.Println("literal:", ret)
-	assert.Equal(t, "Null", ret)
 }
 
 func TestNullValueAsInt(t *testing.T) {

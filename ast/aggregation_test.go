@@ -7,116 +7,76 @@ import (
 )
 
 func TestAggregationMax(t *testing.T) {
-	objects := []GQLObject{
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{1},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{2},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{3},
-			},
+	titles := []string{"field1", "field2"}
+
+	objects := Group{
+		Rows: []Row{
+			{Values: []Value{IntegerValue{1}, IntegerValue{2}}},
+			{Values: []Value{IntegerValue{3}, IntegerValue{4}}},
+			{Values: []Value{IntegerValue{5}, IntegerValue{6}}},
 		},
 	}
 
-	ret := aggregationMax("field1", objects)
-	assert.Equal(t, int64(3), ret.AsInt())
+	ret := aggregationMax("field1", titles, &objects)
+	assert.Equal(t, int64(5), ret.AsInt())
 }
 
 func TestAggregationMin(t *testing.T) {
-	objects := []GQLObject{
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{1},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{2},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{3},
-			},
+	titles := []string{"field1", "field2"}
+
+	objects := Group{
+		Rows: []Row{
+			{Values: []Value{IntegerValue{1}, IntegerValue{2}}},
+			{Values: []Value{IntegerValue{3}, IntegerValue{4}}},
+			{Values: []Value{IntegerValue{5}, IntegerValue{6}}},
 		},
 	}
 
-	ret := aggregationMin("field1", objects)
+	ret := aggregationMin("field1", titles, &objects)
 	assert.Equal(t, int64(1), ret.AsInt())
 }
 
 func TestAggregationSum(t *testing.T) {
-	objects := []GQLObject{
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{1},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{2},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{3},
-			},
+	titles := []string{"field1", "field2"}
+
+	objects := Group{
+		Rows: []Row{
+			{Values: []Value{IntegerValue{1}, IntegerValue{2}}},
+			{Values: []Value{IntegerValue{3}, IntegerValue{4}}},
+			{Values: []Value{IntegerValue{5}, IntegerValue{6}}},
 		},
 	}
 
-	ret := aggregationSum("field1", objects)
-	assert.Equal(t, int64(6), ret.AsInt())
+	ret := aggregationSum("field1", titles, &objects)
+	assert.Equal(t, int64(9), ret.AsInt())
 }
 
 func TestAggregationAverage(t *testing.T) {
-	objects := []GQLObject{
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{1},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{2},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{3},
-			},
+	titles := []string{"field1", "field2"}
+
+	objects := Group{
+		Rows: []Row{
+			{Values: []Value{IntegerValue{1}, IntegerValue{2}}},
+			{Values: []Value{IntegerValue{3}, IntegerValue{4}}},
+			{Values: []Value{IntegerValue{5}, IntegerValue{6}}},
 		},
 	}
 
-	ret := aggregationAverage("field1", objects)
-	assert.Equal(t, int64(2), ret.AsInt())
+	ret := aggregationAverage("field1", titles, &objects)
+	assert.Equal(t, int64(3), ret.AsInt())
 }
 
 func TestAggregationCount(t *testing.T) {
-	objects := []GQLObject{
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{1},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{2},
-			},
-		},
-		{
-			Attributes: map[string]Value{
-				"field1": IntegerValue{3},
-			},
+	titles := []string{"field1", "field2"}
+
+	objects := Group{
+		Rows: []Row{
+			{Values: []Value{IntegerValue{1}, IntegerValue{2}}},
+			{Values: []Value{IntegerValue{3}, IntegerValue{4}}},
+			{Values: []Value{IntegerValue{5}, IntegerValue{6}}},
 		},
 	}
 
-	ret := aggregationCount("field1", objects)
+	ret := aggregationCount("field1", titles, &objects)
 	assert.Equal(t, int64(3), ret.AsInt())
 }

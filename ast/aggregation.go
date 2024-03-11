@@ -1,9 +1,5 @@
 package ast
 
-import (
-	"strings"
-)
-
 type Aggregation func(string, []string, *Group) Value
 
 type AggregationPrototype struct {
@@ -51,7 +47,7 @@ func aggregationMax(fieldName string, titles []string, objects *Group) Value {
 	var columnIndex int
 
 	for i, v := range titles {
-		if strings.Compare(v, fieldName) == 0 {
+		if v == fieldName {
 			columnIndex = i
 			break
 		}
@@ -73,7 +69,7 @@ func aggregationMin(fieldName string, titles []string, objects *Group) Value {
 	var columnIndex int
 
 	for i, v := range titles {
-		if strings.Compare(v, fieldName) == 0 {
+		if v == fieldName {
 			columnIndex = i
 			break
 		}
@@ -96,7 +92,7 @@ func aggregationSum(fieldName string, titles []string, objects *Group) Value {
 	var columnIndex int
 
 	for i, v := range titles {
-		if strings.Compare(v, fieldName) == 0 {
+		if v == fieldName {
 			columnIndex = i
 			break
 		}
@@ -115,7 +111,7 @@ func aggregationAverage(fieldName string, titles []string, objects *Group) Value
 	var columnIndex int
 
 	for i, v := range titles {
-		if strings.Compare(v, fieldName) == 0 {
+		if v == fieldName {
 			columnIndex = i
 			break
 		}

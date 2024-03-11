@@ -2,6 +2,11 @@ package ast
 
 import "strings"
 
+const (
+	typesNull      = "Null"
+	typesUndefined = "Undefined"
+)
+
 type DataType interface {
 	Equal(DataType) bool
 	Fmt() string
@@ -588,7 +593,7 @@ func (u Undefined) Equal(other DataType) bool {
 }
 
 func (u Undefined) Fmt() string {
-	return "Undefined"
+	return typesUndefined
 }
 
 func (u Undefined) IsAny() bool {
@@ -654,7 +659,7 @@ func (n Null) Equal(other DataType) bool {
 }
 
 func (n Null) Fmt() string {
-	return "Null"
+	return typesNull
 }
 
 func (n Null) IsAny() bool {

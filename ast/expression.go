@@ -36,16 +36,20 @@ type AssignmentExpression struct {
 	Value  Expression
 }
 
-func (e AssignmentExpression) Kind() ExpressionKind {
+func (e *AssignmentExpression) Kind() ExpressionKind {
 	return ExprAssignment
 }
 
-func (e AssignmentExpression) ExprType(scope *Environment) DataType {
+func (e *AssignmentExpression) ExprType(scope *Environment) DataType {
 	return e.Value.ExprType(scope)
 }
 
-func (e AssignmentExpression) AsAny() interface{} {
+func (e *AssignmentExpression) AsAny() interface{} {
 	return e
+}
+
+func (e *AssignmentExpression) IsConst() bool {
+	return false
 }
 
 type StringValueType int
@@ -62,11 +66,11 @@ type StringExpression struct {
 	ValueType StringValueType
 }
 
-func (e StringExpression) Kind() ExpressionKind {
+func (e *StringExpression) Kind() ExpressionKind {
 	return ExprString
 }
 
-func (e StringExpression) ExprType(scope *Environment) DataType {
+func (e *StringExpression) ExprType(scope *Environment) DataType {
 	switch e.ValueType {
 	case StringValueText:
 		return Text{}
@@ -81,11 +85,11 @@ func (e StringExpression) ExprType(scope *Environment) DataType {
 	}
 }
 
-func (e StringExpression) AsAny() interface{} {
+func (e *StringExpression) AsAny() interface{} {
 	return e
 }
 
-func (e StringExpression) IsConst() bool {
+func (e *StringExpression) IsConst() bool {
 	return true
 }
 
@@ -93,11 +97,11 @@ type SymbolExpression struct {
 	Value string
 }
 
-func (e SymbolExpression) Kind() ExpressionKind {
+func (e *SymbolExpression) Kind() ExpressionKind {
 	return ExprSymbol
 }
 
-func (e SymbolExpression) ExprType(scope *Environment) DataType {
+func (e *SymbolExpression) ExprType(scope *Environment) DataType {
 	if scope.Contains(e.Value) {
 		return scope.Scopes[e.Value]
 	}
@@ -109,11 +113,11 @@ func (e SymbolExpression) ExprType(scope *Environment) DataType {
 	return Undefined{}
 }
 
-func (e SymbolExpression) AsAny() interface{} {
+func (e *SymbolExpression) AsAny() interface{} {
 	return e
 }
 
-func (e SymbolExpression) IsConst() bool {
+func (e *SymbolExpression) IsConst() bool {
 	return false
 }
 
@@ -121,11 +125,11 @@ type GlobalVariableExpression struct {
 	Name string
 }
 
-func (e GlobalVariableExpression) Kind() ExpressionKind {
+func (e *GlobalVariableExpression) Kind() ExpressionKind {
 	return ExprGlobalVariable
 }
 
-func (e GlobalVariableExpression) ExprType(scope *Environment) DataType {
+func (e *GlobalVariableExpression) ExprType(scope *Environment) DataType {
 	if scope.Contains(e.Name) {
 		return scope.Scopes[e.Name]
 	}
@@ -137,11 +141,11 @@ func (e GlobalVariableExpression) ExprType(scope *Environment) DataType {
 	return Undefined{}
 }
 
-func (e GlobalVariableExpression) AsAny() interface{} {
+func (e *GlobalVariableExpression) AsAny() interface{} {
 	return e
 }
 
-func (e GlobalVariableExpression) IsConst() bool {
+func (e *GlobalVariableExpression) IsConst() bool {
 	return false
 }
 
@@ -149,19 +153,19 @@ type NumberExpression struct {
 	Value Value
 }
 
-func (e NumberExpression) Kind() ExpressionKind {
+func (e *NumberExpression) Kind() ExpressionKind {
 	return ExprNumber
 }
 
-func (e NumberExpression) ExprType(scope *Environment) DataType {
+func (e *NumberExpression) ExprType(scope *Environment) DataType {
 	return e.Value.DataType()
 }
 
-func (e NumberExpression) AsAny() interface{} {
+func (e *NumberExpression) AsAny() interface{} {
 	return e
 }
 
-func (e NumberExpression) IsConst() bool {
+func (e *NumberExpression) IsConst() bool {
 	return true
 }
 
@@ -169,19 +173,19 @@ type BooleanExpression struct {
 	IsTrue bool
 }
 
-func (e BooleanExpression) Kind() ExpressionKind {
+func (e *BooleanExpression) Kind() ExpressionKind {
 	return ExprBoolean
 }
 
-func (e BooleanExpression) ExprType(scope *Environment) DataType {
+func (e *BooleanExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e BooleanExpression) AsAny() interface{} {
+func (e *BooleanExpression) AsAny() interface{} {
 	return e
 }
 
-func (e BooleanExpression) IsConst() bool {
+func (e *BooleanExpression) IsConst() bool {
 	return true
 }
 
@@ -197,11 +201,11 @@ type PrefixUnary struct {
 	Op    PrefixUnaryOperator
 }
 
-func (e PrefixUnary) Kind() ExpressionKind {
+func (e *PrefixUnary) Kind() ExpressionKind {
 	return ExprPrefixUnary
 }
 
-func (e PrefixUnary) ExprType(scope *Environment) DataType {
+func (e *PrefixUnary) ExprType(scope *Environment) DataType {
 	if e.Op == Bang {
 		return Boolean{}
 	} else {
@@ -209,11 +213,11 @@ func (e PrefixUnary) ExprType(scope *Environment) DataType {
 	}
 }
 
-func (e PrefixUnary) AsAny() interface{} {
+func (e *PrefixUnary) AsAny() interface{} {
 	return e
 }
 
-func (e PrefixUnary) IsConst() bool {
+func (e *PrefixUnary) IsConst() bool {
 	return false
 }
 
@@ -233,11 +237,11 @@ type ArithmeticExpression struct {
 	Right    Expression
 }
 
-func (e ArithmeticExpression) Kind() ExpressionKind {
+func (e *ArithmeticExpression) Kind() ExpressionKind {
 	return ExprArithmetic
 }
 
-func (e ArithmeticExpression) ExprType(scope *Environment) DataType {
+func (e *ArithmeticExpression) ExprType(scope *Environment) DataType {
 	lhs := e.Left.ExprType(scope)
 	rhs := e.Right.ExprType(scope)
 
@@ -248,11 +252,11 @@ func (e ArithmeticExpression) ExprType(scope *Environment) DataType {
 	return Float{}
 }
 
-func (e ArithmeticExpression) AsAny() interface{} {
+func (e *ArithmeticExpression) AsAny() interface{} {
 	return e
 }
 
-func (e ArithmeticExpression) IsConst() bool {
+func (e *ArithmeticExpression) IsConst() bool {
 	return false
 }
 
@@ -274,11 +278,11 @@ type ComparisonExpression struct {
 	Right    Expression
 }
 
-func (e ComparisonExpression) Kind() ExpressionKind {
+func (e *ComparisonExpression) Kind() ExpressionKind {
 	return ExprComparison
 }
 
-func (e ComparisonExpression) ExprType(scope *Environment) DataType {
+func (e *ComparisonExpression) ExprType(scope *Environment) DataType {
 	if e.Operator == CONullSafeEqual {
 		return Integer{}
 	} else {
@@ -286,11 +290,11 @@ func (e ComparisonExpression) ExprType(scope *Environment) DataType {
 	}
 }
 
-func (e ComparisonExpression) AsAny() interface{} {
+func (e *ComparisonExpression) AsAny() interface{} {
 	return e
 }
 
-func (e ComparisonExpression) IsConst() bool {
+func (e *ComparisonExpression) IsConst() bool {
 	return false
 }
 
@@ -299,19 +303,19 @@ type LikeExpression struct {
 	Pattern Expression
 }
 
-func (e LikeExpression) Kind() ExpressionKind {
+func (e *LikeExpression) Kind() ExpressionKind {
 	return ExprLike
 }
 
-func (e LikeExpression) ExprType(scope *Environment) DataType {
+func (e *LikeExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e LikeExpression) AsAny() interface{} {
+func (e *LikeExpression) AsAny() interface{} {
 	return e
 }
 
-func (e LikeExpression) IsConst() bool {
+func (e *LikeExpression) IsConst() bool {
 	return false
 }
 
@@ -320,19 +324,19 @@ type GlobExpression struct {
 	Pattern Expression
 }
 
-func (e GlobExpression) Kind() ExpressionKind {
+func (e *GlobExpression) Kind() ExpressionKind {
 	return ExprGlob
 }
 
-func (e GlobExpression) ExprType(scope *Environment) DataType {
+func (e *GlobExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e GlobExpression) AsAny() interface{} {
+func (e *GlobExpression) AsAny() interface{} {
 	return e
 }
 
-func (e GlobExpression) IsConst() bool {
+func (e *GlobExpression) IsConst() bool {
 	return false
 }
 
@@ -350,19 +354,19 @@ type LogicalExpression struct {
 	Right    Expression
 }
 
-func (e LogicalExpression) Kind() ExpressionKind {
+func (e *LogicalExpression) Kind() ExpressionKind {
 	return ExprLogical
 }
 
-func (e LogicalExpression) ExprType(scope *Environment) DataType {
+func (e *LogicalExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e LogicalExpression) AsAny() interface{} {
+func (e *LogicalExpression) AsAny() interface{} {
 	return e
 }
 
-func (e LogicalExpression) IsConst() bool {
+func (e *LogicalExpression) IsConst() bool {
 	return false
 }
 
@@ -381,19 +385,19 @@ type BitwiseExpression struct {
 	Right    Expression
 }
 
-func (e BitwiseExpression) Kind() ExpressionKind {
+func (e *BitwiseExpression) Kind() ExpressionKind {
 	return ExprBitwise
 }
 
-func (e BitwiseExpression) ExprType(scope *Environment) DataType {
+func (e *BitwiseExpression) ExprType(scope *Environment) DataType {
 	return Integer{}
 }
 
-func (e BitwiseExpression) AsAny() interface{} {
+func (e *BitwiseExpression) AsAny() interface{} {
 	return e
 }
 
-func (e BitwiseExpression) IsConst() bool {
+func (e *BitwiseExpression) IsConst() bool {
 	return false
 }
 
@@ -403,21 +407,21 @@ type CallExpression struct {
 	IsAggregation bool
 }
 
-func (e CallExpression) Kind() ExpressionKind {
+func (e *CallExpression) Kind() ExpressionKind {
 	return ExprCall
 }
 
-func (e CallExpression) ExprType(scope *Environment) DataType {
+func (e *CallExpression) ExprType(scope *Environment) DataType {
 	prototype := Prototypes[e.FunctionName]
 
 	return prototype.Result
 }
 
-func (e CallExpression) AsAny() interface{} {
+func (e *CallExpression) AsAny() interface{} {
 	return e
 }
 
-func (e CallExpression) IsConst() bool {
+func (e *CallExpression) IsConst() bool {
 	return false
 }
 
@@ -427,19 +431,19 @@ type BetweenExpression struct {
 	RangeEnd   Expression
 }
 
-func (e BetweenExpression) Kind() ExpressionKind {
+func (e *BetweenExpression) Kind() ExpressionKind {
 	return ExprBetween
 }
 
-func (e BetweenExpression) ExprType(scope *Environment) DataType {
+func (e *BetweenExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e BetweenExpression) AsAny() interface{} {
+func (e *BetweenExpression) AsAny() interface{} {
 	return e
 }
 
-func (e BetweenExpression) IsConst() bool {
+func (e *BetweenExpression) IsConst() bool {
 	return false
 }
 
@@ -450,19 +454,19 @@ type CaseExpression struct {
 	ValuesType   DataType
 }
 
-func (e CaseExpression) Kind() ExpressionKind {
+func (e *CaseExpression) Kind() ExpressionKind {
 	return ExprCase
 }
 
-func (e CaseExpression) ExprType(scope *Environment) DataType {
+func (e *CaseExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e CaseExpression) AsAny() interface{} {
+func (e *CaseExpression) AsAny() interface{} {
 	return e
 }
 
-func (e CaseExpression) IsConst() bool {
+func (e *CaseExpression) IsConst() bool {
 	return false
 }
 
@@ -473,19 +477,19 @@ type InExpression struct {
 	HasNotKeyword bool
 }
 
-func (e InExpression) Kind() ExpressionKind {
+func (e *InExpression) Kind() ExpressionKind {
 	return ExprIn
 }
 
-func (e InExpression) ExprType(scope *Environment) DataType {
+func (e *InExpression) ExprType(scope *Environment) DataType {
 	return e.ValuesType
 }
 
-func (e InExpression) AsAny() interface{} {
+func (e *InExpression) AsAny() interface{} {
 	return e
 }
 
-func (e InExpression) IsConst() bool {
+func (e *InExpression) IsConst() bool {
 	return false
 }
 
@@ -494,36 +498,36 @@ type IsNullExpression struct {
 	HasNot   bool
 }
 
-func (e IsNullExpression) Kind() ExpressionKind {
+func (e *IsNullExpression) Kind() ExpressionKind {
 	return ExprIsNull
 }
 
-func (e IsNullExpression) ExprType(scope *Environment) DataType {
+func (e *IsNullExpression) ExprType(scope *Environment) DataType {
 	return Boolean{}
 }
 
-func (e IsNullExpression) AsAny() interface{} {
+func (e *IsNullExpression) AsAny() interface{} {
 	return e
 }
 
-func (e IsNullExpression) IsConst() bool {
+func (e *IsNullExpression) IsConst() bool {
 	return false
 }
 
 type NullExpression struct{}
 
-func (e NullExpression) ExpressionKind() ExpressionKind {
+func (e *NullExpression) Kind() ExpressionKind {
 	return ExprNull
 }
 
-func (e NullExpression) ExprType(scope *Environment) DataType {
+func (e *NullExpression) ExprType(scope *Environment) DataType {
 	return Null{}
 }
 
-func (e NullExpression) AsAny() interface{} {
+func (e *NullExpression) AsAny() interface{} {
 	return e
 }
 
-func (e NullExpression) IsConst() bool {
+func (e *NullExpression) IsConst() bool {
 	return false
 }

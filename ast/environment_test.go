@@ -13,8 +13,8 @@ func TestDefine(t *testing.T) {
 		Scopes:       map[string]DataType{},
 	}
 
-	env.Define("key1", Text)
-	assert.Equal(t, true, env.Scopes["key1"].IsText())
+	env.Define("field1", Text{})
+	assert.Equal(t, true, env.Scopes["field1"].IsText())
 }
 
 func TestDefineGlobal(t *testing.T) {
@@ -24,8 +24,8 @@ func TestDefineGlobal(t *testing.T) {
 		Scopes:       map[string]DataType{},
 	}
 
-	env.DefineGlobal("key1", Text)
-	assert.Equal(t, true, env.GlobalsTypes["key1"].IsText())
+	env.DefineGlobal("field1", Text{})
+	assert.Equal(t, true, env.GlobalsTypes["field1"].IsText())
 }
 
 func TestContains(t *testing.T) {
@@ -35,11 +35,12 @@ func TestContains(t *testing.T) {
 		Scopes:       map[string]DataType{},
 	}
 
-	env.Define("key1", Text)
-	assert.Equal(t, true, env.Contains("key1"))
+	env.Define("field1", Text{})
+	env.DefineGlobal("field2", Integer{})
 
-	env.DefineGlobal("key2", Text)
-	assert.Equal(t, true, env.Contains("key2"))
+	assert.Equal(t, true, env.Contains("field1"))
+	assert.Equal(t, true, env.Contains("field2"))
+	assert.Equal(t, false, env.Contains("invalid"))
 }
 
 func TestResolveType(t *testing.T) {
@@ -49,15 +50,19 @@ func TestResolveType(t *testing.T) {
 		Scopes:       map[string]DataType{},
 	}
 
-	env.Define("key1", Text)
-	ret, err := env.ResolveType("key1")
+	env.Define("field1", Text{})
+	env.DefineGlobal("@field2", Integer{})
+
+	ret, err := env.ResolveType("field1")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, ret.IsText())
 
-	env.DefineGlobal("@key2", Text)
-	ret, err = env.ResolveType("@key2")
+	ret, err = env.ResolveType("@field2")
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, ret.IsText())
+	assert.Equal(t, true, ret.IsInt())
+
+	ret, err = env.ResolveType("invalid")
+	assert.NotEqual(t, nil, err)
 }
 
 func TestClearSession(t *testing.T) {
@@ -67,7 +72,8 @@ func TestClearSession(t *testing.T) {
 		Scopes:       map[string]DataType{},
 	}
 
-	env.Define("key1", Text)
+	env.Define("field1", Text{})
+
 	env.ClearSession()
 	assert.Equal(t, 0, len(env.Scopes))
 }

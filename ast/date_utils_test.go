@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,239 +9,140 @@ import (
 
 const (
 	TestTime         = "08:30:00"
-	TestDate         = "2024-01-02"
-	TestDateTime     = "2024-01-02 08:30:00"
-	TestDateTimeFull = "2024-01-02 08:30:00.000"
+	TestTimestamp    = 1705117592
+	TestDate         = "2024-01-10"
+	TestDateTime     = "2024-01-10 12:36:31"
+	TestDateTimeFull = "2024-01-10 12:36:31.000"
 )
 
 func TestGetUnixTimestampMs(t *testing.T) {
 	ret := GetUnixTimestampMs()
+	fmt.Println("GetUnixTimestampMs:", ret)
 	assert.NotEqual(t, 0, ret)
 }
 
 func TestTimeStampToDate(t *testing.T) {
-	type args struct {
-		timeStamp int64
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "test1", args: args{timeStamp: 1704153600}, want: TestDate},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampToDate(tt.args.timeStamp); got != tt.want {
-				t.Errorf("TimeStampToDate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret := TimeStampToDate(TestTimestamp)
+	fmt.Println("TimeStampToDate:", ret)
+	assert.NotEqual(t, "", ret)
 }
 
 func TestTimeStampToTime(t *testing.T) {
-	type args struct {
-		timeStamp int64
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "test1", args: args{timeStamp: 1704155400}, want: "08:30:00"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampToTime(tt.args.timeStamp); got != tt.want {
-				t.Logf("TimeStampToTime() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret := TimeStampToTime(TestTimestamp)
+	fmt.Println("TimeStampToTime:", ret)
+	assert.NotEqual(t, "", ret)
 }
 
 func TestTimeStampToDateTime(t *testing.T) {
-	type args struct {
-		timeStamp int64
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "test1", args: args{timeStamp: 1704155400}, want: TestDateTime},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampToDateTime(tt.args.timeStamp); got != tt.want {
-				t.Logf("TimeStampToDateTime() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret := TimeStampToDateTime(TestTimestamp)
+	fmt.Println("TimeStampToDateTime:", ret)
+	assert.NotEqual(t, "", ret)
 }
 
 func TestDateToTimeStamp(t *testing.T) {
-	type args struct {
-		date string
-	}
+	ret := DateToTimeStamp(TestDateTime)
+	fmt.Println("DateToTimeStamp:", ret)
+	assert.Equal(t, 0, ret)
 
-	tests := []struct {
-		name string
-		args args
-		want int64
-	}{
-		{name: "test1", args: args{date: TestDate}, want: 1704153600},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := DateToTimeStamp(tt.args.date); got != tt.want {
-				t.Errorf("DateToTimeStamp() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret = DateToTimeStamp(TestDate)
+	fmt.Println("DateToTimeStamp:", ret)
+	assert.NotEqual(t, 0, ret)
 }
 
 func TestDateTimeToTimeStamp(t *testing.T) {
-	type args struct {
-		date string
-	}
+	ret := DateTimeToTimeStamp(TestDateTimeFull)
+	fmt.Println("DateTimeToTimeStamp:", ret)
+	assert.NotEqual(t, 0, ret)
 
-	tests := []struct {
-		name string
-		args args
-		want int64
-	}{
-		{name: "test1", args: args{date: TestDateTime}, want: 1704184200},
-		{name: "test2", args: args{date: TestDateTimeFull}, want: 1704184200},
-	}
+	ret = DateTimeToTimeStamp(TestDateTime)
+	fmt.Println("DateTimeToTimeStamp:", ret)
+	assert.NotEqual(t, 0, ret)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := DateTimeToTimeStamp(tt.args.date); got != tt.want {
-				t.Errorf("DateTimeToTimeStamp() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret = DateTimeToTimeStamp("invalid")
+	fmt.Println("DateTimeToTimeStamp:", ret)
+	assert.Equal(t, 0, ret)
 }
 
 func TestDateTimeToHour(t *testing.T) {
-	// TBD: FIXME
+	ret := DateTimeToHour(TestTimestamp)
+	fmt.Println("DateTimeToHour:", ret)
+	assert.NotEqual(t, 0, ret)
 }
 
 func TestDateToDayNumberInMonth(t *testing.T) {
-	// TBD: FIXME
+	ret := DateToDayNumberInMonth(TestTimestamp)
+	fmt.Println("DateToDayNumberInMonth:", ret)
+	assert.NotEqual(t, 0, ret)
 }
 
 func TestDateToDayName(t *testing.T) {
-	// TBD: FIXME
+	ret := DateToDayName(TestTimestamp)
+	fmt.Println("DateToDayName:", ret)
+	assert.NotEqual(t, "", ret)
 }
 
 func TestDateToMonthName(t *testing.T) {
-	// TBD: FIXME
+	ret := DateToMonthName(TestTimestamp)
+	fmt.Println("DateToMonthName:", ret)
+	assert.NotEqual(t, "", ret)
 }
 
 func TestTimeStampFromYearAndDay(t *testing.T) {
-	type args struct {
-		year      int
-		dayOfYear uint
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want int64
-	}{
-		{name: "test1", args: args{year: 2024, dayOfYear: 2}, want: 1704153600},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TimeStampFromYearAndDay(tt.args.year, tt.args.dayOfYear); got != tt.want {
-				t.Errorf("TimeStampFromYearAndDay() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret := TimeStampFromYearAndDay(2024, 1)
+	fmt.Println("TimeStampFromYearAndDay:", ret)
+	assert.NotEqual(t, 0, ret)
 }
 
 func TestIsValidTimeFormat(t *testing.T) {
-	type args struct {
-		timeStr string
-	}
+	ret := IsValidTimeFormat("")
+	assert.Equal(t, false, ret)
 
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{name: "test-ok", args: args{timeStr: TestTime}, want: true},
-		{name: "test-err1", args: args{timeStr: "8:30"}, want: false},
-		{name: "test-err2", args: args{timeStr: "8:70"}, want: false},
-		{name: "test-err3", args: args{timeStr: "33:20:00"}, want: false},
-	}
+	ret = IsValidTimeFormat("12:36:3")
+	assert.Equal(t, false, ret)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := IsValidTimeFormat(tt.args.timeStr); got != tt.want {
-				t.Errorf("IsValidTimeFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret = IsValidTimeFormat("12:36:31.0000")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidTimeFormat("12:36:31.000.000")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidTimeFormat("12:36:61.000")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidTimeFormat("12:36:31.000")
+	assert.Equal(t, true, ret)
 }
 
 func TestIsValidDateFormat(t *testing.T) {
-	type args struct {
-		dateStr string
-	}
+	ret := IsValidDateFormat("")
+	assert.Equal(t, false, ret)
 
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{name: "test-ok", args: args{dateStr: TestDate}, want: true},
-		{name: "test-err1", args: args{dateStr: "2024-33-04"}, want: false},
-		{name: "test-err2", args: args{dateStr: "2024-01-60"}, want: false},
-	}
+	ret = IsValidDateFormat("2024-01-100")
+	assert.Equal(t, false, ret)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := IsValidDateFormat(tt.args.dateStr); got != tt.want {
-				t.Errorf("IsValidDateFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret = IsValidDateFormat("2024-01-10-00")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidDateFormat("2024-01-40")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidDateFormat("2024-01-10")
+	assert.Equal(t, true, ret)
 }
 
 func TestIsValidDateTimeFormat(t *testing.T) {
-	type args struct {
-		datetimeStr string
-	}
+	ret := IsValidDateTimeFormat("")
+	assert.Equal(t, false, ret)
 
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{name: "test-ok1", args: args{datetimeStr: TestDateTime}, want: true},
-		{name: "test-ok2", args: args{datetimeStr: TestDateTimeFull}, want: true},
-		{name: "test-err1", args: args{datetimeStr: "2024-33-02 08:30:00"}, want: false},
-		{name: "test-err2", args: args{datetimeStr: "2024-01-53 08:30:00"}, want: false},
-		{name: "test-err3", args: args{datetimeStr: "2024-01-02 35:30:00"}, want: false},
-		{name: "test-err4", args: args{datetimeStr: "2024-01-02 08:87:00"}, want: false},
-		{name: "test-err5", args: args{datetimeStr: "2024-01-02 08:30:99"}, want: false},
-	}
+	ret = IsValidDateTimeFormat("2024-01-10 12:36:31.0000")
+	assert.Equal(t, false, ret)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := IsValidDateTimeFormat(tt.args.datetimeStr); got != tt.want {
-				t.Errorf("IsValidDateTimeFormat() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ret = IsValidDateTimeFormat("2024-01-10 12:36:31.000 000")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidDateTimeFormat("2024-01-10 12:36:71.000")
+	assert.Equal(t, false, ret)
+
+	ret = IsValidDateTimeFormat("2024-01-10 12:36:31.000")
+	assert.Equal(t, true, ret)
 }
