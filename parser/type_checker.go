@@ -43,7 +43,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueTime,
 			},
@@ -62,7 +62,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDate,
 			},
@@ -80,7 +80,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDateTime,
 			},
@@ -110,7 +110,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueTime,
 			},
@@ -129,7 +129,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return LeftSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueTime,
 			},
@@ -148,7 +148,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDate,
 			},
@@ -167,7 +167,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return LeftSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDate,
 			},
@@ -185,7 +185,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return RightSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDateTime,
 			},
@@ -203,7 +203,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 		}
 
 		return LeftSideCasted{
-			expr: ast.StringExpression{
+			expr: &ast.StringExpression{
 				Value:     stringLiteralValue,
 				ValueType: ast.StringValueDateTime,
 			},
