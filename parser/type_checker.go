@@ -32,7 +32,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 	}
 
 	if dataType.IsTime() && exprType.IsText() && expr.Kind() == ast.ExprString {
-		literal := expr.AsAny().(ast.StringExpression)
+		literal := expr.AsAny().(*ast.StringExpression)
 		stringLiteralValue := literal.Value
 		if !ast.IsValidTimeFormat(stringLiteralValue) {
 			return Error{
@@ -51,7 +51,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 	}
 
 	if dataType.IsDate() && exprType.IsText() && expr.Kind() == ast.ExprString {
-		literal := expr.AsAny().(ast.StringExpression)
+		literal := expr.AsAny().(*ast.StringExpression)
 		stringLiteralValue := literal.Value
 		if !ast.IsValidDateFormat(stringLiteralValue) {
 			return Error{
@@ -70,7 +70,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 	}
 
 	if dataType.IsDateTime() && exprType.IsText() && expr.Kind() == ast.ExprString {
-		literal := expr.AsAny().(ast.StringExpression)
+		literal := expr.AsAny().(*ast.StringExpression)
 		stringLiteralValue := literal.Value
 		if !ast.IsValidDateTimeFormat(stringLiteralValue) {
 			return Error{
@@ -100,7 +100,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsTime() && rhsType.IsText() && rhs.Kind() == ast.ExprString {
-		expr := rhs.AsAny().(ast.StringExpression)
+		expr := rhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidTimeFormat(stringLiteralValue) {
 			return Error{
@@ -119,7 +119,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsText() && rhsType.IsTime() && lhs.Kind() == ast.ExprString {
-		expr := lhs.AsAny().(ast.StringExpression)
+		expr := lhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidTimeFormat(stringLiteralValue) {
 			return Error{
@@ -138,7 +138,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsDate() && rhsType.IsText() && rhs.Kind() == ast.ExprString {
-		expr := rhs.AsAny().(ast.StringExpression)
+		expr := rhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidDateFormat(stringLiteralValue) {
 			return Error{
@@ -157,7 +157,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsText() && rhsType.IsDate() && lhs.Kind() == ast.ExprString {
-		expr := lhs.AsAny().(ast.StringExpression)
+		expr := lhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidDateFormat(stringLiteralValue) {
 			return Error{
@@ -176,7 +176,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsDateTime() && rhsType.IsText() && rhs.Kind() == ast.ExprString {
-		expr := rhs.AsAny().(ast.StringExpression)
+		expr := rhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidDateTimeFormat(stringLiteralValue) {
 			return Error{
@@ -194,7 +194,7 @@ func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckRe
 	}
 
 	if lhsType.IsText() && rhsType.IsDateTime() && lhs.Kind() == ast.ExprString {
-		expr := lhs.AsAny().(ast.StringExpression)
+		expr := lhs.AsAny().(*ast.StringExpression)
 		stringLiteralValue := expr.Value
 		if !ast.IsValidDateTimeFormat(stringLiteralValue) {
 			return Error{
