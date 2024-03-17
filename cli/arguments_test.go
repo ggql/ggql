@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -8,8 +9,18 @@ import (
 )
 
 func TestEmptyArguments(t *testing.T) {
+	wd, _ := os.Getwd()
+
 	actual := ParseArguments([]string{"ggql"})
-	expected := Command{}
+	expected := Command{
+		ReplMode: Arguments{
+			repos:        []string{wd},
+			analysis:     false,
+			pagination:   false,
+			pageSize:     10,
+			outputFormat: 0,
+		},
+	}
 
 	ret := reflect.DeepEqual(actual.ReplMode, expected.ReplMode)
 	assert.Equal(t, true, ret)
@@ -18,23 +29,16 @@ func TestEmptyArguments(t *testing.T) {
 func TestReposArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--repos", "."})
 	expected := Command{
-		QueryMode: struct {
-			Query     string
-			Arguments Arguments
-		}{
-			Arguments: struct {
-				repos        []string
-				analysis     bool
-				pagination   bool
-				pageSize     int
-				outputFormat OutputFormat
-			}{
-				repos: []string{"--repos", "."},
-			},
+		ReplMode: Arguments{
+			repos:        []string{"."},
+			analysis:     false,
+			pagination:   false,
+			pageSize:     10,
+			outputFormat: 0,
 		},
 	}
 
-	ret := reflect.DeepEqual(actual.QueryMode.Arguments.repos, expected.QueryMode.Arguments.repos)
+	ret := reflect.DeepEqual(actual.ReplMode.repos, expected.ReplMode.repos)
 	assert.Equal(t, true, ret)
 }
 
@@ -60,19 +64,12 @@ func TestPaginationArguments(t *testing.T) {
 func TestPagesizeArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--pagesize", "10"})
 	expected := Command{
-		QueryMode: struct {
-			Query     string
-			Arguments Arguments
-		}{
-			Arguments: struct {
-				repos        []string
-				analysis     bool
-				pagination   bool
-				pageSize     int
-				outputFormat OutputFormat
-			}{
-				pageSize: 10,
-			},
+		ReplMode: Arguments{
+			repos:        []string{},
+			analysis:     false,
+			pagination:   false,
+			pageSize:     10,
+			outputFormat: 0,
 		},
 	}
 
@@ -80,7 +77,7 @@ func TestPagesizeArguments(t *testing.T) {
 	assert.Equal(t, true, ret)
 
 	actual = ParseArguments([]string{"ggql", "--pagesize", "-"})
-	expected.Error = "Argument --pagesize must be followed by the page size"
+	expected.Error = "Invalid page size"
 
 	ret = reflect.DeepEqual(actual.Error, expected.Error)
 	assert.Equal(t, true, ret)
@@ -89,23 +86,16 @@ func TestPagesizeArguments(t *testing.T) {
 func TestOutputArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--output", "csv"})
 	expected := Command{
-		QueryMode: struct {
-			Query     string
-			Arguments Arguments
-		}{
-			Arguments: struct {
-				repos        []string
-				analysis     bool
-				pagination   bool
-				pageSize     int
-				outputFormat OutputFormat
-			}{
-				outputFormat: CSV,
-			},
+		ReplMode: Arguments{
+			repos:        []string{},
+			analysis:     false,
+			pagination:   false,
+			pageSize:     10,
+			outputFormat: CSV,
 		},
 	}
 
-	ret := reflect.DeepEqual(actual.QueryMode.Arguments.outputFormat, expected.QueryMode.Arguments.outputFormat)
+	ret := reflect.DeepEqual(actual.ReplMode.outputFormat, expected.ReplMode.outputFormat)
 	assert.Equal(t, true, ret)
 
 	actual = ParseArguments([]string{"ggql", "--output", "text"})

@@ -131,6 +131,7 @@ func ParseArguments(args []string) Command {
 			default:
 				return Command{Error: "invalid output format"}
 			}
+			argIndex++
 		default:
 			return Command{Error: fmt.Sprintf("Unknown command %s", arg)}
 		}
