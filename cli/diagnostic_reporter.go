@@ -2,28 +2,30 @@ package cli
 
 import (
 	"fmt"
+
+	"github.com/ggql/ggql/parser"
 )
 
 type DiagnosticReporter struct {
 	stdout ColoredStream
 }
 
-func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic Diagnostic) {
+func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic parser.Diagnostic) {
 	d.stdout.SetColor(Red)
 	d.stdout.Printlnf(fmt.Sprintf("[%s]: %s", diagnostic.Label(), diagnostic.Message()))
 
-	if diagnostic.Location() != nil {
-		d.stdout.Printlnf(fmt.Sprintf("=> Line %d, Column %d,", diagnostic.Location()[0], diagnostic.Location()[1]))
+	if diagnostic.Location().Start >= 0 && diagnostic.Location().End >= 0 {
+		d.stdout.Printlnf(fmt.Sprintf("=> Line %d, Column %d,", diagnostic.Location().Start, diagnostic.Location().End))
 	}
 
 	if query != "" {
 		d.stdout.Printlnf("  |")
 		d.stdout.Printlnf(fmt.Sprintf("1 | %s", query))
-		if diagnostic.Location() != nil {
+		if diagnostic.Location().Start >= 0 && diagnostic.Location().End >= 0 {
 			d.stdout.Printf("  | ")
-			d.stdout.Printf(d.repeat("-", diagnostic.Location()[0]))
+			d.stdout.Printf(d.repeat("-", diagnostic.Location().Start))
 			d.stdout.SetColor(Yellow)
-			d.stdout.Printlnf(d.repeat("^", d.max(1, diagnostic.Location()[1]-diagnostic.Location()[0])))
+			d.stdout.Printlnf(d.repeat("^", d.max(1, diagnostic.Location().End-diagnostic.Location().Start)))
 			d.stdout.SetColor(Red)
 		}
 		d.stdout.Printlnf("  |")

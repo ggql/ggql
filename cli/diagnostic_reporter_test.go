@@ -4,12 +4,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ggql/ggql/parser"
 )
 
 func TestReportDiagnostic(t *testing.T) {
 	reporter := DiagnosticReporter{}
+	err := parser.NewError("error")
 
-	reporter.ReportDiagnostic("keyword", Diagnostic.Error("error"))
+	reporter.ReportDiagnostic("keyword", *err)
 	assert.Equal(t, nil, nil)
 }
 
