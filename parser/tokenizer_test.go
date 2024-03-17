@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:funlen,goconst,gocritic
 func TestTokenize(t *testing.T) {
 	// Symbol: NAME
 	script := "NAME"
@@ -569,6 +570,7 @@ func TestIgnoreSingleLineComment(t *testing.T) {
 	assert.Equal(t, 5, pos)
 }
 
+// nolint:gocritic
 func TestIgnoreCStyleComment(t *testing.T) {
 	// Comment: /*N
 	chars := []rune{'/', '*', 'N'}

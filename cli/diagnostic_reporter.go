@@ -10,7 +10,7 @@ type DiagnosticReporter struct {
 	stdout ColoredStream
 }
 
-func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic parser.Diagnostic) {
+func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic *parser.Diagnostic) {
 	d.stdout.SetColor(Red)
 	d.stdout.Printlnf(fmt.Sprintf("[%s]: %s", diagnostic.Label(), diagnostic.Message()))
 

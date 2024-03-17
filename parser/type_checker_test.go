@@ -65,6 +65,7 @@ func TestIsExpressionTypeEquals(t *testing.T) {
 	assert.Equal(t, NotEqualAndCantImplicitCast{}, result)
 }
 
+// nolint:funlen
 func TestAreTypesEquals(t *testing.T) {
 	// Cast equal
 	scope := &ast.Environment{}

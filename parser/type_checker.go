@@ -90,6 +90,7 @@ func IsExpressionTypeEquals(scope *ast.Environment, expr ast.Expression, dataTyp
 	return NotEqualAndCantImplicitCast{}
 }
 
+// nolint:funlen,gocyclo
 func AreTypesEquals(scope *ast.Environment, lhs, rhs ast.Expression) TypeCheckResult {
 	lhsType := lhs.ExprType(scope)
 	rhsType := rhs.ExprType(scope)

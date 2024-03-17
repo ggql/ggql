@@ -93,7 +93,7 @@ type Token struct {
 	Literal  string
 }
 
-// nolint:funlen,gocyclo
+// nolint:funlen,goconst,gocyclo
 func Tokenize(script string) ([]Token, *Diagnostic) {
 	var tokens []Token
 

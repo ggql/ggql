@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ggql/ggql/ast"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ggql/ggql/ast"
 )
 
+//nolint:gocritic
 func TestParseGql(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -57,45 +59,42 @@ func TestParseGql(t *testing.T) {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 
-	// // Test: SELECT @name @invalid
-	// tokens2 := []Token{
-	// 	Token{
-	// 		Location: Location{
-	// 			Start: 1,
-	// 			End: 2,
-	// 		},
-	// 		Kind: Select,
-	// 		Literal: "Select",
-	// 	},
-	// 	Token{
-	// 		Location: Location{
-	// 			Start: 2,
-	// 			End: 3,
-	// 		},
-	// 		Kind: GlobalVariable,
-	// 		Literal: "@name",
-	// 	},
-	// 	Token{
-	// 		Location: Location{
-	// 			Start: 3,
-	// 			End: 4,
-	// 		},
-	// 		Kind: GlobalVariable,
-	// 		Literal: "@invalid",
-	// 	},
-	// }
-	//
-	// ret, err := ParserGql(tokens2, env)
-	// fmt.Println(ret)
-	// if err.message == "" {
-	// 	t.Errorf("ParserGql failed with error: %v", err)
-	// }
-	//
-	// if query.SomeField != expectedValue {
-	//     t.Errorf("ParserGql returned unexpected query: %+v", query)
-	// }
+	// Test: SELECT @name @invalid
+	tokens = []Token{
+		{
+			Location: Location{
+				Start: 1,
+				End:   2,
+			},
+			Kind:    Select,
+			Literal: "SELECT",
+		},
+		{
+			Location: Location{
+				Start: 2,
+				End:   3,
+			},
+			Kind:    GlobalVariable,
+			Literal: "@name",
+		},
+		{
+			Location: Location{
+				Start: 3,
+				End:   4,
+			},
+			Kind:    GlobalVariable,
+			Literal: "@invalid",
+		},
+	}
+
+	_, err = ParserGql(tokens, &env)
+
+	if err.message == "" {
+		t.Errorf("ParserGql failed with error: %v", err)
+	}
 }
 
+//nolint:gocritic
 func TestParseSetQuery(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -147,6 +146,7 @@ func TestParseSetQuery(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseSelectQuery(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -221,6 +221,7 @@ func TestParseSelectQuery(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseSelectStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -248,6 +249,7 @@ func TestParseSelectStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseWhereStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -275,6 +277,7 @@ func TestParseWhereStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseGroupByStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -319,6 +322,7 @@ func TestParseGroupByStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseHavingStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -371,6 +375,7 @@ func TestParseHavingStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseLimitStatement(t *testing.T) {
 	// Test: LIMIT 1
 	tokens := []Token{
@@ -400,6 +405,7 @@ func TestParseLimitStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseOffsetStatement(t *testing.T) {
 	// Test: OFFSET 1
 	tokens := []Token{
@@ -429,6 +435,7 @@ func TestParseOffsetStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseOrderByStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -473,6 +480,7 @@ func TestParseOrderByStatement(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -517,6 +525,7 @@ func TestParseExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseAssignmentExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -561,6 +570,7 @@ func TestParseAssignmentExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseIsNullExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -605,6 +615,7 @@ func TestParseIsNullExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseInExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -681,6 +692,7 @@ func TestParseInExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseBetweenExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -757,6 +769,7 @@ func TestParseBetweenExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseLogicalOrExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -833,6 +846,7 @@ func TestParseLogicalOrExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseLogicalAndExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -909,6 +923,7 @@ func TestParseLogicalAndExpression(t *testing.T) {
 	}
 }
 
+//nolint:goconst,gocritic
 func TestParseBitwiseOrExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -985,6 +1000,7 @@ func TestParseBitwiseOrExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseLogicalXorExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1061,6 +1077,7 @@ func TestParseLogicalXorExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseBitwiseAndExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1137,6 +1154,7 @@ func TestParseBitwiseAndExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseEqualityExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1181,6 +1199,7 @@ func TestParseEqualityExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseComparisonExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1225,6 +1244,7 @@ func TestParseComparisonExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseBitwiseShiftExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1269,6 +1289,7 @@ func TestParseBitwiseShiftExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseTermExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1313,6 +1334,7 @@ func TestParseTermExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseFactorExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1357,6 +1379,7 @@ func TestParseFactorExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseLikeExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1401,6 +1424,7 @@ func TestParseLikeExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseGLobExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1445,6 +1469,7 @@ func TestParseGLobExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseUnaryExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1481,6 +1506,7 @@ func TestParseUnaryExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseFunctionCallExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1533,6 +1559,7 @@ func TestParseFunctionCallExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseArgumentsExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1577,6 +1604,7 @@ func TestParseArgumentsExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParsePrimaryExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1661,6 +1689,7 @@ func TestParsePrimaryExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseGroupExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1705,6 +1734,7 @@ func TestParseGroupExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestParseCaseExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1789,6 +1819,7 @@ func TestParseCaseExpression(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestCheckFunctionCallExpression(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1813,6 +1844,7 @@ func TestCheckFunctionCallExpression(t *testing.T) {
 	}
 }
 
+//nolint:goconst,gocritic,gomnd
 func TestTypeCheckSelectedFields(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -1847,6 +1879,7 @@ func TestTypeCheckSelectedFields(t *testing.T) {
 	}
 }
 
+//nolint:gocritic
 func TestUnExpectedStatementError(t *testing.T) {
 	// Test: start == 0
 	tokens := []Token{
@@ -1865,6 +1898,7 @@ func TestUnExpectedStatementError(t *testing.T) {
 	assert.Equal(t, "Unexpected statement", err.message)
 }
 
+//nolint:gocritic
 func TestUnExpectedExpressionError(t *testing.T) {
 	// Test: position == 0
 	tokens := []Token{
@@ -1908,6 +1942,7 @@ func TestUnExpectedExpressionError(t *testing.T) {
 	assert.Equal(t, "Unexpected `==`, Just use `=` to check equality", err2.message)
 }
 
+//nolint:gocritic
 func TestUnExpectedContentAfterCorrectStatement(t *testing.T) {
 	// Test: invalid
 	statement_name := "invalid"
@@ -1927,6 +1962,7 @@ func TestUnExpectedContentAfterCorrectStatement(t *testing.T) {
 	assert.Equal(t, "Unexpected content after the end of `INVALID` statement", err.message)
 }
 
+//nolint:gocritic
 func TestGetExpressionName(t *testing.T) {
 	// Test: symbol
 	expression := ast.SymbolExpression{
@@ -1938,6 +1974,7 @@ func TestGetExpressionName(t *testing.T) {
 	}
 }
 
+//nolint:goconst,gocritic
 func TestRegisterCurrentTableFieldsTypes(t *testing.T) {
 	// Test: commits
 	table_name := "commits"
@@ -1950,6 +1987,7 @@ func TestRegisterCurrentTableFieldsTypes(t *testing.T) {
 	assert.Equal(t, ast.Text{}, env.Scopes["commit_id"])
 }
 
+//nolint:gocritic
 func TestSelectAllTableFields(t *testing.T) {
 	// Test: commits
 	table_name := "commits"
@@ -2002,6 +2040,7 @@ func TestGetSafeLocation(t *testing.T) {
 	assert.Equal(t, 2, location.End)
 }
 
+//nolint:gocritic
 func TestIsAssignmentOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2017,6 +2056,7 @@ func TestIsAssignmentOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsTermOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2032,6 +2072,7 @@ func TestIsTermOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsBitwiseShiftOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2047,6 +2088,7 @@ func TestIsBitwiseShiftOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsPrefixUnaryOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2062,6 +2104,7 @@ func TestIsPrefixUnaryOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsComparisonOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2076,6 +2119,7 @@ func TestIsComparisonOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsFactorOperator(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
@@ -2090,6 +2134,7 @@ func TestIsFactorOperator(t *testing.T) {
 	assert.Equal(t, false, status)
 }
 
+//nolint:gocritic
 func TestIsAscOrDesc(t *testing.T) {
 	// Test: kind = TokenKind::Symbol
 	tokens := Token{
