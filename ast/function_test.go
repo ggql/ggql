@@ -144,12 +144,12 @@ func TestTextCharIndex(t *testing.T) {
 
 	buf = append(buf, TextValue{"h"}, TextValue{"hello"})
 	ret := textCharIndex(buf)
-	assert.Equal(t, 1, ret.AsInt())
+	assert.Equal(t, int64(1), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, TextValue{"w"}, TextValue{"hello"})
 	ret = textCharIndex(buf)
-	assert.Equal(t, 0, ret.AsInt())
+	assert.Equal(t, int64(0), ret.AsInt())
 }
 
 func TestTextReplace(t *testing.T) {
@@ -284,12 +284,12 @@ func TestTextStrcmp(t *testing.T) {
 
 	buf = append(buf, TextValue{"hello"}, TextValue{"hello"})
 	ret := textStrcmp(buf)
-	assert.Equal(t, 2, ret.AsInt())
+	assert.Equal(t, int64(2), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, TextValue{"hello"}, TextValue{"world"})
 	ret = textStrcmp(buf)
-	assert.Equal(t, 1, ret.AsInt())
+	assert.Equal(t, int64(1), ret.AsInt())
 }
 
 // Date functions
@@ -513,32 +513,32 @@ func TestNumericSign(t *testing.T) {
 
 	buf = append(buf, IntegerValue{0})
 	ret := numericSign(buf)
-	assert.Equal(t, 0, ret.AsInt())
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, IntegerValue{1})
 	ret = numericSign(buf)
-	assert.Equal(t, 1, ret.AsInt())
+	assert.Equal(t, int64(1), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, IntegerValue{-1})
 	ret = numericSign(buf)
-	assert.Equal(t, -1, ret.AsInt())
+	assert.Equal(t, int64(-1), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, FloatValue{0})
 	ret = numericSign(buf)
-	assert.Equal(t, 0, ret.AsInt())
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, FloatValue{1})
 	ret = numericSign(buf)
-	assert.Equal(t, 1, ret.AsInt())
+	assert.Equal(t, int64(1), ret.AsInt())
 
 	buf = nil
 	buf = append(buf, FloatValue{-1})
 	ret = numericSign(buf)
-	assert.Equal(t, -1, ret.AsInt())
+	assert.Equal(t, int64(-1), ret.AsInt())
 }
 
 // General functions
@@ -587,7 +587,7 @@ func TestGeneralGreatest(t *testing.T) {
 
 	buf = append(buf, IntegerValue{1}, IntegerValue{2}, IntegerValue{3})
 	ret := generalGreatest(buf)
-	assert.Equal(t, 3, ret.AsInt())
+	assert.Equal(t, int64(3), ret.AsInt())
 }
 
 func TestGeneralLeast(t *testing.T) {
@@ -595,5 +595,5 @@ func TestGeneralLeast(t *testing.T) {
 
 	buf = append(buf, IntegerValue{1}, IntegerValue{2}, IntegerValue{3})
 	ret := generalLeast(buf)
-	assert.Equal(t, 1, ret.AsInt())
+	assert.Equal(t, int64(1), ret.AsInt())
 }

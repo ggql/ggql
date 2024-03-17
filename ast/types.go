@@ -127,6 +127,26 @@ func (a Any) IsVarargs() bool {
 // Text implementation
 
 func (t Text) Equal(other DataType) bool {
+	if other.IsVariant() {
+		for _, item := range other.(Variant) {
+			if item.IsText() {
+				return true
+			}
+		}
+	}
+
+	if other.IsOptional() {
+		if other.(Optional).DataType.IsText() {
+			return true
+		}
+	}
+
+	if other.IsVarargs() {
+		if other.(Varargs).DataType.IsText() {
+			return true
+		}
+	}
+
 	return other.IsText()
 }
 
@@ -217,7 +237,7 @@ func (i Integer) IsFloat() bool {
 }
 
 func (i Integer) IsNumber() bool {
-	return false
+	return true
 }
 
 func (i Integer) IsText() bool {
@@ -283,7 +303,7 @@ func (f Float) IsFloat() bool {
 }
 
 func (f Float) IsNumber() bool {
-	return false
+	return true
 }
 
 func (f Float) IsText() bool {
@@ -823,7 +843,7 @@ func (o Optional) Equal(other DataType) bool {
 }
 
 func (o Optional) Fmt() string {
-	return o.DataType.Fmt()
+	return o.DataType.Fmt() + "?"
 }
 
 func (o Optional) IsAny() bool {

@@ -75,6 +75,10 @@ func (v IntegerValue) Compare(other Value) Ordering {
 }
 
 func (v IntegerValue) Plus(other Value) (Value, error) {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
+		return IntegerValue{0}, nil
+	}
+
 	if other.DataType().IsFloat() {
 		return FloatValue{float64(v.AsInt()) + other.AsFloat()}, nil
 	}
@@ -94,6 +98,10 @@ func (v IntegerValue) Plus(other Value) (Value, error) {
 }
 
 func (v IntegerValue) Minus(other Value) (Value, error) {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
+		return IntegerValue{0}, nil
+	}
+
 	if other.DataType().IsFloat() {
 		return FloatValue{float64(v.AsInt()) - other.AsFloat()}, nil
 	}
@@ -239,6 +247,10 @@ func (v FloatValue) Compare(other Value) Ordering {
 }
 
 func (v FloatValue) Plus(other Value) (Value, error) {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
+		return IntegerValue{0}, nil
+	}
+
 	if other.DataType().IsInt() {
 		return FloatValue{v.AsFloat() + float64(other.AsInt())}, nil
 	}
@@ -247,6 +259,10 @@ func (v FloatValue) Plus(other Value) (Value, error) {
 }
 
 func (v FloatValue) Minus(other Value) (Value, error) {
+	if !other.DataType().IsInt() && !other.DataType().IsFloat() {
+		return IntegerValue{0}, nil
+	}
+
 	if other.DataType().IsInt() {
 		return FloatValue{v.AsFloat() - float64(other.AsInt())}, nil
 	}

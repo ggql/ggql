@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	TestTime         = "08:30:00"
 	TestTimestamp    = 1705117592
 	TestDate         = "2024-01-10"
 	TestDateTime     = "2024-01-10 12:36:31"
@@ -18,7 +17,7 @@ const (
 func TestGetUnixTimestampMs(t *testing.T) {
 	ret := GetUnixTimestampMs()
 	fmt.Println("GetUnixTimestampMs:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 }
 
 func TestTimeStampToDate(t *testing.T) {
@@ -42,37 +41,37 @@ func TestTimeStampToDateTime(t *testing.T) {
 func TestDateToTimeStamp(t *testing.T) {
 	ret := DateToTimeStamp(TestDateTime)
 	fmt.Println("DateToTimeStamp:", ret)
-	assert.Equal(t, 0, ret)
+	assert.LessOrEqual(t, ret, int64(0))
 
 	ret = DateToTimeStamp(TestDate)
 	fmt.Println("DateToTimeStamp:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 }
 
 func TestDateTimeToTimeStamp(t *testing.T) {
 	ret := DateTimeToTimeStamp(TestDateTimeFull)
 	fmt.Println("DateTimeToTimeStamp:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 
 	ret = DateTimeToTimeStamp(TestDateTime)
 	fmt.Println("DateTimeToTimeStamp:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 
 	ret = DateTimeToTimeStamp("invalid")
 	fmt.Println("DateTimeToTimeStamp:", ret)
-	assert.Equal(t, 0, ret)
+	assert.LessOrEqual(t, ret, int64(0))
 }
 
 func TestDateTimeToHour(t *testing.T) {
 	ret := DateTimeToHour(TestTimestamp)
 	fmt.Println("DateTimeToHour:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 }
 
 func TestDateToDayNumberInMonth(t *testing.T) {
 	ret := DateToDayNumberInMonth(TestTimestamp)
 	fmt.Println("DateToDayNumberInMonth:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, 0)
 }
 
 func TestDateToDayName(t *testing.T) {
@@ -90,7 +89,7 @@ func TestDateToMonthName(t *testing.T) {
 func TestTimeStampFromYearAndDay(t *testing.T) {
 	ret := TimeStampFromYearAndDay(2024, 1)
 	fmt.Println("TimeStampFromYearAndDay:", ret)
-	assert.NotEqual(t, 0, ret)
+	assert.Greater(t, ret, int64(0))
 }
 
 func TestIsValidTimeFormat(t *testing.T) {

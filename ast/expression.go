@@ -459,7 +459,7 @@ func (e *CaseExpression) Kind() ExpressionKind {
 }
 
 func (e *CaseExpression) ExprType(scope *Environment) DataType {
-	return Boolean{}
+	return e.ValuesType
 }
 
 func (e *CaseExpression) AsAny() interface{} {

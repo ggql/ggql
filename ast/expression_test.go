@@ -103,7 +103,7 @@ func TestGlobalVariableExpressionExprType(t *testing.T) {
 		Scopes:       make(map[string]DataType),
 	}
 
-	scope.GlobalsTypes["field1"] = Text{}
+	scope.Scopes["field1"] = Text{}
 
 	ret := expr.ExprType(scope)
 	assert.Equal(t, true, ret.IsText())

@@ -58,12 +58,13 @@ func TestIntegerValueCompare(t *testing.T) {
 func TestIntegerValuePlus(t *testing.T) {
 	value := IntegerValue{1}
 	null := NullValue{}
-	_, err := value.Plus(null)
-	assert.NotEqual(t, nil, err)
+	ret, err := value.Plus(null)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	value = IntegerValue{1}
 	otherInt := IntegerValue{1}
-	ret, err := value.Plus(otherInt)
+	ret, err = value.Plus(otherInt)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, int64(2), ret.AsInt())
 
@@ -77,12 +78,13 @@ func TestIntegerValuePlus(t *testing.T) {
 func TestIntegerValueMinus(t *testing.T) {
 	value := IntegerValue{1}
 	null := NullValue{}
-	_, err := value.Minus(null)
-	assert.NotEqual(t, nil, err)
+	ret, err := value.Minus(null)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	value = IntegerValue{1}
 	otherInt := IntegerValue{1}
-	ret, err := value.Minus(otherInt)
+	ret, err = value.Minus(otherInt)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, int64(0), ret.AsInt())
 
@@ -235,12 +237,13 @@ func TestFloatValueCompare(t *testing.T) {
 func TestFloatValuePlus(t *testing.T) {
 	value := FloatValue{1.0}
 	null := NullValue{}
-	_, err := value.Plus(null)
-	assert.NotEqual(t, nil, err)
+	ret, err := value.Plus(null)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	value = FloatValue{1.0}
 	otherInt := IntegerValue{1}
-	ret, err := value.Plus(otherInt)
+	ret, err = value.Plus(otherInt)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 2.0, ret.AsFloat())
 
@@ -254,12 +257,13 @@ func TestFloatValuePlus(t *testing.T) {
 func TestFloatValueMinus(t *testing.T) {
 	value := FloatValue{1.0}
 	null := NullValue{}
-	_, err := value.Minus(null)
-	assert.NotEqual(t, nil, err)
+	ret, err := value.Minus(null)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, int64(0), ret.AsInt())
 
 	value = FloatValue{1.0}
 	otherInt := IntegerValue{1}
-	ret, err := value.Minus(otherInt)
+	ret, err = value.Minus(otherInt)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, float64(0), ret.AsFloat())
 
