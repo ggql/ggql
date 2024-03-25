@@ -511,7 +511,7 @@ func TestConsumeOctalNumber(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeOctalNumber(chars, &pos, &start)
-	assert.Equal(t, "Invalid octal number", err.Message())
+	assert.Equal(t, "Missing digits after the integer base prefix", err.Message())
 
 	// Integer: 0_7
 	chars = []rune{'0', '_', '7'}

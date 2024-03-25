@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -437,59 +439,373 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 		return nil, NewError("Unexpected character").WithLocationSpan(columnStart, position)
 	}
 
-	return tokens, nil
+	return tokens, &Diagnostic{}
 }
 
+// nolint:lll
 func consumeGlobalVariableName(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	// Consume `@`
+	*pos += 1
+
+	// Make sure first character is alphabetic
+	if *pos < len(chars) && !unicode.IsLetter(chars[*pos]) {
+		return Token{}, NewError("Global variable name must start with alphabetic character").AddHelp("Add at least one alphabetic character after @").WithLocationSpan(*start, *pos)
+	}
+
+	for *pos < len(chars) && (chars[*pos] == '_' || unicode.IsLetter(chars[*pos]) || unicode.IsDigit(chars[*pos])) {
+		*pos += 1
+	}
+
+	// Identifier is case-insensitive by default, convert to lowercase to be easy to compare and lookup
+	literal := string(chars[*start:*pos])
+	buf := strings.ToLower(literal)
+
+	location := Location{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     GlobalVariable,
+		Literal:  buf,
+	}, &Diagnostic{}
 }
 
 func consumeIdentifier(chars []rune, pos, start *int) Token {
-	// TODO: FIXME
-	return Token{}
+	for *pos < len(chars) && (chars[*pos] == '_' || unicode.IsLetter(chars[*pos]) || unicode.IsDigit(chars[*pos])) {
+		*pos++
+	}
+
+	// Identifier is being case-insensitive by default, convert to lowercase to be easy to compare and lookup
+	literal := chars[*start:*pos]
+	buf := strings.ToLower(string(literal))
+
+	location := Location{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     resolveSymbolKind(buf),
+		Literal:  buf,
+	}
 }
 
 func consumeNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	kind := Integer
+
+	for *pos < len(chars) && (unicode.IsDigit(chars[*pos]) || chars[*pos] == '_') {
+		*pos++
+	}
+
+	if *pos < len(chars) && chars[*pos] == '.' {
+		*pos++
+		kind = Float
+		for *pos < len(chars) && (unicode.IsDigit(chars[*pos]) || chars[*pos] == '_') {
+			*pos++
+		}
+	}
+
+	literal := chars[*start:*pos]
+	buf := string(literal)
+
+	literalNum := strings.ReplaceAll(buf, "_", "")
+	if _, err := strconv.ParseFloat(literalNum, 64); err != nil {
+		return Token{}, NewError("invalid number")
+	}
+
+	location := Location{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     kind,
+		Literal:  literalNum,
+	}, &Diagnostic{}
 }
 
 func consumeBackticksIdentifier(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	*pos += 1
+
+	for *pos < len(chars) && chars[*pos] != '`' {
+		*pos += 1
+	}
+
+	if *pos >= len(chars) {
+		return Token{}, NewError("Unterminated backticks").AddHelp("Add ` at the end of the identifier").WithLocationSpan(*start, *pos)
+	}
+
+	*pos += 1
+
+	literal := chars[*start+1 : *pos-1]
+	identifier := string(literal)
+
+	location := struct {
+		Start int
+		End   int
+	}{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     Symbol,
+		Literal:  identifier,
+	}, &Diagnostic{}
 }
 
+// nolint:lll
 func consumeBinaryNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	hasDigit := false
+
+	for *pos < len(chars) && (chars[*pos] == '0' || chars[*pos] == '1' || chars[*pos] == '_') {
+		*pos++
+		hasDigit = true
+	}
+
+	if !hasDigit {
+		return Token{}, NewError("Missing digits after the integer base prefix").AddHelp("Expect at least one binary digits after the prefix 0b").AddHelp("Binary digit mean 0 or 1").WithLocationSpan(*start, *pos)
+	}
+
+	literal := chars[*start:*pos]
+	buf := string(literal)
+	literalNum := strings.ReplaceAll(buf, "_", "")
+
+	convertResult, err := strconv.ParseInt(literalNum, 2, 64)
+	if err != nil {
+		return Token{}, NewError("Invalid binary number").WithLocationSpan(*start, *pos)
+	}
+
+	location := struct {
+		Start int
+		End   int
+	}{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     Integer,
+		Literal:  strconv.FormatInt(convertResult, 10),
+	}, &Diagnostic{}
 }
 
+// nolint:lll
 func consumeOctalNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	hasDigit := false
+
+	for *pos < len(chars) && ((chars[*pos] >= '0' && chars[*pos] < '8') || chars[*pos] == '_') {
+		*pos++
+		hasDigit = true
+	}
+
+	if !hasDigit {
+		return Token{}, NewError("Missing digits after the integer base prefix").AddHelp("Expect at least one octal digits after the prefix 0o").AddHelp("Octal digit mean 0 to 8 number").WithLocationSpan(*start, *pos)
+	}
+
+	literal := chars[*start:*pos]
+	buf := string(literal)
+	literalNum := strings.Replace(buf, "_", "", -1)
+
+	convertResult, err := strconv.ParseInt(literalNum, 8, 64)
+	if err != nil {
+		return Token{}, NewError("Invalid octal number")
+	}
+
+	location := struct {
+		Start int
+		End   int
+	}{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     Integer,
+		Literal:  strconv.FormatInt(convertResult, 10),
+	}, &Diagnostic{}
 }
 
+// nolint:lll
 func consumeHexNumber(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	helper := func(r rune) bool {
+		if _, err := strconv.ParseUint(string(r), 16, 64); err != nil {
+			return false
+		}
+		return true
+	}
+
+	hasDigit := false
+
+	for *pos < len(chars) && (helper(chars[*pos]) || chars[*pos] == '_') {
+		*pos++
+		hasDigit = true
+	}
+
+	if !hasDigit {
+		return Token{}, NewError("Missing digits after the integer base prefix").AddHelp("Expect at least one hex digits after the prefix 0x").AddHelp("Hex digit mean 0 to 9 and a to f").WithLocationSpan(*start, *pos)
+	}
+
+	literal := chars[*start:*pos]
+	buf := string(literal)
+	literalNum := strings.ReplaceAll(buf, "_", "")
+
+	convertResult, err := strconv.ParseInt(literalNum, 16, 64)
+	if err != nil {
+		return Token{}, NewError("Invalid hex decimal number")
+	}
+
+	location := struct {
+		Start int
+		End   int
+	}{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     Integer,
+		Literal:  strconv.FormatInt(convertResult, 10),
+	}, &Diagnostic{}
 }
 
+// nolint:lll
 func consumeString(chars []rune, pos, start *int) (Token, *Diagnostic) {
-	// TODO: FIXME
-	return Token{}, nil
+	*pos += 1
+
+	for *pos < len(chars) && chars[*pos] != '"' {
+		*pos += 1
+	}
+
+	if *pos >= len(chars) {
+		return Token{}, NewError("Unterminated double quote string").AddHelp("Add \" at the end of the String literal").WithLocationSpan(*start, *pos)
+	}
+
+	*pos += 1
+
+	literal := chars[*start+1 : *pos-1]
+	stringLiteral := string(literal)
+
+	location := struct {
+		Start int
+		End   int
+	}{
+		Start: *start,
+		End:   *pos,
+	}
+
+	return Token{
+		Location: location,
+		Kind:     String,
+		Literal:  stringLiteral,
+	}, &Diagnostic{}
 }
 
 func ignoreSingleLineComment(chars []rune, pos *int) {
-	// TODO: FIXME
+	*pos += 2
+
+	for *pos < len(chars) && chars[*pos] != '\n' {
+		*pos += 1
+	}
+
+	*pos += 1
 }
 
 func ignoreCStyleComment(chars []rune, pos *int) *Diagnostic {
-	// TODO: FIXME
-	return nil
+	*pos += 2
+
+	for *pos+1 < len(chars) && (chars[*pos] != '*' || chars[*pos+1] != '/') {
+		*pos += 1
+	}
+
+	if *pos+2 > len(chars) {
+		return NewError("C Style comment must end with */").AddHelp("Add */ at the end of C Style comments").WithLocationSpan(*pos, *pos)
+	}
+
+	*pos += 2
+
+	return &Diagnostic{}
 }
 
+// nolint:funlen,gocyclo
 func resolveSymbolKind(literal string) TokenKind {
-	// TODO: FIXME
-	return Set
+	switch strings.ToLower(literal) {
+	// Reserved keywords
+	case "set":
+		return Set
+	case "select":
+		return Select
+	case "distinct":
+		return Distinct
+	case "from":
+		return From
+	case "group":
+		return Group
+	case "where":
+		return Where
+	case "having":
+		return Having
+	case "limit":
+		return Limit
+	case "offset":
+		return Offset
+	case "order":
+		return Order
+	case "by":
+		return By
+	case "case":
+		return Case
+	case "when":
+		return When
+	case "then":
+		return Then
+	case "else":
+		return Else
+	case "end":
+		return End
+	case "between":
+		return Between
+	case "in":
+		return In
+	case "is":
+		return Is
+	case "not":
+		return Not
+	case "like":
+		return Like
+	case "glob":
+		return Glob
+	// Logical Operators
+	case "or":
+		return LogicalOr
+	case "and":
+		return LogicalAnd
+	case "xor":
+		return LogicalXor
+	// True, False and Null
+	case "true":
+		return True
+	case "false":
+		return False
+	case "null":
+		return Null
+	case "as":
+		return As
+	// Order by DES and ASC
+	case "asc":
+		return Ascending
+	case "desc":
+		return Descending
+	// Identifier
+	default:
+		return Symbol
+	}
 }
