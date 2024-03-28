@@ -154,7 +154,7 @@ func TestParseSelectQuery(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 
-	// Test: SELECT count(name) FROM commits
+	// Test: SELECT * FROM branches WHERE is_head = "true"
 	tokens := []Token{
 		{
 			Location: Location{
@@ -169,16 +169,16 @@ func TestParseSelectQuery(t *testing.T) {
 				Start: 2,
 				End:   3,
 			},
-			Kind:    Symbol,
-			Literal: "count",
+			Kind:    Star,
+			Literal: "*",
 		},
 		{
 			Location: Location{
 				Start: 3,
 				End:   4,
 			},
-			Kind:    LeftParen,
-			Literal: "(",
+			Kind:    From,
+			Literal: "FROM",
 		},
 		{
 			Location: Location{
@@ -186,33 +186,34 @@ func TestParseSelectQuery(t *testing.T) {
 				End:   5,
 			},
 			Kind:    Symbol,
-			Literal: "name",
+			Literal: "branches",
 		},
 		{
 			Location: Location{
 				Start: 5,
 				End:   6,
 			},
-			Kind:    RightParen,
-			Literal: ")",
+			Kind:    Where,
+			Literal: "WHERE",
 		},
 		{
 			Location: Location{
 				Start: 6,
 				End:   7,
 			},
-			Kind:    From,
-			Literal: "FROM",
+			Kind:    Symbol,
+			Literal: "is_head",
 		},
 		{
 			Location: Location{
 				Start: 7,
 				End:   8,
 			},
-			Kind:    Symbol,
-			Literal: "commits",
+			Kind:    True,
+			Literal: "false",
 		},
 	}
+
 	position := 0
 
 	_, err := ParseSelectQuery(&env, &tokens, &position)
@@ -534,7 +535,7 @@ func TestParseAssignmentExpression(t *testing.T) {
 	}
 	context := ParserContext{}
 
-	// Test: commit_count := -1
+	// Test: commit_count := 1
 	tokens := []Token{
 		{
 			Location: Location{
@@ -701,69 +702,53 @@ func TestParseBetweenExpression(t *testing.T) {
 	}
 	context := ParserContext{}
 
-	// Test: "One" IN ("One", "Two")
+	// Test: commit_count BETWEEN 2 .. 30000
 	tokens := []Token{
 		{
 			Location: Location{
 				Start: 1,
 				End:   2,
 			},
-			Kind:    String,
-			Literal: "One",
+			Kind:    Symbol,
+			Literal: "commit_count",
 		},
 		{
 			Location: Location{
 				Start: 2,
 				End:   3,
 			},
-			Kind:    In,
-			Literal: "IN",
+			Kind:    Between,
+			Literal: "BETWEEN",
 		},
 		{
 			Location: Location{
 				Start: 3,
 				End:   4,
 			},
-			Kind:    LeftParen,
-			Literal: "(",
+			Kind:    Integer,
+			Literal: "2",
 		},
 		{
 			Location: Location{
 				Start: 4,
 				End:   5,
 			},
-			Kind:    String,
-			Literal: "One",
+			Kind:    DotDot,
+			Literal: "..",
 		},
 		{
 			Location: Location{
 				Start: 5,
 				End:   6,
 			},
-			Kind:    Comma,
-			Literal: ",",
-		},
-		{
-			Location: Location{
-				Start: 6,
-				End:   7,
-			},
-			Kind:    String,
-			Literal: "Two",
-		},
-		{
-			Location: Location{
-				Start: 7,
-				End:   8,
-			},
-			Kind:    RightParen,
-			Literal: ")",
+			Kind:    Integer,
+			Literal: "30000",
 		},
 	}
 
 	position := 0
 
-	_, err := ParseInExpression(&context, &env, &tokens, &position)
+	_, err := ParseBetweenExpression(&context, &env, &tokens, &position)
 	if err.message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
@@ -1372,8 +1357,9 @@ func TestParseFactorExpression(t *testing.T) {
 	}
 
 	position := 0
-
+	fmt.Println("===1")
 	_, err := ParseFactorExpression(&context, &env, &tokens, &position)
+	fmt.Println("===2")
 	if err.message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
@@ -1478,7 +1464,7 @@ func TestParseUnaryExpression(t *testing.T) {
 	}
 	context := ParserContext{}
 
-	// Test: !is_remote
+	// Test: !1
 	tokens := []Token{
 		{
 			Location: Location{
@@ -1493,15 +1479,15 @@ func TestParseUnaryExpression(t *testing.T) {
 				Start: 2,
 				End:   3,
 			},
-			Kind:    Symbol,
-			Literal: "is_remote",
+			Kind:    Integer,
+			Literal: "1",
 		},
 	}
 
 	position := 0
 
 	_, err := ParseUnaryExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }

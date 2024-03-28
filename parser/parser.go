@@ -169,6 +169,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 			statement, _ := ParseOrderByStatement(&context, env, tokens, position)
 			statements["order"] = statement
 		default:
+			*position += 1
 			break
 		}
 	}
@@ -429,8 +430,7 @@ func ParseLimitStatement(tokens *[]Token, position *int) (ast.Statement, Diagnos
 // nolint:lll
 func ParseOffsetStatement(tokens *[]Token, position *int) (ast.Statement, Diagnostic) {
 	*position += 1
-
-	if *position >= len(*tokens) || (*tokens)[*position].Kind == Integer {
+	if *position >= len(*tokens) || (*tokens)[*position].Kind != Integer {
 		return &ast.OffsetStatement{}, *NewError("Expect number after `OFFSET` keyword").WithLocation(GetSafeLocation(tokens, *position-1))
 	}
 
@@ -525,7 +525,7 @@ func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tok
 		return nil, err
 	}
 	if *position < len(*tokens) && (*tokens)[*position].Kind == ColonEqual {
-		if expression.Kind() != ast.ExpressionKind(GlobalVariable) {
+		if expression.Kind() != ast.ExprGlobalVariable {
 			return nil, *NewError("Assignment expressions expect global variable name before `:=`").WithLocation((*tokens)[*position].Location)
 		}
 
@@ -551,7 +551,10 @@ func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tok
 }
 
 func ParseIsNullExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
-	expression, _ := ParseInExpression(context, env, tokens, position)
+	expression, err := ParseInExpression(context, env, tokens, position)
+	if err.message != "" {
+		return nil, err
+	}
 	if *position < len(*tokens) && (*tokens)[*position].Kind == Is {
 		isLocation := (*tokens)[*position].Location
 
@@ -848,7 +851,7 @@ func ParseBitwiseAndExpression(context *ParserContext, env *ast.Environment, tok
 
 	lhs := expression
 
-	if *position < len(*tokens) && (*tokens)[*position].Kind != BitwiseAnd {
+	if *position < len(*tokens) && (*tokens)[*position].Kind == BitwiseAnd {
 		*position += 1
 		if lhs.ExprType(env).Fmt() != "Boolean" {
 			return nil, TypeMismatchError(
@@ -1106,7 +1109,6 @@ func ParseFactorExpression(context *ParserContext, env *ast.Environment, tokens 
 	if err.message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
-
 	lhs := expression
 	for *position < len(*tokens) && IsFactorOperator(&(*tokens)[*position]) {
 		operator := &(*tokens)[*position]
@@ -1242,7 +1244,6 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 
 		return &ast.PrefixUnary{Right: rhs, Op: op}, Diagnostic{}
 	}
-
 	return ParseFunctionCallExpression(context, env, tokens, position)
 }
 
@@ -1393,7 +1394,6 @@ func ParsePrimaryExpression(context *ParserContext, env *ast.Environment, tokens
 	if *position >= len(*tokens) {
 		return nil, UnExpectedExpressionError(tokens, position)
 	}
-
 	switch (*tokens)[*position].Kind {
 	case String:
 		*position += 1
@@ -1402,25 +1402,25 @@ func ParsePrimaryExpression(context *ParserContext, env *ast.Environment, tokens
 			ValueType: ast.StringValueText,
 		}, Diagnostic{}
 	case Symbol:
-		value := (*tokens)[*position-1].Literal
+		value := (*tokens)[*position].Literal
 		*position += 1
 		if !contains(context.SelectedFields, value) {
 			context.HiddenSelections = append(context.HiddenSelections, value)
 		}
 		return &ast.SymbolExpression{Value: value}, Diagnostic{}
 	case GlobalVariable:
-		name := (*tokens)[*position-1].Literal
+		name := (*tokens)[*position].Literal
 		*position += 1
 		return &ast.GlobalVariableExpression{Name: name}, Diagnostic{}
 	case Integer:
-		if integer, err := strconv.ParseInt((*tokens)[*position-1].Literal, 10, 64); err == nil {
+		if integer, err := strconv.ParseInt((*tokens)[*position].Literal, 10, 64); err == nil {
 			*position += 1
 			value := ast.IntegerValue{Value: integer}
 			return &ast.NumberExpression{Value: value}, Diagnostic{}
 		}
 		return nil, *NewError("Too big Integer value").AddHelp(fmt.Sprintf("Integer value must be between %d and %d", math.MinInt64, math.MaxInt64)).WithLocation((*tokens)[*position].Location)
 	case Float:
-		if float, err := strconv.ParseFloat((*tokens)[*position-1].Literal, 64); err == nil {
+		if float, err := strconv.ParseFloat((*tokens)[*position].Literal, 64); err == nil {
 			*position += 1
 			value := ast.FloatValue{Value: float}
 			return &ast.NumberExpression{Value: value}, Diagnostic{}
