@@ -1,610 +1,424 @@
-package main
+package engine
 
 import (
-    "errors"
-    "regexp"
-    "strings"
+	"errors"
+	"math"
+	"regexp"
+	"strings"
+
+	"github.com/ggql/ggql/ast"
 )
 
-type Value interface{}
-
-type Environment struct {
-    Globals map[string]Value
+// nolint:funlen,gocyclo
+func EvaluateExpression(env *ast.Environment, expression ast.Expression, titles []string, object []ast.Value) (ast.Value, error) {
+	switch expression.Kind() {
+	case ast.ExprAssignment:
+		expr := expression.(*ast.AssignmentExpression)
+		return EvaluateAssignment(env, expr, titles, object)
+	case ast.ExprString:
+		expr := expression.(*ast.StringExpression)
+		return EvaluateString(expr)
+	case ast.ExprSymbol:
+		expr := expression.(*ast.SymbolExpression)
+		return EvaluateSymbol(expr, titles, object)
+	case ast.ExprGlobalVariable:
+		expr := expression.(*ast.GlobalVariableExpression)
+		return EvaluateGlobalVariable(env, expr)
+	case ast.ExprNumber:
+		expr := expression.(*ast.NumberExpression)
+		return EvaluateNumber(expr), nil
+	case ast.ExprBoolean:
+		expr := expression.(*ast.BooleanExpression)
+		return EvaluateBoolean(expr), nil
+	case ast.ExprPrefixUnary:
+		expr := expression.(*ast.PrefixUnary)
+		return EvaluatePrefixUnary(env, expr, titles, object)
+	case ast.ExprArithmetic:
+		expr := expression.(*ast.ArithmeticExpression)
+		return EvaluateArithmetic(env, expr, titles, object)
+	case ast.ExprComparison:
+		expr := expression.(*ast.ComparisonExpression)
+		return EvaluateComparison(env, expr, titles, object)
+	case ast.ExprLike:
+		expr := expression.(*ast.LikeExpression)
+		return EvaluateLike(env, expr, titles, object)
+	case ast.ExprGlob:
+		expr := expression.(*ast.GlobExpression)
+		return EvaluateGlob(env, expr, titles, object)
+	case ast.ExprLogical:
+		expr := expression.(*ast.LogicalExpression)
+		return EvaluateLogical(env, expr, titles, object)
+	case ast.ExprBitwise:
+		expr := expression.(*ast.BitwiseExpression)
+		return EvaluateBitwise(env, expr, titles, object)
+	case ast.ExprCall:
+		expr := expression.(*ast.CallExpression)
+		return EvaluateCall(env, expr, titles, object)
+	case ast.ExprBetween:
+		expr := expression.(*ast.BetweenExpression)
+		return EvaluateBetween(env, expr, titles, object)
+	case ast.ExprCase:
+		expr := expression.(*ast.CaseExpression)
+		return EvaluateCase(env, expr, titles, object)
+	case ast.ExprIn:
+		expr := expression.(*ast.InExpression)
+		return EvaluateIn(env, expr, titles, object)
+	case ast.ExprIsNull:
+		expr := expression.(*ast.IsNullExpression)
+		return EvaluateIsNull(env, expr, titles, object)
+	case ast.ExprNull:
+		return nil, nil
+	default:
+		return nil, errors.New("invalid expression kind")
+	}
 }
 
-type Expression interface {
-    Kind() ExpressionKind
+func EvaluateAssignment(env *ast.Environment, expr *ast.AssignmentExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	value, err := EvaluateExpression(env, expr.Value, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	env.Globals[expr.Symbol] = value
+
+	return value, nil
 }
 
-type ExpressionKind int
-
-const (
-    Assignment ExpressionKind = iota
-    String
-    Symbol
-    GlobalVariable
-    Number
-    Boolean
-    PrefixUnary
-    Arithmetic
-    Comparison
-    Like
-    Glob
-    Logical
-    Bitwise
-    Call
-    Between
-    Case
-    In
-    IsNull
-    Null
-)
-
-type AssignmentExpression struct {
-    Symbol string
-    Value  Expression
+func EvaluateString(expr *ast.StringExpression) (ast.Value, error) {
+	switch expr.ValueType {
+	case ast.StringValueText:
+		return ast.TextValue{Value: expr.Value}, nil
+	case ast.StringValueTime:
+		return ast.TimeValue{Value: expr.Value}, nil
+	case ast.StringValueDate:
+		return ast.DateValue{Value: ast.DateToTimeStamp(expr.Value)}, nil
+	case ast.StringValueDateTime:
+		return ast.DateValue{Value: ast.DateTimeToTimeStamp(expr.Value)}, nil
+	default:
+		return nil, errors.New("invalid string value type")
+	}
 }
 
-type StringExpression struct {
-    ValueType StringValueType
-    Value     string
+func EvaluateSymbol(expr *ast.SymbolExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	for index, title := range titles {
+		if expr.Value == title {
+			return object[index], nil
+		}
+	}
+
+	return nil, errors.New("invalid column name")
 }
 
-type StringValueType int
+func EvaluateGlobalVariable(env *ast.Environment, expr *ast.GlobalVariableExpression) (ast.Value, error) {
+	value, ok := env.Globals[expr.Name]
+	if ok {
+		return value, nil
+	}
 
-const (
-    Text StringValueType = iota
-    Time
-    Date
-    DateTime
-)
-
-type SymbolExpression struct {
-    Value string
+	return nil, errors.New("global variable not found")
 }
 
-type GlobalVariableExpression struct {
-    Name string
+func EvaluateNumber(expr *ast.NumberExpression) ast.Value {
+	return expr.Value
 }
 
-type NumberExpression struct {
-    Value float64
+func EvaluateBoolean(expr *ast.BooleanExpression) ast.Value {
+	return ast.BooleanValue{Value: expr.IsTrue}
 }
 
-type BooleanExpression struct {
-    IsTrue bool
+func EvaluatePrefixUnary(env *ast.Environment, expr *ast.PrefixUnary, titles []string, object []ast.Value) (ast.Value, error) {
+	rhs, err := EvaluateExpression(env, expr.Right, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	switch expr.Op {
+	case ast.POMinus:
+		if rhs.DataType().IsInt() {
+			return ast.IntegerValue{Value: -rhs.AsInt()}, nil
+		}
+		return ast.FloatValue{Value: -rhs.AsFloat()}, nil
+	case ast.POBang:
+		return ast.BooleanValue{Value: !rhs.AsBool()}, nil
+	default:
+		return nil, errors.New("invalid prefix unary operator")
+	}
 }
 
-type PrefixUnary struct {
-    Operator PrefixUnaryOperator
-    Right    Expression
+func EvaluateArithmetic(env *ast.Environment, expr *ast.ArithmeticExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	lhs, err := EvaluateExpression(env, expr.Left, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	rhs, err := EvaluateExpression(env, expr.Right, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	switch expr.Operator {
+	case ast.AOPlus:
+		return ast.FloatValue{Value: lhs.AsFloat() + rhs.AsFloat()}, nil
+	case ast.AOMinus:
+		return ast.FloatValue{Value: lhs.AsFloat() - rhs.AsFloat()}, nil
+	case ast.AOStar:
+		return ast.FloatValue{Value: lhs.AsFloat() * rhs.AsFloat()}, nil
+	case ast.AOSlash:
+		return ast.FloatValue{Value: lhs.AsFloat() / rhs.AsFloat()}, nil
+	case ast.AOModulus:
+		return ast.FloatValue{Value: math.Mod(lhs.AsFloat(), rhs.AsFloat())}, nil
+	default:
+		return nil, errors.New("invalid arithmetic operator")
+	}
 }
 
-type PrefixUnaryOperator int
+// nolint:gocyclo
+func EvaluateComparison(env *ast.Environment, expr *ast.ComparisonExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	lhs, err := EvaluateExpression(env, expr.Left, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-const (
-    Minus PrefixUnaryOperator = iota
-    Bang
-)
+	rhs, err := EvaluateExpression(env, expr.Right, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-type ArithmeticExpression struct {
-    Operator ArithmeticOperator
-    Left     Expression
-    Right    Expression
+	comparisonResult := lhs.Compare(rhs)
+
+	if expr.Operator == ast.CONullSafeEqual {
+		if lhs.DataType().IsNull() && rhs.DataType().IsNull() {
+			return ast.IntegerValue{Value: 1}, nil
+		} else if lhs.DataType().IsNull() || rhs.DataType().IsNull() {
+			return ast.IntegerValue{Value: 0}, nil
+		} else if comparisonResult == ast.Equal {
+			return ast.IntegerValue{Value: 1}, nil
+		} else {
+			return ast.IntegerValue{Value: 0}, nil
+		}
+	}
+
+	switch expr.Operator {
+	case ast.COGreater:
+		return ast.BooleanValue{Value: comparisonResult == ast.Greater}, nil
+	case ast.COGreaterEqual:
+		return ast.BooleanValue{Value: comparisonResult == ast.Greater || comparisonResult == ast.Equal}, nil
+	case ast.COLess:
+		return ast.BooleanValue{Value: comparisonResult == ast.Less}, nil
+	case ast.COLessEqual:
+		return ast.BooleanValue{Value: comparisonResult == ast.Less || comparisonResult == ast.Equal}, nil
+	case ast.COEqual:
+		return ast.BooleanValue{Value: comparisonResult == ast.Equal}, nil
+	case ast.CONotEqual:
+		return ast.BooleanValue{Value: comparisonResult != ast.Equal}, nil
+	case ast.CONullSafeEqual:
+		return ast.BooleanValue{Value: false}, nil
+	default:
+		return nil, errors.New("invalid comparison operator")
+	}
 }
 
-type ArithmeticOperator int
+func EvaluateLike(env *ast.Environment, expr *ast.LikeExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	rhs, err := EvaluateExpression(env, expr.Pattern, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-const (
-    Plus ArithmeticOperator = iota
-    Minus
-    Star
-    Slash
-    Modulus
-)
+	pattern := "^" + strings.ToLower(rhs.AsText()) + "$"
+	pattern = strings.ReplaceAll(pattern, "%", ".*")
+	pattern = strings.ReplaceAll(pattern, "_", ".")
 
-type ComparisonExpression struct {
-    Operator ComparisonOperator
-    Left     Expression
-    Right    Expression
+	regex, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	lhs, err := EvaluateExpression(env, expr.Input, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.BooleanValue{Value: regex.MatchString(strings.ToLower(lhs.AsText()))}, nil
 }
 
-type ComparisonOperator int
+func EvaluateGlob(env *ast.Environment, expr *ast.GlobExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	rhs, err := EvaluateExpression(env, expr.Pattern, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-const (
-    Greater ComparisonOperator = iota
-    GreaterEqual
-    Less
-    LessEqual
-    Equal
-    NotEqual
-    NullSafeEqual
-)
+	pattern := "^" + regexp.QuoteMeta(rhs.AsText()) + "$"
+	pattern = strings.ReplaceAll(pattern, ".", "\\.")
+	pattern = strings.ReplaceAll(pattern, "*", ".*")
+	pattern = strings.ReplaceAll(pattern, "?", ".")
 
-type LikeExpression struct {
-    Input   Expression
-    Pattern Expression
+	regex, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	lhs, err := EvaluateExpression(env, expr.Input, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.BooleanValue{Value: regex.MatchString(lhs.AsText())}, nil
 }
 
-type GlobExpression struct {
-    Input   Expression
-    Pattern Expression
+func EvaluateLogical(env *ast.Environment, expr *ast.LogicalExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	lhs, err := EvaluateExpression(env, expr.Left, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	if expr.Operator == ast.LOAnd && !lhs.AsBool() {
+		return ast.BooleanValue{Value: false}, nil
+	}
+
+	if expr.Operator == ast.LOOr && lhs.AsBool() {
+		return ast.BooleanValue{Value: true}, nil
+	}
+
+	rhs, err := EvaluateExpression(env, expr.Right, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	switch expr.Operator {
+	case ast.LOAnd:
+		return ast.BooleanValue{Value: lhs.AsBool() && rhs.AsBool()}, nil
+	case ast.LOOr:
+		return ast.BooleanValue{Value: lhs.AsBool() || rhs.AsBool()}, nil
+	case ast.LOXor:
+		return ast.BooleanValue{Value: lhs.AsBool() != rhs.AsBool()}, nil
+	default:
+		return nil, errors.New("invalid logical operator")
+	}
 }
 
-type LogicalExpression struct {
-    Operator LogicalOperator
-    Left     Expression
-    Right    Expression
+// nolint:gomnd
+func EvaluateBitwise(env *ast.Environment, expr *ast.BitwiseExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	lhs, err := EvaluateExpression(env, expr.Left, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	rhs, err := EvaluateExpression(env, expr.Right, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	switch expr.Operator {
+	case ast.BOOr:
+		return ast.IntegerValue{Value: lhs.AsInt() | rhs.AsInt()}, nil
+	case ast.BOAnd:
+		return ast.IntegerValue{Value: lhs.AsInt() & rhs.AsInt()}, nil
+	case ast.BORightShift:
+		if rhs.AsInt() >= 64 {
+			return nil, errors.New("attempt to shift right with overflow")
+		}
+		return ast.IntegerValue{Value: lhs.AsInt() >> rhs.AsInt()}, nil
+	case ast.BOLeftShift:
+		if rhs.AsInt() >= 64 {
+			return nil, errors.New("attempt to shift left with overflow")
+		}
+		return ast.IntegerValue{Value: lhs.AsInt() << rhs.AsInt()}, nil
+	default:
+		return nil, errors.New("invalid bitwise operator")
+	}
 }
 
-type LogicalOperator int
+func EvaluateCall(env *ast.Environment, expr *ast.CallExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	function := ast.Functions[expr.FunctionName]
+	if function == nil {
+		return nil, errors.New("function not found")
+	}
 
-const (
-    And LogicalOperator = iota
-    Or
-    Xor
-)
+	arguments := make([]ast.Value, len(expr.Arguments))
 
-type BitwiseExpression struct {
-    Operator BitwiseOperator
-    Left     Expression
-    Right    Expression
+	for i, arg := range expr.Arguments {
+		value, err := EvaluateExpression(env, arg, titles, object)
+		if err != nil {
+			return nil, err
+		}
+		arguments[i] = value
+	}
+
+	return function(arguments), nil
 }
 
-type BitwiseOperator int
+func EvaluateBetween(env *ast.Environment, expr *ast.BetweenExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	value, err := EvaluateExpression(env, expr.Value, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-const (
-    Or BitwiseOperator = iota
-    And
-    RightShift
-    LeftShift
-)
+	rangeStart, err := EvaluateExpression(env, expr.RangeStart, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-type CallExpression struct {
-    FunctionName string
-    Arguments    []Expression
+	rangeEnd, err := EvaluateExpression(env, expr.RangeEnd, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	retStart := value.Compare(rangeStart) == ast.Less || value.Compare(rangeStart) == ast.Equal
+	retEnd := value.Compare(rangeEnd) == ast.Greater || value.Compare(rangeStart) == ast.Equal
+
+	return ast.BooleanValue{Value: retStart && retEnd}, nil
 }
 
-type BetweenExpression struct {
-    Value       Expression
-    RangeStart  Expression
-    RangeEnd    Expression
+func EvaluateCase(env *ast.Environment, expr *ast.CaseExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	conditions := expr.Conditions
+	values := expr.Values
+
+	for i := 0; i < len(conditions); i++ {
+		condition, err := EvaluateExpression(env, conditions[i], titles, object)
+		if err != nil {
+			return nil, err
+		}
+		if condition.AsBool() {
+			return EvaluateExpression(env, values[i], titles, object)
+		}
+	}
+
+	if expr.DefaultValue == nil {
+		return nil, errors.New("invalid case statement")
+	}
+
+	return EvaluateExpression(env, expr.DefaultValue, titles, object)
 }
 
-type CaseExpression struct {
-    Conditions   []Expression
-    Values       []Expression
-    DefaultValue *Expression
+func EvaluateIn(env *ast.Environment, expr *ast.InExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	argument, err := EvaluateExpression(env, expr.Argument, titles, object)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, valueExpr := range expr.Values {
+		value, err := EvaluateExpression(env, valueExpr, titles, object)
+		if err != nil {
+			return nil, err
+		}
+		if argument.Equals(value) {
+			return ast.BooleanValue{Value: !expr.HasNotKeyword}, nil
+		}
+	}
+
+	return ast.BooleanValue{Value: expr.HasNotKeyword}, nil
 }
 
-type InExpression struct {
-    Argument      Expression
-    Values        []Expression
-    HasNotKeyword bool
-}
+func EvaluateIsNull(env *ast.Environment, expr *ast.IsNullExpression, titles []string, object []ast.Value) (ast.Value, error) {
+	argument, err := EvaluateExpression(env, expr.Argument, titles, object)
+	if err != nil {
+		return nil, err
+	}
 
-type IsNullExpression struct {
-    Argument Expression
-    HasNot   bool
-}
+	isNull := argument.DataType().IsNull()
+	if expr.HasNot {
+		return ast.BooleanValue{Value: !isNull}, nil
+	}
 
-func EvaluateExpression(env *Environment, expression Expression, titles []string, object []Value) (Value, error) {
-    switch expression.Kind() {
-    case Assignment:
-        expr := expression.(*AssignmentExpression)
-        return EvaluateAssignment(env, expr, titles, object)
-    case String:
-        expr := expression.(*StringExpression)
-        return EvaluateString(expr)
-    case Symbol:
-        expr := expression.(*SymbolExpression)
-        return EvaluateSymbol(expr, titles, object)
-    case GlobalVariable:
-        expr := expression.(*GlobalVariableExpression)
-        return EvaluateGlobalVariable(env, expr)
-    case Number:
-        expr := expression.(*NumberExpression)
-        return EvaluateNumber(expr), nil
-    case Boolean:
-        expr := expression.(*BooleanExpression)
-        return EvaluateBoolean(expr), nil
-    case PrefixUnary:
-        expr := expression.(*PrefixUnary)
-        return EvaluatePrefixUnary(env, expr, titles, object)
-    case Arithmetic:
-        expr := expression.(*ArithmeticExpression)
-        return EvaluateArithmetic(env, expr, titles, object)
-    case Comparison:
-        expr := expression.(*ComparisonExpression)
-        return EvaluateComparison(env, expr, titles, object)
-    case Like:
-        expr := expression.(*LikeExpression)
-        return EvaluateLike(env, expr, titles, object)
-    case Glob:
-        expr := expression.(*GlobExpression)
-        return EvaluateGlob(env, expr, titles, object)
-    case Logical:
-        expr := expression.(*LogicalExpression)
-        return EvaluateLogical(env, expr, titles, object)
-    case Bitwise:
-        expr := expression.(*BitwiseExpression)
-        return EvaluateBitwise(env, expr, titles, object)
-    case Call:
-        expr := expression.(*CallExpression)
-        return EvaluateCall(env, expr, titles, object)
-    case Between:
-        expr := expression.(*BetweenExpression)
-        return EvaluateBetween(env, expr, titles, object)
-    case Case:
-        expr := expression.(*CaseExpression)
-        return EvaluateCase(env, expr, titles, object)
-    case In:
-        expr := expression.(*InExpression)
-        return EvaluateIn(env, expr, titles, object)
-    case IsNull:
-        expr := expression.(*IsNullExpression)
-        return EvaluateIsNull(env, expr, titles, object)
-    case Null:
-        return nil, nil
-    default:
-        return nil, errors.New("Invalid expression kind")
-    }
-}
-
-func EvaluateAssignment(env *Environment, expr *AssignmentExpression, titles []string, object []Value) (Value, error) {
-    value, err := EvaluateExpression(env, expr.Value, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    env.Globals[expr.Symbol] = value
-    return value, nil
-}
-
-func EvaluateString(expr *StringExpression) (Value, error) {
-    switch expr.ValueType {
-    case Text:
-        return expr.Value, nil
-    case Time:
-        return expr.Value, nil
-    case Date:
-        return expr.Value, nil
-    case DateTime:
-        return expr.Value, nil
-    default:
-        return nil, errors.New("Invalid string value type")
-    }
-}
-
-func EvaluateSymbol(expr *SymbolExpression, titles []string, object []Value) (Value, error) {
-    for index, title := range titles {
-        if expr.Value == title {
-            return object[index], nil
-        }
-    }
-    return nil, errors.New("Invalid column name")
-}
-
-func EvaluateGlobalVariable(env *Environment, expr *GlobalVariableExpression) (Value, error) {
-    value, ok := env.Globals[expr.Name]
-    if ok {
-        return value, nil
-    }
-    return nil, errors.New("Global variable not found")
-}
-
-func EvaluateNumber(expr *NumberExpression) Value {
-    return expr.Value
-}
-
-func EvaluateBoolean(expr *BooleanExpression) Value {
-    return expr.IsTrue
-}
-
-func EvaluatePrefixUnary(env *Environment, expr *PrefixUnary, titles []string, object []Value) (Value, error) {
-    rhs, err := EvaluateExpression(env, expr.Right, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    switch expr.Operator {
-    case Minus:
-        if f, ok := rhs.(float64); ok {
-            return -f, nil
-        }
-        return nil, errors.New("Invalid prefix unary operation")
-    case Bang:
-        if b, ok := rhs.(bool); ok {
-            return !b, nil
-        }
-        return nil, errors.New("Invalid prefix unary operation")
-    default:
-        return nil, errors.New("Invalid prefix unary operator")
-    }
-}
-
-func EvaluateArithmetic(env *Environment, expr *ArithmeticExpression, titles []string, object []Value) (Value, error) {
-    lhs, err := EvaluateExpression(env, expr.Left, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    rhs, err := EvaluateExpression(env, expr.Right, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    switch expr.Operator {
-    case Plus:
-        return lhs.(float64) + rhs.(float64), nil
-    case Minus:
-        return lhs.(float64) - rhs.(float64), nil
-    case Star:
-        return lhs.(float64) * rhs.(float64), nil
-    case Slash:
-        return lhs.(float64) / rhs.(float64), nil
-    case Modulus:
-        return int(lhs.(float64)) % int(rhs.(float64)), nil
-    default:
-        return nil, errors.New("Invalid arithmetic operator")
-    }
-}
-
-func EvaluateComparison(env *Environment, expr *ComparisonExpression, titles []string, object []Value) (Value, error) {
-    lhs, err := EvaluateExpression(env, expr.Left, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    rhs, err := EvaluateExpression(env, expr.Right, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    leftType := getType(lhs)
-    comparisonResult := 0
-    if leftType == "int" {
-        if lhs.(int) > rhs.(int) {
-            comparisonResult = 1
-        } else if lhs.(int) < rhs.(int) {
-            comparisonResult = -1
-        }
-    } else if leftType == "float64" {
-        if lhs.(float64) > rhs.(float64) {
-            comparisonResult = 1
-        } else if lhs.(float64) < rhs.(float64) {
-            comparisonResult = -1
-        }
-    } else if leftType == "bool" {
-        if lhs.(bool) == rhs.(bool) {
-            comparisonResult = 0
-        } else {
-            comparisonResult = 1
-        }
-    } else {
-        if lhs.(string) > rhs.(string) {
-            comparisonResult = 1
-        } else if lhs.(string) < rhs.(string) {
-            comparisonResult = -1
-        }
-    }
-    if expr.Operator == NullSafeEqual {
-        if isNull(lhs) && isNull(rhs) {
-            return 1, nil
-        } else if isNull(lhs) || isNull(rhs) {
-            return 0, nil
-        } else if comparisonResult == 0 {
-            return 1, nil
-        } else {
-            return 0, nil
-        }
-    }
-    switch expr.Operator {
-    case Greater:
-        return comparisonResult > 0, nil
-    case GreaterEqual:
-        return comparisonResult >= 0, nil
-    case Less:
-        return comparisonResult < 0, nil
-    case LessEqual:
-        return comparisonResult <= 0, nil
-    case Equal:
-        return comparisonResult == 0, nil
-    case NotEqual:
-        return comparisonResult != 0, nil
-    default:
-        return nil, errors.New("Invalid comparison operator")
-    }
-}
-
-func EvaluateLike(env *Environment, expr *LikeExpression, titles []string, object []Value) (Value, error) {
-    rhs, err := EvaluateExpression(env, expr.Pattern, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    pattern := "^" + strings.ToLower(rhs.(string))
-    pattern = strings.ReplaceAll(pattern, "%", ".*")
-    pattern = strings.ReplaceAll(pattern, "_", ".")
-    regex, err := regexp.Compile(pattern)
-    if err != nil {
-        return nil, err
-    }
-    lhs, err := EvaluateExpression(env, expr.Input, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    return regex.MatchString(strings.ToLower(lhs.(string))), nil
-}
-
-func EvaluateGlob(env *Environment, expr *GlobExpression, titles []string, object []Value) (Value, error) {
-    rhs, err := EvaluateExpression(env, expr.Pattern, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    pattern := "^" + regexp.QuoteMeta(rhs.(string))
-    pattern = strings.ReplaceAll(pattern, "*", ".*")
-    pattern = strings.ReplaceAll(pattern, "?", ".")
-    regex, err := regexp.Compile(pattern)
-    if err != nil {
-        return nil, err
-    }
-    lhs, err := EvaluateExpression(env, expr.Input, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    return regex.MatchString(lhs.(string)), nil
-}
-
-func EvaluateLogical(env *Environment, expr *LogicalExpression, titles []string, object []Value) (Value, error) {
-    lhs, err := EvaluateExpression(env, expr.Left, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    if expr.Operator == And && !lhs.(bool) {
-        return false, nil
-    }
-    if expr.Operator == Or && lhs.(bool) {
-        return true, nil
-    }
-    rhs, err := EvaluateExpression(env, expr.Right, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    switch expr.Operator {
-    case And:
-        return lhs.(bool) && rhs.(bool), nil
-    case Or:
-        return lhs.(bool) || rhs.(bool), nil
-    case Xor:
-        return lhs.(bool) != rhs.(bool), nil
-    default:
-        return nil, errors.New("Invalid logical operator")
-    }
-}
-
-func EvaluateBitwise(env *Environment, expr *BitwiseExpression, titles []string, object []Value) (Value, error) {
-    lhs, err := EvaluateExpression(env, expr.Left, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    rhs, err := EvaluateExpression(env, expr.Right, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    switch expr.Operator {
-    case Or:
-        return lhs.(int) | rhs.(int), nil
-    case And:
-        return lhs.(int) & rhs.(int), nil
-    case RightShift:
-        if rhs.(int) >= 64 {
-            return nil, errors.New("Attempt to shift right with overflow")
-        }
-        return lhs.(int) >> rhs.(int), nil
-    case LeftShift:
-        if rhs.(int) >= 64 {
-            return nil, errors.New("Attempt to shift left with overflow")
-        }
-        return lhs.(int) << rhs.(int), nil
-    default:
-        return nil, errors.New("Invalid bitwise operator")
-    }
-}
-
-func EvaluateCall(env *Environment, expr *CallExpression, titles []string, object []Value) (Value, error) {
-    function := FUNCTIONS[expr.FunctionName]
-    if function == nil {
-        return nil, errors.New("Function not found")
-    }
-    arguments := make([]Value, len(expr.Arguments))
-    for i, arg := range expr.Arguments {
-        value, err := EvaluateExpression(env, arg, titles, object)
-        if err != nil {
-            return nil, err
-        }
-        arguments[i] = value
-    }
-    return function(arguments), nil
-}
-
-func EvaluateBetween(env *Environment, expr *BetweenExpression, titles []string, object []Value) (Value, error) {
-    value, err := EvaluateExpression(env, expr.Value, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    rangeStart, err := EvaluateExpression(env, expr.RangeStart, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    rangeEnd, err := EvaluateExpression(env, expr.RangeEnd, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    return value.(int) >= rangeStart.(int) && value.(int) <= rangeEnd.(int), nil
-}
-
-func EvaluateCase(env *Environment, expr *CaseExpression, titles []string, object []Value) (Value, error) {
-    conditions := expr.Conditions
-    values := expr.Values
-    for i := 0; i < len(conditions); i++ {
-        condition, err := EvaluateExpression(env, conditions[i], titles, object)
-        if err != nil {
-            return nil, err
-        }
-        if condition.(bool) {
-            return EvaluateExpression(env, values[i], titles, object)
-        }
-    }
-    if expr.DefaultValue != nil {
-        return EvaluateExpression(env, *expr.DefaultValue, titles, object)
-    }
-    return nil, errors.New("Invalid case statement")
-}
-
-func EvaluateIn(env *Environment, expr *InExpression, titles []string, object []Value) (Value, error) {
-    argument, err := EvaluateExpression(env, expr.Argument, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    for _, valueExpr := range expr.Values {
-        value, err := EvaluateExpression(env, valueExpr, titles, object)
-        if err != nil {
-            return nil, err
-        }
-        if argument == value {
-            return !expr.HasNotKeyword, nil
-        }
-    }
-    return expr.HasNotKeyword, nil
-}
-
-func EvaluateIsNull(env *Environment, expr *IsNullExpression, titles []string, object []Value) (Value, error) {
-    argument, err := EvaluateExpression(env, expr.Argument, titles, object)
-    if err != nil {
-        return nil, err
-    }
-    isNull := isNull(argument)
-    if expr.HasNot {
-        return !isNull, nil
-    }
-    return isNull, nil
-}
-
-func getType(v Value) string {
-    switch v.(type) {
-    case int:
-        return "int"
-    case float64:
-        return "float64"
-    case bool:
-        return "bool"
-    case string:
-        return "string"
-    default:
-        return ""
-    }
-}
-
-func isNull(v Value) bool {
-    return v == nil
-}
-
-var FUNCTIONS = map[string]func([]Value) Value{}
-
-func main() {
-    // Your code here
+	return ast.BooleanValue{Value: isNull}, nil
 }

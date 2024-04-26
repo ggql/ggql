@@ -4,13 +4,15 @@ import (
 	"errors"
 	"sort"
 
+	"github.com/go-git/go-git/v5"
+
 	"github.com/ggql/ggql/ast"
 )
 
 func ExecuteStatement(
 	env *ast.Environment,
 	statement ast.Statement,
-	repo *Repository,
+	repo *git.Repository,
 	gitqlObject *ast.GitQLObject,
 	aliasTable map[string]string,
 	hiddenSelection []string,
@@ -55,7 +57,7 @@ func ExecuteStatement(
 func executeSelectStatement(
 	env *ast.Environment,
 	statement *ast.SelectStatement,
-	repo *Repository,
+	repo *git.Repository,
 	gitqlObject *ast.GitQLObject,
 	hiddenSelections []string,
 ) error {
@@ -69,16 +71,16 @@ func executeSelectStatement(
 	}
 
 	for _, fieldName := range fieldsNames {
-		gitqlObject.Titles = append(gitqlObject.Titles, getColumnName(statement.AliasTable, fieldName))
+		gitqlObject.Titles = append(gitqlObject.Titles, GetColumnName(statement.AliasTable, fieldName))
 	}
 
-	objects, err := selectGQLObjects(env, repo, statement.TableName, fieldsNames, gitqlObject.Titles, statement.FieldsValues)
+	objects, err := SelectGQLObjects(env, repo, statement.TableName, fieldsNames, gitqlObject.Titles, statement.FieldsValues)
 	if err != nil {
 		return err
 	}
 
 	if gitqlObject.IsEmpty() {
-		gitqlObject.Groups = append(gitqlObject.Groups, objects)
+		gitqlObject.Groups = append(gitqlObject.Groups, *objects)
 	} else {
 		gitqlObject.Groups[0].Rows = append(gitqlObject.Groups[0].Rows, objects.Rows...)
 	}
@@ -99,7 +101,7 @@ func executeWhereStatement(
 	firstGroup := gitqlObject.Groups[0].Rows
 	for _, object := range firstGroup {
 		// !!!
-		evalResult, err := evaluateExpression(env, statement.Condition, gitqlObject.Titles, object.Values)
+		evalResult, err := EvaluateExpression(env, statement.Condition, gitqlObject.Titles, object.Values)
 		if err != nil {
 			return err
 		}
@@ -131,7 +133,7 @@ func executeHavingStatement(
 	filteredGroup := ast.Group{}
 	firstGroup := gitqlObject.Groups[0].Rows
 	for _, object := range firstGroup {
-		evalResult, err := evaluateExpression(env, statement.Condition, gitqlObject.Titles, object.Values)
+		evalResult, err := EvaluateExpression(env, statement.Condition, gitqlObject.Titles, object.Values)
 		if err != nil {
 			return err
 		}
@@ -214,12 +216,12 @@ func executeOrderByStatement(
 				continue
 			}
 
-			first, err := evaluateExpression(env, argument, gitqlObject.Titles, mainGroup.Rows[i].Values)
+			first, err := EvaluateExpression(env, argument, gitqlObject.Titles, mainGroup.Rows[i].Values)
 			if err != nil {
 				return false
 			}
 
-			other, err := evaluateExpression(env, argument, gitqlObject.Titles, mainGroup.Rows[j].Values)
+			other, err := EvaluateExpression(env, argument, gitqlObject.Titles, mainGroup.Rows[j].Values)
 			if err != nil {
 				return false
 			}
@@ -294,37 +296,13 @@ func executeGlobalVariableStatement(
 	env *ast.Environment,
 	statement *ast.GlobalVariableStatement,
 ) error {
-	value, err := evaluateExpression(env, nil, nil, nil)
+	value, err := EvaluateExpression(env, nil, nil, nil)
 	if err != nil {
 		return err
 	}
 
 	env.Globals[statement.Name] = value
 	return nil
-}
-
-// !!!
-func selectGQLObjects(
-	env *ast.Environment,
-	repo *Repository,
-	tableName string,
-	fieldsNames []string,
-	titles []string,
-	fieldsValues []ast.Expression,
-) (ast.Group, error) {
-	objects := ast.Group{}
-	return objects, nil
-}
-
-// !!!
-func evaluateExpression(
-	env *ast.Environment,
-	expression ast.Expression,
-	titles []string,
-	values []ast.Value,
-) (ast.Value, error) {
-	var a ast.Value
-	return a, nil
 }
 
 func contains(slice []string, item string) bool {
@@ -334,13 +312,6 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
-}
-
-func getColumnName(aliasTable map[string]string, columnName string) string {
-	if alias, ok := aliasTable[columnName]; ok {
-		return alias
-	}
-	return columnName
 }
 
 func indexOf(slice []string, item string) int {

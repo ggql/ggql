@@ -192,8 +192,8 @@ func (e *BooleanExpression) IsConst() bool {
 type PrefixUnaryOperator int
 
 const (
-	Minus PrefixUnaryOperator = iota
-	Bang
+	POMinus PrefixUnaryOperator = iota
+	POBang
 )
 
 type PrefixUnary struct {
@@ -206,7 +206,7 @@ func (e *PrefixUnary) Kind() ExpressionKind {
 }
 
 func (e *PrefixUnary) ExprType(scope *Environment) DataType {
-	if e.Op == Bang {
+	if e.Op == POBang {
 		return Boolean{}
 	} else {
 		return Integer{}
@@ -343,9 +343,9 @@ func (e *GlobExpression) IsConst() bool {
 type LogicalOperator int
 
 const (
-	Or LogicalOperator = iota
-	And
-	Xor
+	LOOr LogicalOperator = iota
+	LOAnd
+	LOXor
 )
 
 type LogicalExpression struct {

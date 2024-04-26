@@ -718,7 +718,7 @@ func ParseLogicalOrExpression(context *ParserContext, env *ast.Environment, toke
 
 		lhs = &ast.LogicalExpression{
 			Left:     lhs,
-			Operator: ast.Or,
+			Operator: ast.LOOr,
 			Right:    rhs,
 		}
 	}
@@ -754,7 +754,7 @@ func ParseLogicalAndExpression(context *ParserContext, env *ast.Environment, tok
 
 		lhs = &ast.LogicalExpression{
 			Left:     lhs,
-			Operator: ast.And,
+			Operator: ast.LOAnd,
 			Right:    rhs,
 		}
 	}
@@ -835,7 +835,7 @@ func ParseLogicalXorExpression(context *ParserContext, env *ast.Environment, tok
 
 		lhs = &ast.LogicalExpression{
 			Left:     lhs,
-			Operator: ast.Xor,
+			Operator: ast.LOXor,
 			Right:    rhs,
 		}
 	}
@@ -1214,9 +1214,9 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 	if *position < len(*tokens) && IsPrefixUnaryOperator(&(*tokens)[*position]) {
 		var op ast.PrefixUnaryOperator
 		if (*tokens)[*position].Kind == Bang {
-			op = ast.Bang
+			op = ast.POBang
 		} else {
-			op = ast.Minus
+			op = ast.POMinus
 		}
 
 		*position += 1
@@ -1226,7 +1226,7 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 			return nil, err
 		}
 		rhsType := rhs.ExprType(env)
-		if op == ast.Bang && rhsType.Fmt() != "Boolean" {
+		if op == ast.POBang && rhsType.Fmt() != "Boolean" {
 			return nil, TypeMismatchError(
 				GetSafeLocation(tokens, *position-1),
 				ast.Boolean{},
@@ -1234,7 +1234,7 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 			)
 		}
 
-		if op == ast.Minus && rhsType.Fmt() != "Integer" {
+		if op == ast.POMinus && rhsType.Fmt() != "Integer" {
 			return nil, TypeMismatchError(
 				GetSafeLocation(tokens, *position-1),
 				ast.Integer{},

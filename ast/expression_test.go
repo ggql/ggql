@@ -161,7 +161,7 @@ func TestPrefixUnaryExpressionKind(t *testing.T) {
 func TestPrefixUnaryExpressionExprType(t *testing.T) {
 	expr := &PrefixUnary{
 		Right: &NumberExpression{Value: NullValue{}},
-		Op:    Minus,
+		Op:    POMinus,
 	}
 
 	scope := &Environment{
@@ -175,7 +175,7 @@ func TestPrefixUnaryExpressionExprType(t *testing.T) {
 
 	expr = &PrefixUnary{
 		Right: &NumberExpression{Value: NullValue{}},
-		Op:    Bang,
+		Op:    POBang,
 	}
 
 	ret = expr.ExprType(scope)
@@ -289,7 +289,7 @@ func TestLogicalExpressionKind(t *testing.T) {
 func TestLogicalExpressionExprType(t *testing.T) {
 	expr := &LogicalExpression{
 		Left:     &NumberExpression{Value: IntegerValue{1}},
-		Operator: Or,
+		Operator: LOOr,
 		Right:    &NumberExpression{Value: IntegerValue{1}},
 	}
 
