@@ -100,7 +100,6 @@ func executeWhereStatement(
 	filteredGroup := ast.Group{}
 	firstGroup := gitqlObject.Groups[0].Rows
 	for _, object := range firstGroup {
-		// !!!
 		evalResult, err := EvaluateExpression(env, statement.Condition, gitqlObject.Titles, object.Values)
 		if err != nil {
 			return err
@@ -278,7 +277,6 @@ func executeGroupByStatement(
 	return nil
 }
 
-// !!!
 func executeAggregationFunctionStatement(
 	env *ast.Environment,
 	statement *ast.AggregationsStatement,
@@ -287,6 +285,58 @@ func executeAggregationFunctionStatement(
 ) error {
 	if len(statement.Aggregations) == 0 {
 		return nil
+	}
+
+	groupsCount := len(gitqlObject.Groups)
+
+	for _, group := range gitqlObject.Groups {
+		if group.IsEmpty() {
+			continue
+		}
+		// Resolve all aggregations functions first
+		for _, aggregation := range statement.Aggregations {
+			fn := aggregation.Function
+			if fn.Name != "" && fn.Arg != "" {
+				// Get alias name if exists or column name by default
+				var resultColumnName string // TBD: FIXME
+				columnName := GetColumnName(aliasTable, resultColumnName)
+				columnIndex := indexOf(gitqlObject.Titles, columnName)
+
+				aggregationFunction := ast.Aggregations[fn.Name]
+
+				result := aggregationFunction(fn.Arg, gitqlObject.Titles, &ast.Group{})
+
+				for _, object := range group.Rows {
+					if columnIndex < len(object.Values) {
+						object.Values[columnIndex] = result
+					} else {
+						object.Values = append(object.Values, result)
+					}
+				}
+			}
+		}
+
+		// Resolve aggregations expressions
+		for _, aggregation := range statement.Aggregations {
+			if expr := aggregation.Expression; expr != nil {
+				var resultColumnName string // TBD: FIXME
+				columnName := GetColumnName(aliasTable, resultColumnName)
+				columnIndex := indexOf(gitqlObject.Titles, columnName)
+
+				for _, object := range group.Rows {
+					result, _ := EvaluateExpression(env, *expr, gitqlObject.Titles, object.Values)
+					if columnIndex < len(object.Values) {
+						object.Values[columnIndex] = result
+					} else {
+						object.Values = append(object.Values, result)
+					}
+				}
+			}
+		}
+
+		if groupsCount > 1 {
+			group.Rows = group.Rows[:1]
+		}
 	}
 
 	return nil
