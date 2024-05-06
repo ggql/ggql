@@ -156,12 +156,12 @@ func executeLimitStatement(
 		return nil
 	}
 
-	if len(gitqlObject.Groups) > 1 {
+	if gitqlObject.Len() > 1 {
 		gitqlObject.Flat()
 	}
 
 	mainGroup := &gitqlObject.Groups[0]
-	if statement.Count <= len(mainGroup.Rows) {
+	if statement.Count <= mainGroup.Len() {
 		mainGroup.Rows = mainGroup.Rows[:statement.Count]
 	}
 
@@ -199,12 +199,12 @@ func executeOrderByStatement(
 		return nil
 	}
 
-	if len(gitqlObject.Groups) > 1 {
+	if gitqlObject.Len() > 1 {
 		gitqlObject.Flat()
 	}
 
 	mainGroup := &gitqlObject.Groups[0]
-	if len(mainGroup.Rows) == 0 {
+	if mainGroup.IsEmpty() {
 		return nil
 	}
 
@@ -253,7 +253,7 @@ func executeGroupByStatement(
 	}
 
 	mainGroup := gitqlObject.Groups[0]
-	if len(mainGroup.Rows) == 0 {
+	if mainGroup.IsEmpty() {
 		return nil
 	}
 
@@ -287,7 +287,7 @@ func executeAggregationFunctionStatement(
 		return nil
 	}
 
-	groupsCount := len(gitqlObject.Groups)
+	groupsCount := gitqlObject.Len()
 
 	for _, group := range gitqlObject.Groups {
 		if group.IsEmpty() {
@@ -298,7 +298,7 @@ func executeAggregationFunctionStatement(
 			fn := aggregation.Function
 			if fn.Name != "" && fn.Arg != "" {
 				// Get alias name if exists or column name by default
-				var resultColumnName string // TBD: FIXME
+				var resultColumnName string // TBD: FIXME (used for aggregation.0)
 				columnName := GetColumnName(aliasTable, resultColumnName)
 				columnIndex := indexOf(gitqlObject.Titles, columnName)
 
@@ -319,7 +319,7 @@ func executeAggregationFunctionStatement(
 		// Resolve aggregations expressions
 		for _, aggregation := range statement.Aggregations {
 			if expr := aggregation.Expression; expr != nil {
-				var resultColumnName string // TBD: FIXME
+				var resultColumnName string // TBD: FIXME (used for aggregation.0)
 				columnName := GetColumnName(aliasTable, resultColumnName)
 				columnIndex := indexOf(gitqlObject.Titles, columnName)
 

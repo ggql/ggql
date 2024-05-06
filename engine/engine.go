@@ -10,7 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-var GQLCOMMANDSINORDER = []string{
+var gqlCommandsInOrder = []string{
 	"select",
 	"where",
 	"group",
@@ -28,13 +28,6 @@ type EvaluationResult struct {
 	}
 	SetGlobalVariable bool
 }
-
-// type EvaluationResult int
-
-// const (
-// 	SelectedGroups EvaluationResult = iota
-// 	SetGlobalVariable
-// )
 
 func Evaluate(env *ast.Environment, repos []*git.Repository, query ast.Query) (EvaluationResult, error) {
 	if query.Select != nil {
@@ -65,7 +58,7 @@ func EvaluateSelectQuery(
 	statementsMap := query.Statements
 	firstRepo := repos[0]
 
-	for _, gqlCommand := range GQLCOMMANDSINORDER {
+	for _, gqlCommand := range gqlCommandsInOrder {
 		if statement, ok := statementsMap[gqlCommand]; ok {
 			switch gqlCommand {
 			case "select":
@@ -77,8 +70,15 @@ func EvaluateSelectQuery(
 						return EvaluationResult{}, err
 					}
 
-					if gitqlObject.IsEmpty() || len(gitqlObject.Groups[0].Rows) == 0 {
-						return EvaluationResult{}, nil
+					if gitqlObject.IsEmpty() || gitqlObject.Groups[0].IsEmpty() {
+						return EvaluationResult{SelectedGroups: struct {
+							Obj ast.GitQLObject
+							Str []string
+						}{
+							Obj: gitqlObject,
+							Str: hiddenSelections,
+						},
+						}, nil
 					}
 
 					continue
@@ -87,15 +87,29 @@ func EvaluateSelectQuery(
 				for _, repo := range repos {
 					err := ExecuteStatement(env, statement, repo, &gitqlObject, aliasTable, hiddenSelections)
 					if err != nil {
-						return EvaluationResult{}, err
+						return EvaluationResult{SelectedGroups: struct {
+							Obj ast.GitQLObject
+							Str []string
+						}{
+							Obj: gitqlObject,
+							Str: hiddenSelections,
+						},
+						}, err
 					}
 				}
 
-				if len(gitqlObject.Groups) == 0 || len(gitqlObject.Groups[0].Rows) == 0 {
-					return EvaluationResult{}, nil
+				if gitqlObject.IsEmpty() || gitqlObject.Groups[0].IsEmpty() {
+					return EvaluationResult{SelectedGroups: struct {
+						Obj ast.GitQLObject
+						Str []string
+					}{
+						Obj: gitqlObject,
+						Str: hiddenSelections,
+					},
+					}, nil
 				}
 
-				if selectStatement.TableName == "" && selectStatement.IsDistinct {
+				if selectStatement.TableName != "" && selectStatement.IsDistinct {
 					ApplyDistinctOnObjectsGroup(&gitqlObject, hiddenSelections)
 				}
 
@@ -121,11 +135,18 @@ func EvaluateSelectQuery(
 		}
 	}
 
-	return EvaluationResult{}, nil
+	return EvaluationResult{SelectedGroups: struct {
+		Obj ast.GitQLObject
+		Str []string
+	}{
+		Obj: gitqlObject,
+		Str: hiddenSelections,
+	},
+	}, nil
 }
 
 func ApplyDistinctOnObjectsGroup(gitqlObject *ast.GitQLObject, hiddenSelections []string) {
-	if len(gitqlObject.Groups) == 0 {
+	if gitqlObject.IsEmpty() {
 		return
 	}
 
@@ -161,7 +182,7 @@ func ApplyDistinctOnObjectsGroup(gitqlObject *ast.GitQLObject, hiddenSelections 
 		newObjects.Rows = append(newObjects.Rows, ast.Row{Values: object.Values})
 	}
 
-	if len(objects) != len(newObjects.Rows) {
+	if len(objects) != newObjects.Len() {
 		gitqlObject.Groups[0].Rows = newObjects.Rows
 	}
 }

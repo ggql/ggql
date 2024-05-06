@@ -19,8 +19,7 @@ func main() {
 	args := os.Args
 	command := cli.ParseArguments(args)
 
-	fmt.Println(&command.Version)
-	if &command.ReplMode != nil {
+	if len(command.ReplMode.Repos) != 0 {
 		launchGitqlRepl(command.ReplMode)
 	}
 	if command.QueryMode.Query != "" {
@@ -35,7 +34,7 @@ func main() {
 		env := ast.Environment{}
 		executeGitqlQuery(command.QueryMode.Query, command.QueryMode.Arguments, repos, &env, &reporter)
 	}
-	if command.Help != false {
+	if command.Help {
 		cli.PrintHelpList()
 	}
 	if command.Version != "" {
@@ -54,7 +53,7 @@ func launchGitqlRepl(args cli.Arguments) {
 		return
 	}
 	globalEnv := ast.Environment{}
-	gitRepositories := gitReposResult
+	gitRepositories := gitReposResult.ok
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -72,7 +71,7 @@ func launchGitqlRepl(args cli.Arguments) {
 			break
 		}
 
-		executeGitqlQuery(input, args, gitRepositories.ok, &globalEnv, &reporter)
+		executeGitqlQuery(input, args, gitRepositories, &globalEnv, &reporter)
 		globalEnv.ClearSession()
 	}
 }
@@ -121,14 +120,14 @@ func executeGitqlQuery(
 				fmt.Println(err)
 			}
 		case cli.JSON:
-			indexes := []int{}
+			var indexes []int
 			for index, title := range groups.SelectedGroups.Obj.Titles {
 				if strings.Contains(hiddenSelection.Error(), title) {
 					indexes = append([]int{index}, indexes...)
 				}
 			}
 
-			if len(groups.SelectedGroups.Obj.Groups) > 1 {
+			if groups.SelectedGroups.Obj.Len() > 1 {
 				groups.SelectedGroups.Obj.Flat()
 			}
 
@@ -171,7 +170,7 @@ func executeGitqlQuery(
 
 	engineDuration := time.Since(engineStart)
 
-	if args.Analysis == true {
+	if args.Analysis {
 		fmt.Println("Analysis:")
 		fmt.Println("Frontend : ", frontDuration)
 		fmt.Println("Engine   : ", engineDuration)
