@@ -55,7 +55,7 @@ func TestParseGql(t *testing.T) {
 
 	_, err := ParserGql(tokens, &env)
 
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 
@@ -89,7 +89,7 @@ func TestParseGql(t *testing.T) {
 
 	_, err = ParserGql(tokens, &env)
 
-	if err.message == "" {
+	if err.Message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -141,7 +141,7 @@ func TestParseSetQuery(t *testing.T) {
 
 	ret, err := ParseSetQuery(&env, &tokens, &position)
 	fmt.Println(ret)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -217,7 +217,7 @@ func TestParseSelectQuery(t *testing.T) {
 	position := 0
 
 	_, err := ParseSelectQuery(&env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -245,7 +245,7 @@ func TestParseSelectStatement(t *testing.T) {
 	position := 1
 
 	_, err := ParseSelectStatement(&context, &env, &tokens, &position)
-	if err.message == "" {
+	if err.Message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -273,7 +273,7 @@ func TestParseWhereStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseWhereStatement(&context, &env, &tokens, &position)
-	if err.message == "" {
+	if err.Message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -318,7 +318,7 @@ func TestParseGroupByStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseGroupByStatement(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -371,7 +371,7 @@ func TestParseHavingStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseHavingStatement(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -401,7 +401,7 @@ func TestParseLimitStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseLimitStatement(&tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -431,7 +431,7 @@ func TestParseOffsetStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseOffsetStatement(&tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -476,7 +476,7 @@ func TestParseOrderByStatement(t *testing.T) {
 	position := 0
 
 	_, err := ParseOrderByStatement(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -521,7 +521,7 @@ func TestParseExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -566,7 +566,7 @@ func TestParseAssignmentExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseAssignmentExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -611,7 +611,7 @@ func TestParseIsNullExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseIsNullExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -688,7 +688,7 @@ func TestParseInExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseInExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -749,7 +749,7 @@ func TestParseBetweenExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseBetweenExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -826,7 +826,7 @@ func TestParseLogicalOrExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseLogicalOrExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -903,7 +903,7 @@ func TestParseLogicalAndExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseLogicalAndExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -980,7 +980,7 @@ func TestParseBitwiseOrExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseBitwiseOrExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1057,7 +1057,7 @@ func TestParseLogicalXorExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseLogicalXorExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1134,7 +1134,7 @@ func TestParseBitwiseAndExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseBitwiseAndExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1179,7 +1179,7 @@ func TestParseEqualityExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseEqualityExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1224,7 +1224,7 @@ func TestParseComparisonExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseComparisonExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1269,7 +1269,7 @@ func TestParseBitwiseShiftExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseBitwiseShiftExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1314,7 +1314,7 @@ func TestParseTermExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseTermExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1360,7 +1360,7 @@ func TestParseFactorExpression(t *testing.T) {
 	fmt.Println("===1")
 	_, err := ParseFactorExpression(&context, &env, &tokens, &position)
 	fmt.Println("===2")
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1405,7 +1405,7 @@ func TestParseLikeExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseLikeExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1450,7 +1450,7 @@ func TestParseGLobExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseGlobExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1487,7 +1487,7 @@ func TestParseUnaryExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseUnaryExpression(&context, &env, &tokens, &position)
-	if err.message == "" {
+	if err.Message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1540,7 +1540,7 @@ func TestParseFunctionCallExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseFunctionCallExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1585,7 +1585,7 @@ func TestParseArgumentsExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseArgumentsExpressions(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1670,7 +1670,7 @@ func TestParsePrimaryExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParsePrimaryExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1715,7 +1715,7 @@ func TestParseGroupExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseGroupExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1800,7 +1800,7 @@ func TestParseCaseExpression(t *testing.T) {
 	position := 0
 
 	_, err := ParseCaseExpression(&context, &env, &tokens, &position)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1825,7 +1825,7 @@ func TestCheckFunctionCallExpression(t *testing.T) {
 	}
 
 	_, err := CheckFunctionCallArguments(&env, &arguments, &parameters, function_name, location)
-	if err.message != "" {
+	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1860,7 +1860,7 @@ func TestTypeCheckSelectedFields(t *testing.T) {
 	env.Scopes["commit_id"] = ast.Text{}
 
 	err := TypeCheckSelectedFields(&env, table_name, &fields_names, &tokens, position)
-	if err.message == "" {
+	if err.Message == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -1881,7 +1881,7 @@ func TestUnExpectedStatementError(t *testing.T) {
 	position := 0
 
 	err := UnExpectedStatementError(&tokens, &position)
-	assert.Equal(t, "Unexpected statement", err.message)
+	assert.Equal(t, "Unexpected statement", err.Message)
 }
 
 //nolint:gocritic
@@ -1900,7 +1900,7 @@ func TestUnExpectedExpressionError(t *testing.T) {
 	position := 0
 
 	err := UnExpectedExpressionError(&tokens, &position)
-	assert.Equal(t, "Can't complete parsing this expression", err.message)
+	assert.Equal(t, "Can't complete parsing this expression", err.Message)
 
 	// Test: current.kind == =
 	tokens2 := []Token{
@@ -1925,7 +1925,7 @@ func TestUnExpectedExpressionError(t *testing.T) {
 	position2 := 1
 
 	err2 := UnExpectedExpressionError(&tokens2, &position2)
-	assert.Equal(t, "Unexpected `==`, Just use `=` to check equality", err2.message)
+	assert.Equal(t, "Unexpected `==`, Just use `=` to check equality", err2.Message)
 }
 
 //nolint:gocritic
@@ -1945,7 +1945,7 @@ func TestUnExpectedContentAfterCorrectStatement(t *testing.T) {
 	position := 0
 
 	err := UnExpectedContentAfterCorrectStatement(&statement_name, &tokens, &position)
-	assert.Equal(t, "Unexpected content after the end of `INVALID` statement", err.message)
+	assert.Equal(t, "Unexpected content after the end of `INVALID` statement", err.Message)
 }
 
 //nolint:gocritic
@@ -2144,5 +2144,5 @@ func TestTypeMismatchError(t *testing.T) {
 	actual := ast.Integer{}
 
 	status := TypeMismatchError(location, expected, actual)
-	assert.Equal(t, "Type mismatch expected `Text`, got `Integer`", status.message)
+	assert.Equal(t, "Type mismatch expected `Text`, got `Integer`", status.Message)
 }

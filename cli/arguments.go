@@ -25,11 +25,11 @@ type OutputFormat int
 
 // Arguments for GitQL
 type Arguments struct {
-	repos        []string
-	analysis     bool
-	pagination   bool
-	pageSize     int
-	outputFormat OutputFormat
+	Repos        []string
+	Analysis     bool
+	Pagination   bool
+	PageSize     int
+	OutputFormat OutputFormat
 }
 
 // Command represents the possible GitQL commands
@@ -47,11 +47,11 @@ type Command struct {
 // NewArguments creates a new instance of Arguments with default settings
 func NewArguments() Arguments {
 	return Arguments{
-		repos:        []string{},
-		analysis:     false,
-		pagination:   false,
-		pageSize:     10,
-		outputFormat: Render,
+		Repos:        []string{},
+		Analysis:     false,
+		Pagination:   false,
+		PageSize:     10,
+		OutputFormat: Render,
 	}
 }
 
@@ -86,7 +86,7 @@ func ParseArguments(args []string) Command {
 			for argIndex < argsLen {
 				repo := args[argIndex]
 				if repo[0] != '-' {
-					arguments.repos = append(arguments.repos, repo)
+					arguments.Repos = append(arguments.Repos, repo)
 					argIndex++
 					continue
 				}
@@ -100,10 +100,10 @@ func ParseArguments(args []string) Command {
 			optionalQuery = args[argIndex]
 			argIndex++
 		case "--analysis", "-a":
-			arguments.analysis = true
+			arguments.Analysis = true
 			argIndex++
 		case "--pagination", "-p":
-			arguments.pagination = true
+			arguments.Pagination = true
 			argIndex++
 		case "--pagesize", "-ps":
 			argIndex++
@@ -114,7 +114,7 @@ func ParseArguments(args []string) Command {
 			if err != nil {
 				return Command{Error: "Invalid page size"}
 			}
-			arguments.pageSize = pageSize
+			arguments.PageSize = pageSize
 			argIndex++
 		case "--output", "-o":
 			argIndex++
@@ -123,11 +123,11 @@ func ParseArguments(args []string) Command {
 			}
 			switch strings.ToLower(args[argIndex]) {
 			case "csv":
-				arguments.outputFormat = CSV
+				arguments.OutputFormat = CSV
 			case "json":
-				arguments.outputFormat = JSON
+				arguments.OutputFormat = JSON
 			case "render":
-				arguments.outputFormat = Render
+				arguments.OutputFormat = Render
 			default:
 				return Command{Error: "invalid output format"}
 			}
@@ -138,13 +138,13 @@ func ParseArguments(args []string) Command {
 	}
 
 	// Add the current directory if no repository is passed
-	if len(arguments.repos) == 0 {
+	if len(arguments.Repos) == 0 {
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return Command{Error: "Missing repository paths"}
 		}
 
-		arguments.repos = append(arguments.repos, currentDir)
+		arguments.Repos = append(arguments.Repos, currentDir)
 	}
 
 	if optionalQuery != "" {

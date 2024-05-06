@@ -11,7 +11,7 @@ func TestTokenize(t *testing.T) {
 	// Symbol: NAME
 	script := "NAME"
 	tokens, err := Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 4, tokens[0].Location.End)
@@ -21,7 +21,7 @@ func TestTokenize(t *testing.T) {
 	// GlobalVariable: @NAME
 	script = "@NAME"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 5, tokens[0].Location.End)
@@ -31,7 +31,7 @@ func TestTokenize(t *testing.T) {
 	// Integer: 0x01
 	script = "0x01"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 2, tokens[0].Location.Start)
 	assert.Equal(t, 4, tokens[0].Location.End)
@@ -41,7 +41,7 @@ func TestTokenize(t *testing.T) {
 	// Integer: 0b01
 	script = "0b01"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 2, tokens[0].Location.Start)
 	assert.Equal(t, 4, tokens[0].Location.End)
@@ -51,7 +51,7 @@ func TestTokenize(t *testing.T) {
 	// Integer: 0o01
 	script = "0o01"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 2, tokens[0].Location.Start)
 	assert.Equal(t, 4, tokens[0].Location.End)
@@ -61,7 +61,7 @@ func TestTokenize(t *testing.T) {
 	// Integer: 1
 	script = "1"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 1, tokens[0].Location.End)
@@ -71,7 +71,7 @@ func TestTokenize(t *testing.T) {
 	// Float: 0.1
 	script = "0.1"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 3, tokens[0].Location.End)
@@ -81,7 +81,7 @@ func TestTokenize(t *testing.T) {
 	// String: "name"
 	script = "\"name\""
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 6, tokens[0].Location.End)
@@ -91,7 +91,7 @@ func TestTokenize(t *testing.T) {
 	// Symbol: `name`
 	script = "`name`"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 6, tokens[0].Location.End)
@@ -101,7 +101,7 @@ func TestTokenize(t *testing.T) {
 	// Plus: +
 	script = "+"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -111,7 +111,7 @@ func TestTokenize(t *testing.T) {
 	// Minus: -
 	script = "-"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -121,7 +121,7 @@ func TestTokenize(t *testing.T) {
 	// Star: *
 	script = "*"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -131,7 +131,7 @@ func TestTokenize(t *testing.T) {
 	// Slash: /
 	script = "/"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -141,7 +141,7 @@ func TestTokenize(t *testing.T) {
 	// Percentage: %
 	script = "%"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -151,7 +151,7 @@ func TestTokenize(t *testing.T) {
 	// BitwiseOr: |
 	script = "|"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -161,7 +161,7 @@ func TestTokenize(t *testing.T) {
 	// LogicalOr: ||
 	script = "||"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -171,7 +171,7 @@ func TestTokenize(t *testing.T) {
 	// BitwiseAnd: &
 	script = "&"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -181,7 +181,7 @@ func TestTokenize(t *testing.T) {
 	// LogicalAnd: &&
 	script = "&&"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -191,7 +191,7 @@ func TestTokenize(t *testing.T) {
 	// LogicalXor: ^
 	script = "^"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -201,7 +201,7 @@ func TestTokenize(t *testing.T) {
 	// Comma: ,
 	script = ","
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -211,7 +211,7 @@ func TestTokenize(t *testing.T) {
 	// Dot: .
 	script = "."
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -221,7 +221,7 @@ func TestTokenize(t *testing.T) {
 	// DotDot: ..
 	script = ".."
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -231,7 +231,7 @@ func TestTokenize(t *testing.T) {
 	// Greater: >
 	script = ">"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -241,7 +241,7 @@ func TestTokenize(t *testing.T) {
 	// GreaterEqual: >=
 	script = ">="
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -251,7 +251,7 @@ func TestTokenize(t *testing.T) {
 	// BitwiseRightShift: >>
 	script = ">>"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -261,7 +261,7 @@ func TestTokenize(t *testing.T) {
 	// Less: <
 	script = "<"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -271,7 +271,7 @@ func TestTokenize(t *testing.T) {
 	// NulllSafeEqual: <=>
 	script = "<=>"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -281,7 +281,7 @@ func TestTokenize(t *testing.T) {
 	// LessEqual: <=
 	script = "<="
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -291,7 +291,7 @@ func TestTokenize(t *testing.T) {
 	// BitwiseLeftShift: <<
 	script = "<<"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -301,7 +301,7 @@ func TestTokenize(t *testing.T) {
 	// BangEqual: <>
 	script = "<>"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -311,7 +311,7 @@ func TestTokenize(t *testing.T) {
 	// Equal: =
 	script = "="
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -321,12 +321,12 @@ func TestTokenize(t *testing.T) {
 	// ColonEqual: :
 	script = ":"
 	_, err = Tokenize(script)
-	assert.Equal(t, "Expect `=` after `:`", err.Message())
+	assert.Equal(t, "Expect `=` after `:`", err.DiaMessage())
 
 	// ColonEqual: :=
 	script = ":="
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -336,7 +336,7 @@ func TestTokenize(t *testing.T) {
 	// Bang: !
 	script = "!"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -346,7 +346,7 @@ func TestTokenize(t *testing.T) {
 	// BangEqual: !=
 	script = "!="
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -356,7 +356,7 @@ func TestTokenize(t *testing.T) {
 	// LeftParen: (
 	script = "("
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -366,7 +366,7 @@ func TestTokenize(t *testing.T) {
 	// RightParen: )
 	script = ")"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -376,7 +376,7 @@ func TestTokenize(t *testing.T) {
 	// Semicolon: ;
 	script = ";"
 	tokens, err = Tokenize(script)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 1, len(tokens))
 	assert.Equal(t, 0, tokens[0].Location.Start)
 	assert.Equal(t, 0, tokens[0].Location.End)
@@ -386,7 +386,7 @@ func TestTokenize(t *testing.T) {
 	// Invalid: ?
 	script = "?"
 	_, err = Tokenize(script)
-	assert.Equal(t, "Unexpected character", err.Message())
+	assert.Equal(t, "Unexpected character", err.DiaMessage())
 }
 
 func TestConsumeGlobalVariableName(t *testing.T) {
@@ -395,14 +395,14 @@ func TestConsumeGlobalVariableName(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeGlobalVariableName(chars, &pos, &start)
-	assert.Equal(t, "Global variable name must start with alphabetic character", err.Message())
+	assert.Equal(t, "Global variable name must start with alphabetic character", err.DiaMessage())
 
 	// GlobalVariable: @N
 	chars = []rune{'@', 'N'}
 	start = 0
 	pos = 0
 	token, err := consumeGlobalVariableName(chars, &pos, &start)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 0, token.Location.Start)
 	assert.Equal(t, 2, token.Location.End)
 	assert.Equal(t, "@n", token.Literal)
@@ -427,7 +427,7 @@ func TestConsumeNumber(t *testing.T) {
 	start := 0
 	pos := 0
 	token, err := consumeNumber(chars, &pos, &start)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 0, token.Location.Start)
 	assert.Equal(t, 1, token.Location.End)
 	assert.Equal(t, "1", token.Literal)
@@ -438,7 +438,7 @@ func TestConsumeNumber(t *testing.T) {
 	start = 0
 	pos = 0
 	token, err = consumeNumber(chars, &pos, &start)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 0, token.Location.Start)
 	assert.Equal(t, 3, token.Location.End)
 	assert.Equal(t, "10", token.Literal)
@@ -449,7 +449,7 @@ func TestConsumeNumber(t *testing.T) {
 	start = 0
 	pos = 0
 	token, err = consumeNumber(chars, &pos, &start)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 0, token.Location.Start)
 	assert.Equal(t, 3, token.Location.End)
 	assert.Equal(t, "1.0", token.Literal)
@@ -460,7 +460,7 @@ func TestConsumeNumber(t *testing.T) {
 	start = 0
 	pos = 0
 	token, err = consumeNumber(chars, &pos, &start)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 0, token.Location.Start)
 	assert.Equal(t, 5, token.Location.End)
 	assert.Equal(t, "10.0", token.Literal)
@@ -473,7 +473,7 @@ func TestConsumeBackticksIdentifier(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeBackticksIdentifier(chars, &pos, &start)
-	assert.Equal(t, "Unterminated backticks", err.Message())
+	assert.Equal(t, "Unterminated backticks", err.DiaMessage())
 
 	// Symbol: `N`
 	chars = []rune{'`', 'N', '`'}
@@ -492,7 +492,7 @@ func TestConsumeBinaryNumber(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeBinaryNumber(chars, &pos, &start)
-	assert.Equal(t, "Missing digits after the integer base prefix", err.Message())
+	assert.Equal(t, "Missing digits after the integer base prefix", err.DiaMessage())
 
 	// Integer: 010
 	chars = []rune{'0', '1', '0'}
@@ -511,7 +511,7 @@ func TestConsumeOctalNumber(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeOctalNumber(chars, &pos, &start)
-	assert.Equal(t, "Missing digits after the integer base prefix", err.Message())
+	assert.Equal(t, "Missing digits after the integer base prefix", err.DiaMessage())
 
 	// Integer: 0_7
 	chars = []rune{'0', '_', '7'}
@@ -530,7 +530,7 @@ func TestConsumeHexNumber(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeHexNumber(chars, &pos, &start)
-	assert.Equal(t, "Missing digits after the integer base prefix", err.Message())
+	assert.Equal(t, "Missing digits after the integer base prefix", err.DiaMessage())
 
 	// Integer: 01EF
 	chars = []rune{'0', '1', 'E', 'F'}
@@ -549,7 +549,7 @@ func TestConsumeString(t *testing.T) {
 	start := 0
 	pos := 0
 	_, err := consumeString(chars, &pos, &start)
-	assert.Equal(t, "Unterminated double quote string", err.Message())
+	assert.Equal(t, "Unterminated double quote string", err.DiaMessage())
 
 	// String: "N"
 	chars = []rune{'"', 'N', '"'}
@@ -576,13 +576,13 @@ func TestIgnoreCStyleComment(t *testing.T) {
 	chars := []rune{'/', '*', 'N'}
 	pos := 0
 	err := ignoreCStyleComment(chars, &pos)
-	assert.Equal(t, "C Style comment must end with */", err.Message())
+	assert.Equal(t, "C Style comment must end with */", err.DiaMessage())
 
 	// Comment: /*N*/
 	chars = []rune{'/', '*', 'N', '*', '/'}
 	pos = 0
 	err = ignoreCStyleComment(chars, &pos)
-	assert.Equal(t, "", err.Message())
+	assert.Equal(t, "", err.DiaMessage())
 	assert.Equal(t, 5, pos)
 }
 

@@ -14,11 +14,11 @@ func TestEmptyArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql"})
 	expected := Command{
 		ReplMode: Arguments{
-			repos:        []string{wd},
-			analysis:     false,
-			pagination:   false,
-			pageSize:     10,
-			outputFormat: 0,
+			Repos:        []string{wd},
+			Analysis:     false,
+			Pagination:   false,
+			PageSize:     10,
+			OutputFormat: 0,
 		},
 	}
 
@@ -30,15 +30,15 @@ func TestReposArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--repos", "."})
 	expected := Command{
 		ReplMode: Arguments{
-			repos:        []string{"."},
-			analysis:     false,
-			pagination:   false,
-			pageSize:     10,
-			outputFormat: 0,
+			Repos:        []string{"."},
+			Analysis:     false,
+			Pagination:   false,
+			PageSize:     10,
+			OutputFormat: 0,
 		},
 	}
 
-	ret := reflect.DeepEqual(actual.ReplMode.repos, expected.ReplMode.repos)
+	ret := reflect.DeepEqual(actual.ReplMode.Repos, expected.ReplMode.Repos)
 	assert.Equal(t, true, ret)
 }
 
@@ -65,15 +65,15 @@ func TestPagesizeArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--pagesize", "10"})
 	expected := Command{
 		ReplMode: Arguments{
-			repos:        []string{},
-			analysis:     false,
-			pagination:   false,
-			pageSize:     10,
-			outputFormat: 0,
+			Repos:        []string{},
+			Analysis:     false,
+			Pagination:   false,
+			PageSize:     10,
+			OutputFormat: 0,
 		},
 	}
 
-	ret := reflect.DeepEqual(actual.QueryMode.Arguments.pageSize, expected.QueryMode.Arguments.pageSize)
+	ret := reflect.DeepEqual(actual.QueryMode.Arguments.PageSize, expected.QueryMode.Arguments.PageSize)
 	assert.Equal(t, true, ret)
 
 	actual = ParseArguments([]string{"ggql", "--pagesize", "-"})
@@ -87,15 +87,15 @@ func TestOutputArguments(t *testing.T) {
 	actual := ParseArguments([]string{"ggql", "--output", "csv"})
 	expected := Command{
 		ReplMode: Arguments{
-			repos:        []string{},
-			analysis:     false,
-			pagination:   false,
-			pageSize:     10,
-			outputFormat: CSV,
+			Repos:        []string{},
+			Analysis:     false,
+			Pagination:   false,
+			PageSize:     10,
+			OutputFormat: CSV,
 		},
 	}
 
-	ret := reflect.DeepEqual(actual.ReplMode.outputFormat, expected.ReplMode.outputFormat)
+	ret := reflect.DeepEqual(actual.ReplMode.OutputFormat, expected.ReplMode.OutputFormat)
 	assert.Equal(t, true, ret)
 
 	actual = ParseArguments([]string{"ggql", "--output", "text"})

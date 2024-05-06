@@ -66,7 +66,7 @@ func ParseSetQuery(env *ast.Environment, tokens *[]Token, position *int) (ast.Qu
 
 	aggregationsCountBefore := len(context.Aggregations)
 	value, err := ParseExpression(&context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return ast.Query{}, err
 	}
 	hasAggregations := len(context.Aggregations) != aggregationsCountBefore
@@ -99,7 +99,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 				return ast.Query{}, *NewError("You already used `SELECT` statement").AddNote("Can't use more than one `SELECT` statement in the same query").WithLocation(token.Location)
 			}
 			statement, err := ParseSelectStatement(&context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return ast.Query{}, err
 			}
 			statements["select"] = statement
@@ -109,7 +109,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 				return ast.Query{}, *NewError("You already used `WHERE` statement").AddNote("Can't use more than one `WHERE` statement in the same query").WithLocation(token.Location)
 			}
 			statement, err := ParseWhereStatement(&context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return ast.Query{}, err
 			}
 			statements["where"] = statement
@@ -118,7 +118,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 				return ast.Query{}, *NewError("You already used `GROUP BY` statement").AddNote("Can't use more than one `GROUP BY` statement in the same query").WithLocation(token.Location)
 			}
 			statement, err := ParseGroupByStatement(&context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return ast.Query{}, err
 			}
 			statements["group"] = statement
@@ -130,7 +130,7 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 				return ast.Query{}, *NewError("`HAVING` must be used after `GROUP BY` statement").AddNote("`HAVING` statement must be used in a query that has `GROUP BY` statement").WithLocation(token.Location)
 			}
 			statement, err := ParseHavingStatement(&context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return ast.Query{}, err
 			}
 			statements["having"] = statement
@@ -229,7 +229,7 @@ func ParseSelectStatement(context *ParserContext, env *ast.Environment, tokens *
 	} else {
 		for *position < len(*tokens) && (*tokens)[*position].Kind != From {
 			expression, err := ParseExpression(context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 			exprType := expression.ExprType(env)
@@ -332,7 +332,7 @@ func ParseSelectStatement(context *ParserContext, env *ast.Environment, tokens *
 
 	// Type check all selected fields has type registered in type table
 	err := TypeCheckSelectedFields(env, tableName, &fieldsNames, tokens, *position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -462,7 +462,7 @@ func ParseOrderByStatement(context *ParserContext, env *ast.Environment, tokens 
 
 	for {
 		argument, err := ParseExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		arguments = append(arguments, argument)
@@ -495,7 +495,7 @@ func ParseOrderByStatement(context *ParserContext, env *ast.Environment, tokens 
 func ParseExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	aggregationsCountBefore := len(context.Aggregations)
 	expression, err := ParseAssignmentExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 	hasAggregations := len(context.Aggregations) != aggregationsCountBefore
@@ -521,7 +521,7 @@ func ParseExpression(context *ParserContext, env *ast.Environment, tokens *[]Tok
 
 func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseIsNullExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 	if *position < len(*tokens) && (*tokens)[*position].Kind == ColonEqual {
@@ -536,7 +536,7 @@ func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tok
 		*position += 1
 
 		value, err := ParseIsNullExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		env.DefineGlobal(variableName, value.ExprType(env))
@@ -552,7 +552,7 @@ func ParseAssignmentExpression(context *ParserContext, env *ast.Environment, tok
 
 func ParseIsNullExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseInExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 	if *position < len(*tokens) && (*tokens)[*position].Kind == Is {
@@ -587,7 +587,7 @@ func ParseIsNullExpression(context *ParserContext, env *ast.Environment, tokens 
 // nolint:lll
 func ParseInExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseBetweenExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -608,7 +608,7 @@ func ParseInExpression(context *ParserContext, env *ast.Environment, tokens *[]T
 		}
 
 		values, err := ParseArgumentsExpressions(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -645,7 +645,7 @@ func ParseInExpression(context *ParserContext, env *ast.Environment, tokens *[]T
 // nolint:lll
 func ParseBetweenExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseLogicalOrExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -661,7 +661,7 @@ func ParseBetweenExpression(context *ParserContext, env *ast.Environment, tokens
 
 		argumentType := expression.ExprType(env)
 		rangeStart, err := ParseLogicalOrExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -672,7 +672,7 @@ func ParseBetweenExpression(context *ParserContext, env *ast.Environment, tokens
 		// Consume `..` token
 		*position += 1
 		rangeEnd, err := ParseLogicalOrExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -692,7 +692,7 @@ func ParseBetweenExpression(context *ParserContext, env *ast.Environment, tokens
 
 func ParseLogicalOrExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseLogicalAndExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -728,7 +728,7 @@ func ParseLogicalOrExpression(context *ParserContext, env *ast.Environment, toke
 
 func ParseLogicalAndExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseBitwiseOrExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -764,7 +764,7 @@ func ParseLogicalAndExpression(context *ParserContext, env *ast.Environment, tok
 
 func ParseBitwiseOrExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseLogicalXorExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -783,7 +783,7 @@ func ParseBitwiseOrExpression(context *ParserContext, env *ast.Environment, toke
 		}
 
 		rhs, err := ParseLogicalXorExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		if rhs.ExprType(env).Fmt() != "Boolean" {
@@ -806,7 +806,7 @@ func ParseBitwiseOrExpression(context *ParserContext, env *ast.Environment, toke
 
 func ParseLogicalXorExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseBitwiseAndExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -822,7 +822,7 @@ func ParseLogicalXorExpression(context *ParserContext, env *ast.Environment, tok
 		}
 
 		rhs, err := ParseBitwiseAndExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		if rhs.ExprType(env).Fmt() != "Boolean" {
@@ -845,7 +845,7 @@ func ParseLogicalXorExpression(context *ParserContext, env *ast.Environment, tok
 
 func ParseBitwiseAndExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseEqualityExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -862,7 +862,7 @@ func ParseBitwiseAndExpression(context *ParserContext, env *ast.Environment, tok
 		}
 
 		rhs, err := ParseEqualityExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		if rhs.ExprType(env).Fmt() != "Boolean" {
@@ -886,7 +886,7 @@ func ParseBitwiseAndExpression(context *ParserContext, env *ast.Environment, tok
 // nolint:gomnd
 func ParseEqualityExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseComparisonExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -903,7 +903,7 @@ func ParseEqualityExpression(context *ParserContext, env *ast.Environment, token
 		}
 
 		rhs, err := ParseComparisonExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -946,7 +946,7 @@ func ParseEqualityExpression(context *ParserContext, env *ast.Environment, token
 // nolint:gocyclo,gomnd
 func ParseComparisonExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseBitwiseShiftExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -969,7 +969,7 @@ func ParseComparisonExpression(context *ParserContext, env *ast.Environment, tok
 		}
 
 		rhs, err := ParseBitwiseShiftExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -1012,7 +1012,7 @@ func ParseComparisonExpression(context *ParserContext, env *ast.Environment, tok
 // nolint:goconst,gomnd,lll
 func ParseBitwiseShiftExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	lhs, err := ParseTermExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -1027,7 +1027,7 @@ func ParseBitwiseShiftExpression(context *ParserContext, env *ast.Environment, t
 		}
 
 		rhs, err := ParseTermExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -1052,7 +1052,7 @@ func ParseBitwiseShiftExpression(context *ParserContext, env *ast.Environment, t
 
 func ParseTermExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	lhs, err := ParseFactorExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -1067,7 +1067,7 @@ func ParseTermExpression(context *ParserContext, env *ast.Environment, tokens *[
 		}
 
 		rhs, err := ParseFactorExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -1106,7 +1106,7 @@ func ParseTermExpression(context *ParserContext, env *ast.Environment, tokens *[
 // nolint:gomnd
 func ParseFactorExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseLikeExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 	lhs := expression
@@ -1125,7 +1125,7 @@ func ParseFactorExpression(context *ParserContext, env *ast.Environment, tokens 
 		}
 
 		rhs, err := ParseLikeExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 
@@ -1154,7 +1154,7 @@ func ParseFactorExpression(context *ParserContext, env *ast.Environment, tokens 
 
 func ParseLikeExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseGlobExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -1168,7 +1168,7 @@ func ParseLikeExpression(context *ParserContext, env *ast.Environment, tokens *[
 		}
 
 		pattern, err := ParseGlobExpression(context, env, tokens, position)
-		if err.message != "" || !pattern.ExprType(env).IsText() {
+		if err.Message != "" || !pattern.ExprType(env).IsText() {
 			return nil, *NewError(fmt.Sprintf("Expect `LIKE` right hand side to be `TEXT` but got %s", lhs.ExprType(env))).WithLocation(location)
 		}
 
@@ -1183,7 +1183,7 @@ func ParseLikeExpression(context *ParserContext, env *ast.Environment, tokens *[
 
 func ParseGlobExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParseUnaryExpression(context, env, tokens, position)
-	if err.message != "" || *position >= len(*tokens) {
+	if err.Message != "" || *position >= len(*tokens) {
 		return expression, err
 	}
 
@@ -1197,7 +1197,7 @@ func ParseGlobExpression(context *ParserContext, env *ast.Environment, tokens *[
 		}
 
 		pattern, err := ParseUnaryExpression(context, env, tokens, position)
-		if err.message != "" || !pattern.ExprType(env).IsText() {
+		if err.Message != "" || !pattern.ExprType(env).IsText() {
 			return nil, *NewError(fmt.Sprintf("Expect `GLOB` right hand side to be `TEXT` but got %s", pattern.ExprType(env))).WithLocation(location)
 		}
 
@@ -1222,7 +1222,7 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 		*position += 1
 
 		rhs, err := ParseUnaryExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		rhsType := rhs.ExprType(env)
@@ -1250,7 +1250,7 @@ func ParseUnaryExpression(context *ParserContext, env *ast.Environment, tokens *
 // nolint:funlen,lll
 func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, tokens *[]Token, position *int) (ast.Expression, Diagnostic) {
 	expression, err := ParsePrimaryExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -1268,7 +1268,7 @@ func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, t
 		// Check if this function is a Standard library functions
 		if _, ok := ast.Functions[functionName]; ok {
 			arguments, err := ParseArgumentsExpressions(context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 
@@ -1283,7 +1283,7 @@ func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, t
 				functionName,
 				functionNameLocation,
 			)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 
@@ -1300,7 +1300,7 @@ func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, t
 		// Check if this function is an Aggregation functions
 		if _, ok := ast.Aggregations[functionName]; ok {
 			arguments, err := ParseArgumentsExpressions(context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 
@@ -1315,7 +1315,7 @@ func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, t
 				functionName,
 				functionNameLocation,
 			)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 
@@ -1334,11 +1334,11 @@ func ParseFunctionCallExpression(context *ParserContext, env *ast.Environment, t
 
 			context.Aggregations[columnName] = ast.AggregateValue{
 				Function: struct {
-					First  string
-					Second string
+					Name string
+					Arg  string
 				}{
-					First:  functionName,
-					Second: argument,
+					Name: functionName,
+					Arg:  argument,
 				},
 			}
 
@@ -1361,7 +1361,7 @@ func ParseArgumentsExpressions(context *ParserContext, env *ast.Environment, tok
 
 		for (*tokens)[*position].Kind != RightParen {
 			argument, err := ParseExpression(context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 
@@ -1449,7 +1449,7 @@ func ParseGroupExpression(context *ParserContext, env *ast.Environment, tokens *
 	*position += 1
 
 	expression, err := ParseExpression(context, env, tokens, position)
-	if err.message != "" {
+	if err.Message != "" {
 		return nil, err
 	}
 
@@ -1484,7 +1484,7 @@ func ParseCaseExpression(context *ParserContext, env *ast.Environment, tokens *[
 			*position += 1
 
 			defaultValueExpr, err := ParseExpression(context, env, tokens, position)
-			if err.message != "" {
+			if err.Message != "" {
 				return nil, err
 			}
 			defaultValue = defaultValueExpr
@@ -1501,7 +1501,7 @@ func ParseCaseExpression(context *ParserContext, env *ast.Environment, tokens *[
 		*position += 1
 
 		condition, err := ParseExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		if condition.ExprType(env).Fmt() != "Boolean" {
@@ -1518,7 +1518,7 @@ func ParseCaseExpression(context *ParserContext, env *ast.Environment, tokens *[
 		*position += 1
 
 		expression, err := ParseExpression(context, env, tokens, position)
-		if err.message != "" {
+		if err.Message != "" {
 			return nil, err
 		}
 		values = append(values, expression)

@@ -1,22 +1,22 @@
 package parser
 
 type Diagnostic struct {
-	label    string
-	message  string
-	location Location
-	notes    []string
-	helps    []string
-	docs     string
+	Label    string
+	Message  string
+	Location Location
+	Notes    []string
+	Helps    []string
+	Docs     string
 }
 
 func NewDiagnostic(label, message string) *Diagnostic {
 	return &Diagnostic{
-		label:    label,
-		message:  message,
-		location: Location{},
-		notes:    []string{},
-		helps:    []string{},
-		docs:     "",
+		Label:    label,
+		Message:  message,
+		Location: Location{},
+		Notes:    []string{},
+		Helps:    []string{},
+		Docs:     "",
 	}
 }
 
@@ -29,50 +29,50 @@ func NewException(message string) *Diagnostic {
 }
 
 func (d *Diagnostic) WithLocation(location Location) *Diagnostic {
-	d.location = location
+	d.Location = location
 	return d
 }
 
 func (d *Diagnostic) WithLocationSpan(start, end int) *Diagnostic {
-	d.location = Location{start, end}
+	d.Location = Location{start, end}
 	return d
 }
 
 func (d *Diagnostic) AddNote(note string) *Diagnostic {
-	d.notes = append(d.notes, note)
+	d.Notes = append(d.Notes, note)
 	return d
 }
 
 func (d *Diagnostic) AddHelp(help string) *Diagnostic {
-	d.helps = append(d.helps, help)
+	d.Helps = append(d.Helps, help)
 	return d
 }
 
 func (d *Diagnostic) WithDocs(docs string) *Diagnostic {
-	d.docs = docs
+	d.Docs = docs
 	return d
 }
 
-func (d *Diagnostic) Label() string {
-	return d.label
+func (d *Diagnostic) DiaLabel() string {
+	return d.Label
 }
 
-func (d *Diagnostic) Message() string {
-	return d.message
+func (d *Diagnostic) DiaMessage() string {
+	return d.Message
 }
 
-func (d *Diagnostic) Location() Location {
-	return d.location
+func (d *Diagnostic) DiaLocation() Location {
+	return d.Location
 }
 
-func (d *Diagnostic) Notes() []string {
-	return d.notes
+func (d *Diagnostic) DiaNotes() []string {
+	return d.Notes
 }
 
-func (d *Diagnostic) Helps() []string {
-	return d.helps
+func (d *Diagnostic) DiaHelps() []string {
+	return d.Helps
 }
 
-func (d *Diagnostic) Docs() string {
-	return d.docs
+func (d *Diagnostic) DiaDocs() string {
+	return d.Docs
 }

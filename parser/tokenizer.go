@@ -118,7 +118,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 		// Global Variable Symbol
 		if char == '@' {
 			result, err := consumeGlobalVariableName(characters, &position, &columnStart)
-			if err.Message() != "" {
+			if err.DiaMessage() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, result)
@@ -132,7 +132,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 					position += 2
 					columnStart += 2
 					result, err := consumeHexNumber(characters, &position, &columnStart)
-					if err.Message() != "" {
+					if err.DiaMessage() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -143,7 +143,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 					position += 2
 					columnStart += 2
 					result, err := consumeBinaryNumber(characters, &position, &columnStart)
-					if err.Message() != "" {
+					if err.DiaMessage() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -154,7 +154,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 					position += 2
 					columnStart += 2
 					result, err := consumeOctalNumber(characters, &position, &columnStart)
-					if err.Message() != "" {
+					if err.DiaMessage() != "" {
 						return nil, err
 					}
 					tokens = append(tokens, result)
@@ -163,7 +163,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 			}
 
 			number, err := consumeNumber(characters, &position, &columnStart)
-			if err.Message() != "" {
+			if err.DiaMessage() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, number)
@@ -173,7 +173,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 		// String literal
 		if char == '"' {
 			result, err := consumeString(characters, &position, &columnStart)
-			if err.Message() != "" {
+			if err.DiaMessage() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, result)
@@ -183,7 +183,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 		// All chars between two backticks should be consumed as identifier
 		if char == '`' {
 			result, err := consumeBackticksIdentifier(characters, &position, &columnStart)
-			if err.Message() != "" {
+			if err.DiaMessage() != "" {
 				return nil, err
 			}
 			tokens = append(tokens, result)
@@ -227,7 +227,7 @@ func Tokenize(script string) ([]Token, *Diagnostic) {
 			// Ignore C style comment which from /* comment */
 			if (position+1 < len(characters)) && (characters[position+1] == '*') {
 				err := ignoreCStyleComment(characters, &position)
-				if err.Message() != "" {
+				if err.DiaMessage() != "" {
 					return nil, err
 				}
 				continue

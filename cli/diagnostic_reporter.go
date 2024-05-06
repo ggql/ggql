@@ -12,20 +12,20 @@ type DiagnosticReporter struct {
 
 func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic *parser.Diagnostic) {
 	d.stdout.SetColor(Red)
-	d.stdout.Printlnf(fmt.Sprintf("[%s]: %s", diagnostic.Label(), diagnostic.Message()))
+	d.stdout.Printlnf(fmt.Sprintf("[%s]: %s", diagnostic.DiaLabel(), diagnostic.DiaMessage()))
 
-	if diagnostic.Location().Start >= 0 && diagnostic.Location().End >= 0 {
-		d.stdout.Printlnf(fmt.Sprintf("=> Line %d, Column %d,", diagnostic.Location().Start, diagnostic.Location().End))
+	if diagnostic.DiaLocation().Start >= 0 && diagnostic.DiaLocation().End >= 0 {
+		d.stdout.Printlnf(fmt.Sprintf("=> Line %d, Column %d,", diagnostic.DiaLocation().Start, diagnostic.DiaLocation().End))
 	}
 
 	if query != "" {
 		d.stdout.Printlnf("  |")
 		d.stdout.Printlnf(fmt.Sprintf("1 | %s", query))
-		if diagnostic.Location().Start >= 0 && diagnostic.Location().End >= 0 {
+		if diagnostic.DiaLocation().Start >= 0 && diagnostic.DiaLocation().End >= 0 {
 			d.stdout.Printf("  | ")
-			d.stdout.Printf(d.repeat("-", diagnostic.Location().Start))
+			d.stdout.Printf(d.repeat("-", diagnostic.DiaLocation().Start))
 			d.stdout.SetColor(Yellow)
-			d.stdout.Printlnf(d.repeat("^", d.max(1, diagnostic.Location().End-diagnostic.Location().Start)))
+			d.stdout.Printlnf(d.repeat("^", d.max(1, diagnostic.DiaLocation().End-diagnostic.DiaLocation().Start)))
 			d.stdout.SetColor(Red)
 		}
 		d.stdout.Printlnf("  |")
@@ -33,20 +33,20 @@ func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic *parser.D
 
 	d.stdout.SetColor(Yellow)
 
-	for _, note := range diagnostic.Notes() {
+	for _, note := range diagnostic.DiaNotes() {
 		d.stdout.Printlnf(fmt.Sprintf(" = Note: %s", note))
 	}
 
 	d.stdout.SetColor(Cyan)
 
-	for _, help := range diagnostic.Helps() {
+	for _, help := range diagnostic.DiaHelps() {
 		d.stdout.Printlnf(fmt.Sprintf(" = Help: %s", help))
 	}
 
 	d.stdout.SetColor(Blue)
 
-	if diagnostic.Docs() != "" {
-		d.stdout.Printlnf(fmt.Sprintf(" = Docs: %s", diagnostic.Docs()))
+	if diagnostic.DiaDocs() != "" {
+		d.stdout.Printlnf(fmt.Sprintf(" = Docs: %s", diagnostic.DiaDocs()))
 	}
 
 	d.stdout.Reset()
