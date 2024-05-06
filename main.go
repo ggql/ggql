@@ -197,6 +197,7 @@ type result struct {
 }
 
 func isTerminal(f *os.File) bool {
+	// Check file descriptor if used as terminal or not with os.Isatty()
 	if stat, err := f.Stat(); err == nil {
 		return (stat.Mode() & os.ModeCharDevice) != 0
 	}
