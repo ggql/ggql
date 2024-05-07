@@ -67,7 +67,7 @@ func EvaluateExpression(env *ast.Environment, expression ast.Expression, titles 
 		expr := expression.(*ast.IsNullExpression)
 		return EvaluateIsNull(env, expr, titles, object)
 	case ast.ExprNull:
-		return nil, nil
+		return ast.NullValue{}, nil
 	default:
 		return nil, errors.New("invalid expression kind")
 	}
@@ -93,7 +93,7 @@ func EvaluateString(expr *ast.StringExpression) (ast.Value, error) {
 	case ast.StringValueDate:
 		return ast.DateValue{Value: ast.DateToTimeStamp(expr.Value)}, nil
 	case ast.StringValueDateTime:
-		return ast.DateValue{Value: ast.DateTimeToTimeStamp(expr.Value)}, nil
+		return ast.DateTimeValue{Value: ast.DateTimeToTimeStamp(expr.Value)}, nil
 	default:
 		return nil, errors.New("invalid string value type")
 	}
@@ -184,7 +184,7 @@ func EvaluateComparison(env *ast.Environment, expr *ast.ComparisonExpression, ti
 		return nil, err
 	}
 
-	comparisonResult := lhs.Compare(rhs)
+	comparisonResult := rhs.Compare(lhs)
 
 	if expr.Operator == ast.CONullSafeEqual {
 		if lhs.DataType().IsNull() && rhs.DataType().IsNull() {
@@ -247,7 +247,7 @@ func EvaluateGlob(env *ast.Environment, expr *ast.GlobExpression, titles []strin
 		return nil, err
 	}
 
-	pattern := "^" + regexp.QuoteMeta(rhs.AsText()) + "$"
+	pattern := "^" + rhs.AsText() + "$"
 	pattern = strings.ReplaceAll(pattern, ".", "\\.")
 	pattern = strings.ReplaceAll(pattern, "*", ".*")
 	pattern = strings.ReplaceAll(pattern, "?", ".")
@@ -364,7 +364,7 @@ func EvaluateBetween(env *ast.Environment, expr *ast.BetweenExpression, titles [
 	}
 
 	retStart := value.Compare(rangeStart) == ast.Less || value.Compare(rangeStart) == ast.Equal
-	retEnd := value.Compare(rangeEnd) == ast.Greater || value.Compare(rangeStart) == ast.Equal
+	retEnd := value.Compare(rangeEnd) == ast.Greater || value.Compare(rangeEnd) == ast.Equal
 
 	return ast.BooleanValue{Value: retStart && retEnd}, nil
 }
