@@ -346,7 +346,7 @@ func executeGlobalVariableStatement(
 	env *ast.Environment,
 	statement *ast.GlobalVariableStatement,
 ) error {
-	value, err := EvaluateExpression(env, nil, nil, nil)
+	value, err := EvaluateExpression(env, statement.Value, []string{}, nil)
 	if err != nil {
 		return err
 	}
