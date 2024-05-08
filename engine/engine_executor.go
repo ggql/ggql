@@ -301,7 +301,9 @@ func executeAggregationFunctionStatement(
 				columnName := GetColumnName(aliasTable, resultColumnName)
 				columnIndex := indexOf(gitqlObject.Titles, columnName)
 				aggregationFunction := ast.Aggregations[fn.Name]
-				result := aggregationFunction(fn.Arg, gitqlObject.Titles, &group)
+				var g ast.Group
+				g = group
+				result := aggregationFunction(fn.Arg, gitqlObject.Titles, &g)
 				for _, object := range group.Rows {
 					if columnIndex < len(object.Values) {
 						object.Values[columnIndex] = result

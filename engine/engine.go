@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ggql/ggql/ast"
 	"github.com/go-git/go-git/v5"
+
+	"github.com/ggql/ggql/ast"
 )
 
 var gqlCommandsInOrder = []string{

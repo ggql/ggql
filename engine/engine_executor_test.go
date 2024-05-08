@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"os"
 	"testing"
 
 	"github.com/go-git/go-git/v5"
@@ -8,7 +9,8 @@ import (
 	"github.com/ggql/ggql/ast"
 )
 
-const path = "F:/tt/test.git"
+const path = "test.git"
+const title1 = "title1"
 
 func TestExecuteStatement(t *testing.T) {
 	env := ast.Environment{
@@ -25,9 +27,14 @@ func TestExecuteStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := TestNewRepo(path); err != nil {
+	if err := NewRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
+	defer func() {
+		if err := DeleteRepo(path); err != nil {
+			t.Fatal("failed to delete repo:", err)
+		}
+	}()
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		t.Fatal("failed to open repo")
@@ -42,10 +49,6 @@ func TestExecuteStatement(t *testing.T) {
 		t.Log("execute statement succeeded")
 	} else {
 		t.Errorf("execute statement failed: %v", ret)
-	}
-
-	if err := TestDeleteRepo(path); err != nil {
-		t.Fatal("failed to delete repo:", err)
 	}
 }
 
@@ -64,9 +67,14 @@ func TestExecuteSelectStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := TestNewRepo(path); err != nil {
+	if err := NewRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
+	defer func() {
+		if err := DeleteRepo(path); err != nil {
+			t.Fatal("failed to delete repo:", err)
+		}
+	}()
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		t.Fatal("failed to open repo")
@@ -82,7 +90,7 @@ func TestExecuteSelectStatement(t *testing.T) {
 		t.Errorf("execute statement failed: %v", ret)
 	}
 
-	if err := TestDeleteRepo(path); err != nil {
+	if err := DeleteRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -260,7 +268,7 @@ func TestExecuteAggregationFunctionStatement(t *testing.T) {
 	}
 	var a ast.AggregateValue
 	a.Function.Name = "max"
-	a.Function.Arg = "title1"
+	a.Function.Arg = title1
 	a.Expression = &ast.NumberExpression{Value: ast.IntegerValue{Value: 5}}
 
 	statement.Aggregations["title"] = a
@@ -303,4 +311,15 @@ func TestExecuteGlobalVariableStatement(t *testing.T) {
 	} else {
 		t.Errorf("execute statement failed: %v", ret)
 	}
+}
+
+func NewRepo(path string) error {
+	// Clone the given repository to the given path
+	_, err := git.PlainInit(path, true)
+	return err
+}
+
+func DeleteRepo(path string) error {
+	err := os.RemoveAll(path)
+	return err
 }

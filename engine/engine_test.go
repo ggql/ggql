@@ -3,10 +3,11 @@ package engine
 import (
 	"testing"
 
-	"github.com/ggql/ggql/ast"
-	"github.com/ggql/ggql/parser"
 	"github.com/go-git/go-git/v5"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ggql/ggql/ast"
+	"github.com/ggql/ggql/parser"
 )
 
 const querystr = "SELECT * FROM commits"
@@ -17,9 +18,14 @@ func TestEvaluate(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
-	if err := TestNewRepo(path); err != nil {
+	if err := NewRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
+	defer func() {
+		if err := DeleteRepo(path); err != nil {
+			t.Fatal("failed to delete repo:", err)
+		}
+	}()
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		t.Fatal("failed to open repo")
@@ -37,12 +43,12 @@ func TestEvaluate(t *testing.T) {
 
 	_, errret := Evaluate(&env, repos, query)
 	if errret != nil {
-		if err := TestDeleteRepo(path); err != nil {
+		if err := DeleteRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}
 
-	if err := TestDeleteRepo(path); err != nil {
+	if err := DeleteRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -54,9 +60,14 @@ func TestEvaluateSelectQuery(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 
-	if err := TestNewRepo(path); err != nil {
+	if err := NewRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
+	defer func() {
+		if err := DeleteRepo(path); err != nil {
+			t.Fatal("failed to delete repo:", err)
+		}
+	}()
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		t.Fatal("failed to open repo")
@@ -76,16 +87,16 @@ func TestEvaluateSelectQuery(t *testing.T) {
 	case ast.Query{Select: query.Select}:
 		_, errret := Evaluate(&env, repos, query)
 		if errret != nil {
-			if err := TestDeleteRepo(path); err != nil {
+			if err := DeleteRepo(path); err != nil {
 				t.Fatal("failed to delete repo:", err)
 			}
 		}
 	default:
-		if err := TestDeleteRepo(path); err != nil {
+		if err := DeleteRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}
-	if err := TestDeleteRepo(path); err != nil {
+	if err := DeleteRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
