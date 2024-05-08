@@ -26,7 +26,7 @@ linters-settings:
     local-prefixes: github.com/golangci/golangci-lint
   golint:
     min-confidence: 0
-  gomnd:
+  mnd:
     checks:
       argument,case,condition,return
   govet:
@@ -57,7 +57,7 @@ linters:
     - gocritic
     - gocyclo
     - gofmt
-    - gomnd
+    - mnd
     - goprintffuncname
     - gosec
     - govet
