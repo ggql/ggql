@@ -20,7 +20,6 @@ func ExecuteStatement(
 	switch statement.Kind() {
 	case ast.Select:
 		selectStatement := statement.(*ast.SelectStatement)
-		// !!!
 		for _, alias := range selectStatement.AliasTable {
 			aliasTable[alias] = alias
 		}
@@ -298,14 +297,11 @@ func executeAggregationFunctionStatement(
 			fn := aggregation.Function
 			if fn.Name != "" && fn.Arg != "" {
 				// Get alias name if exists or column name by default
-				var resultColumnName string // TBD: FIXME (used for aggregation.0)
+				resultColumnName := aggregation.Function.Arg
 				columnName := GetColumnName(aliasTable, resultColumnName)
 				columnIndex := indexOf(gitqlObject.Titles, columnName)
-
 				aggregationFunction := ast.Aggregations[fn.Name]
-
-				result := aggregationFunction(fn.Arg, gitqlObject.Titles, &ast.Group{})
-
+				result := aggregationFunction(fn.Arg, gitqlObject.Titles, &group)
 				for _, object := range group.Rows {
 					if columnIndex < len(object.Values) {
 						object.Values[columnIndex] = result
@@ -315,16 +311,15 @@ func executeAggregationFunctionStatement(
 				}
 			}
 		}
-
 		// Resolve aggregations expressions
 		for _, aggregation := range statement.Aggregations {
 			if expr := aggregation.Expression; expr != nil {
-				var resultColumnName string // TBD: FIXME (used for aggregation.0)
+				resultColumnName := aggregation.Function.Arg
 				columnName := GetColumnName(aliasTable, resultColumnName)
 				columnIndex := indexOf(gitqlObject.Titles, columnName)
 
 				for _, object := range group.Rows {
-					result, _ := EvaluateExpression(env, *expr, gitqlObject.Titles, object.Values)
+					result, _ := EvaluateExpression(env, expr, gitqlObject.Titles, object.Values)
 					if columnIndex < len(object.Values) {
 						object.Values[columnIndex] = result
 					} else {
@@ -333,7 +328,6 @@ func executeAggregationFunctionStatement(
 				}
 			}
 		}
-
 		if groupsCount > 1 {
 			group.Rows = group.Rows[:1]
 		}

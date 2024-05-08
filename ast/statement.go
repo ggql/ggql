@@ -132,7 +132,7 @@ func (s *GroupByStatement) Kind() StatementKind {
 }
 
 type AggregateValue struct {
-	Expression *Expression
+	Expression Expression
 	Function   struct {
 		Name string
 		Arg  string

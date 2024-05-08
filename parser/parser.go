@@ -509,7 +509,7 @@ func ParseExpression(context *ParserContext, env *ast.Environment, tokens *[]Tok
 			context.HiddenSelections = append(context.HiddenSelections, columnName)
 		}
 
-		context.Aggregations[columnName] = ast.AggregateValue{Expression: &expression}
+		context.Aggregations[columnName] = ast.AggregateValue{Expression: expression}
 
 		return &ast.SymbolExpression{
 			Value: columnName,
