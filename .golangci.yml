@@ -26,9 +26,6 @@ linters-settings:
     local-prefixes: github.com/golangci/golangci-lint
   golint:
     min-confidence: 0
-  mnd:
-    checks:
-      argument,case,condition,return
   govet:
     shadow: true
     settings:
@@ -44,6 +41,9 @@ linters-settings:
     suggest-new: true
   misspell:
     locale: US
+  mnd:
+    checks:
+      argument,case,condition,return
 
 linters:
   disable-all: true
@@ -57,13 +57,13 @@ linters:
     - gocritic
     - gocyclo
     - gofmt
-    - mnd
     - goprintffuncname
     - gosec
     - govet
     - ineffassign
     - lll
     - misspell
+    - mnd
     - nakedret
     - typecheck
     - unconvert
