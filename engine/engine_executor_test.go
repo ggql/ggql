@@ -12,6 +12,17 @@ import (
 const path = "test.git"
 const title1 = "title1"
 
+func newExecutorRepo(path string) error {
+	// Clone the given repository to the given path
+	_, err := git.PlainInit(path, true)
+	return err
+}
+
+func deleteExecutorRepo(path string) error {
+	err := os.RemoveAll(path)
+	return err
+}
+
 func TestExecuteStatement(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -311,15 +322,4 @@ func TestExecuteGlobalVariableStatement(t *testing.T) {
 	} else {
 		t.Errorf("execute statement failed: %v", ret)
 	}
-}
-
-func newExecutorRepo(path string) error {
-	// Clone the given repository to the given path
-	_, err := git.PlainInit(path, true)
-	return err
-}
-
-func deleteExecutorRepo(path string) error {
-	err := os.RemoveAll(path)
-	return err
 }

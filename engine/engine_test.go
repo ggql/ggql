@@ -13,6 +13,17 @@ import (
 
 const querystr = "SELECT * FROM commits"
 
+func newEngineRepo(path string) error {
+	// Clone the given repository to the given path
+	_, err := git.PlainInit(path, true)
+	return err
+}
+
+func deleteEngineRepo(path string) error {
+	err := os.RemoveAll(path)
+	return err
+}
+
 func TestEvaluate(t *testing.T) {
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
@@ -137,15 +148,4 @@ func TestApplyDistinctOnObjectsGroup(t *testing.T) {
 	var selections2 []string
 	ApplyDistinctOnObjectsGroup(&object2, selections2)
 	assert.Equal(t, len(object2.Groups[0].Rows), 1)
-}
-
-func newEngineRepo(path string) error {
-	// Clone the given repository to the given path
-	_, err := git.PlainInit(path, true)
-	return err
-}
-
-func deleteEngineRepo(path string) error {
-	err := os.RemoveAll(path)
-	return err
 }
