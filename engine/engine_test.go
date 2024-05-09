@@ -14,14 +14,12 @@ import (
 const querystr = "SELECT * FROM commits"
 
 func newEngineRepo(path string) error {
-	// Clone the given repository to the given path
 	_, err := git.PlainInit(path, true)
 	return err
 }
 
 func deleteEngineRepo(path string) error {
-	err := os.RemoveAll(path)
-	return err
+	return os.RemoveAll(path)
 }
 
 func TestEvaluate(t *testing.T) {

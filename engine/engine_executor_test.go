@@ -13,14 +13,12 @@ const path = "test.git"
 const title1 = "title1"
 
 func newExecutorRepo(path string) error {
-	// Clone the given repository to the given path
 	_, err := git.PlainInit(path, true)
 	return err
 }
 
 func deleteExecutorRepo(path string) error {
-	err := os.RemoveAll(path)
-	return err
+	return os.RemoveAll(path)
 }
 
 func TestExecuteStatement(t *testing.T) {
