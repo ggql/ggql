@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"os"
 	"testing"
 
 	"github.com/go-git/go-git/v5"
@@ -18,11 +19,11 @@ func TestEvaluate(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
-	if err := NewRepo(path); err != nil {
+	if err := newEngineRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
 	defer func() {
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteEngineRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}()
@@ -43,12 +44,12 @@ func TestEvaluate(t *testing.T) {
 
 	_, errret := Evaluate(&env, repos, query)
 	if errret != nil {
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteEngineRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}
 
-	if err := DeleteRepo(path); err != nil {
+	if err := deleteEngineRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -60,11 +61,11 @@ func TestEvaluateSelectQuery(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 
-	if err := NewRepo(path); err != nil {
+	if err := newEngineRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
 	defer func() {
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteEngineRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}()
@@ -87,16 +88,16 @@ func TestEvaluateSelectQuery(t *testing.T) {
 	case ast.Query{Select: query.Select}:
 		_, errret := Evaluate(&env, repos, query)
 		if errret != nil {
-			if err := DeleteRepo(path); err != nil {
+			if err := deleteEngineRepo(path); err != nil {
 				t.Fatal("failed to delete repo:", err)
 			}
 		}
 	default:
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteEngineRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}
-	if err := DeleteRepo(path); err != nil {
+	if err := deleteEngineRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -136,4 +137,15 @@ func TestApplyDistinctOnObjectsGroup(t *testing.T) {
 	var selections2 []string
 	ApplyDistinctOnObjectsGroup(&object2, selections2)
 	assert.Equal(t, len(object2.Groups[0].Rows), 1)
+}
+
+func newEngineRepo(path string) error {
+	// Clone the given repository to the given path
+	_, err := git.PlainInit(path, true)
+	return err
+}
+
+func deleteEngineRepo(path string) error {
+	err := os.RemoveAll(path)
+	return err
 }

@@ -27,11 +27,11 @@ func TestExecuteStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := NewRepo(path); err != nil {
+	if err := newExecutorRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
 	defer func() {
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteExecutorRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}()
@@ -67,11 +67,11 @@ func TestExecuteSelectStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := NewRepo(path); err != nil {
+	if err := newExecutorRepo(path); err != nil {
 		t.Fatal("failed to create repo:", err)
 	}
 	defer func() {
-		if err := DeleteRepo(path); err != nil {
+		if err := deleteExecutorRepo(path); err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
 	}()
@@ -90,7 +90,7 @@ func TestExecuteSelectStatement(t *testing.T) {
 		t.Errorf("execute statement failed: %v", ret)
 	}
 
-	if err := DeleteRepo(path); err != nil {
+	if err := deleteExecutorRepo(path); err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -313,13 +313,13 @@ func TestExecuteGlobalVariableStatement(t *testing.T) {
 	}
 }
 
-func NewRepo(path string) error {
+func newExecutorRepo(path string) error {
 	// Clone the given repository to the given path
 	_, err := git.PlainInit(path, true)
 	return err
 }
 
-func DeleteRepo(path string) error {
+func deleteExecutorRepo(path string) error {
 	err := os.RemoveAll(path)
 	return err
 }
