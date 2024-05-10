@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	engineRepo = "ggql-engine-test.git"
-	querystr   = "SELECT * FROM commits"
+	engineRepo     = "ggql-engine-test.git"
+	queryStatement = "SELECT * FROM commits"
 )
 
 func newEngineRepo() *git.Repository {
@@ -39,7 +39,7 @@ func TestEvaluate(t *testing.T) {
 
 	repos := []*git.Repository{repo}
 
-	tokens, errToken := parser.Tokenize(querystr)
+	tokens, errToken := parser.Tokenize(queryStatement)
 	if errToken.Message != "" {
 		t.Fatal("failed to tokenize")
 	}
@@ -66,7 +66,7 @@ func TestEvaluateSelectQuery(t *testing.T) {
 
 	repos := []*git.Repository{repo}
 
-	tokens, errToken := parser.Tokenize(querystr)
+	tokens, errToken := parser.Tokenize(queryStatement)
 	if errToken.Message != "" {
 		t.Fatal("failed to tokenize")
 	}

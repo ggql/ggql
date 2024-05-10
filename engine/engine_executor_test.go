@@ -12,8 +12,8 @@ import (
 const (
 	executorRepo = "ggql-engine-executor-test.git"
 
-	title1 = "title1"
-	title2 = "title2"
+	fieldTitle1 = "title1"
+	fieldTitle2 = "title2"
 )
 
 func newExecutorRepo() *git.Repository {
@@ -97,7 +97,7 @@ func TestExecuteWhereStatement(t *testing.T) {
 	}
 
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -127,7 +127,7 @@ func TestExecuteHavingStatement(t *testing.T) {
 		Condition: &ast.NumberExpression{Value: ast.IntegerValue{Value: 1}},
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -151,7 +151,7 @@ func TestExecuteLimitStatement(t *testing.T) {
 		Count: 0,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -175,7 +175,7 @@ func TestExecuteOffsetStatement(t *testing.T) {
 		Count: 0,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -205,7 +205,7 @@ func TestExecuteOrderByStatement(t *testing.T) {
 		SortingOrders: []ast.SortingOrder{ast.Ascending},
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -226,10 +226,10 @@ func TestExecuteOrderByStatement(t *testing.T) {
 
 func TestExecuteGroupByStatement(t *testing.T) {
 	statement := &ast.GroupByStatement{
-		FieldName: title1,
+		FieldName: fieldTitle1,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -259,12 +259,12 @@ func TestExecuteAggregationFunctionStatement(t *testing.T) {
 	}
 	var a ast.AggregateValue
 	a.Function.Name = "max"
-	a.Function.Arg = title1
+	a.Function.Arg = fieldTitle1
 	a.Expression = &ast.NumberExpression{Value: ast.IntegerValue{Value: 5}}
 
 	statement.Aggregations["title"] = a
 	var object ast.GitQLObject
-	object.Titles = []string{title1, title2}
+	object.Titles = []string{fieldTitle1, fieldTitle2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -276,7 +276,7 @@ func TestExecuteAggregationFunctionStatement(t *testing.T) {
 		}},
 	}
 	table := make(map[string]string)
-	table["title"] = title1
+	table["title"] = fieldTitle1
 	ret := executeAggregationFunctionStatement(&env, statement, &object, table)
 	if ret == nil {
 		t.Log("execute statement succeeded")
