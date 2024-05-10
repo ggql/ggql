@@ -11,15 +11,20 @@ import (
 	"github.com/ggql/ggql/parser"
 )
 
-const querystr = "SELECT * FROM commits"
+const (
+	engineRepo = "ggql-engine-test.git"
+	querystr   = "SELECT * FROM commits"
+)
 
-func newEngineRepo(path string) error {
-	_, err := git.PlainInit(path, true)
-	return err
+func newEngineRepo() *git.Repository {
+	_, _ = git.PlainInit(engineRepo, true)
+	repo, _ := git.PlainOpen(engineRepo)
+
+	return repo
 }
 
-func deleteEngineRepo(path string) error {
-	return os.RemoveAll(path)
+func deleteEngineRepo() {
+	_ = os.RemoveAll(engineRepo)
 }
 
 func TestEvaluate(t *testing.T) {
@@ -28,37 +33,23 @@ func TestEvaluate(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
-	if err := newEngineRepo(path); err != nil {
-		t.Fatal("failed to create repo:", err)
-	}
-	defer func() {
-		if err := deleteEngineRepo(path); err != nil {
-			t.Fatal("failed to delete repo:", err)
-		}
-	}()
-	repo, err := git.PlainOpen(path)
-	if err != nil {
-		t.Fatal("failed to open repo")
-	}
+
+	repo := newEngineRepo()
+	defer deleteEngineRepo()
+
 	repos := []*git.Repository{repo}
 
-	tokens, errtoken := parser.Tokenize(querystr)
-	if errtoken.Message != "" {
+	tokens, errToken := parser.Tokenize(querystr)
+	if errToken.Message != "" {
 		t.Fatal("failed to tokenize")
 	}
-	query, err2 := parser.ParserGql(tokens, &env)
-	if err2.Message != "" {
+	query, errQuery := parser.ParserGql(tokens, &env)
+	if errQuery.Message != "" {
 		t.Fatal("failed to parser")
 	}
 
-	_, errret := Evaluate(&env, repos, query)
-	if errret != nil {
-		if err := deleteEngineRepo(path); err != nil {
-			t.Fatal("failed to delete repo:", err)
-		}
-	}
-
-	if err := deleteEngineRepo(path); err != nil {
+	_, err := Evaluate(&env, repos, query)
+	if err != nil {
 		t.Fatal("failed to delete repo:", err)
 	}
 }
@@ -70,44 +61,28 @@ func TestEvaluateSelectQuery(t *testing.T) {
 		Scopes:       map[string]ast.DataType{},
 	}
 
-	if err := newEngineRepo(path); err != nil {
-		t.Fatal("failed to create repo:", err)
-	}
-	defer func() {
-		if err := deleteEngineRepo(path); err != nil {
-			t.Fatal("failed to delete repo:", err)
-		}
-	}()
-	repo, err := git.PlainOpen(path)
-	if err != nil {
-		t.Fatal("failed to open repo")
-	}
+	repo := newEngineRepo()
+	defer deleteEngineRepo()
+
 	repos := []*git.Repository{repo}
 
-	tokens, errtoken := parser.Tokenize(querystr)
-	if errtoken.Message != "" {
+	tokens, errToken := parser.Tokenize(querystr)
+	if errToken.Message != "" {
 		t.Fatal("failed to tokenize")
 	}
-	query, err2 := parser.ParserGql(tokens, &env)
-	if err2.Message != "" {
+	query, errQuery := parser.ParserGql(tokens, &env)
+	if errQuery.Message != "" {
 		t.Fatal("failed to parser")
 	}
 
 	switch query {
 	case ast.Query{Select: query.Select}:
-		_, errret := Evaluate(&env, repos, query)
-		if errret != nil {
-			if err := deleteEngineRepo(path); err != nil {
-				t.Fatal("failed to delete repo:", err)
-			}
-		}
-	default:
-		if err := deleteEngineRepo(path); err != nil {
+		_, err := Evaluate(&env, repos, query)
+		if err != nil {
 			t.Fatal("failed to delete repo:", err)
 		}
-	}
-	if err := deleteEngineRepo(path); err != nil {
-		t.Fatal("failed to delete repo:", err)
+	default:
+		// PASS
 	}
 }
 

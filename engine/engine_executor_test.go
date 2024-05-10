@@ -9,16 +9,22 @@ import (
 	"github.com/ggql/ggql/ast"
 )
 
-const path = "test.git"
-const title1 = "title1"
+const (
+	executorRepo = "ggql-engine-executor-test.git"
 
-func newExecutorRepo(path string) error {
-	_, err := git.PlainInit(path, true)
-	return err
+	title1 = "title1"
+	title2 = "title2"
+)
+
+func newExecutorRepo() *git.Repository {
+	_, _ = git.PlainInit(executorRepo, true)
+	repo, _ := git.PlainOpen(executorRepo)
+
+	return repo
 }
 
-func deleteExecutorRepo(path string) error {
-	return os.RemoveAll(path)
+func deleteExecutorRepo() {
+	_ = os.RemoveAll(executorRepo)
 }
 
 func TestExecuteStatement(t *testing.T) {
@@ -36,22 +42,12 @@ func TestExecuteStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := newExecutorRepo(path); err != nil {
-		t.Fatal("failed to create repo:", err)
-	}
-	defer func() {
-		if err := deleteExecutorRepo(path); err != nil {
-			t.Fatal("failed to delete repo:", err)
-		}
-	}()
-	repo, err := git.PlainOpen(path)
-	if err != nil {
-		t.Fatal("failed to open repo")
-	}
+	repo := newExecutorRepo()
+	defer deleteExecutorRepo()
 
 	var object ast.GitQLObject
 	var table map[string]string
-	selection := []string{}
+	var selection []string
 
 	ret := ExecuteStatement(&env, statement, repo, &object, table, selection)
 	if ret == nil {
@@ -76,18 +72,8 @@ func TestExecuteSelectStatement(t *testing.T) {
 		IsDistinct:   false,
 	}
 
-	if err := newExecutorRepo(path); err != nil {
-		t.Fatal("failed to create repo:", err)
-	}
-	defer func() {
-		if err := deleteExecutorRepo(path); err != nil {
-			t.Fatal("failed to delete repo:", err)
-		}
-	}()
-	repo, err := git.PlainOpen(path)
-	if err != nil {
-		t.Fatal("failed to open repo")
-	}
+	repo := newExecutorRepo()
+	defer deleteExecutorRepo()
 
 	var object ast.GitQLObject
 	selections := []string{}
@@ -97,10 +83,6 @@ func TestExecuteSelectStatement(t *testing.T) {
 		t.Log("execute statement succeeded")
 	} else {
 		t.Errorf("execute statement failed: %v", ret)
-	}
-
-	if err := deleteExecutorRepo(path); err != nil {
-		t.Fatal("failed to delete repo:", err)
 	}
 }
 
@@ -115,7 +97,7 @@ func TestExecuteWhereStatement(t *testing.T) {
 	}
 
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -145,7 +127,7 @@ func TestExecuteHavingStatement(t *testing.T) {
 		Condition: &ast.NumberExpression{Value: ast.IntegerValue{Value: 1}},
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -169,7 +151,7 @@ func TestExecuteLimitStatement(t *testing.T) {
 		Count: 0,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -193,7 +175,7 @@ func TestExecuteOffsetStatement(t *testing.T) {
 		Count: 0,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -223,7 +205,7 @@ func TestExecuteOrderByStatement(t *testing.T) {
 		SortingOrders: []ast.SortingOrder{ast.Ascending},
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -244,10 +226,10 @@ func TestExecuteOrderByStatement(t *testing.T) {
 
 func TestExecuteGroupByStatement(t *testing.T) {
 	statement := &ast.GroupByStatement{
-		FieldName: "title1",
+		FieldName: title1,
 	}
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -282,7 +264,7 @@ func TestExecuteAggregationFunctionStatement(t *testing.T) {
 
 	statement.Aggregations["title"] = a
 	var object ast.GitQLObject
-	object.Titles = []string{"title1", "title2"}
+	object.Titles = []string{title1, title2}
 	object.Groups = []ast.Group{
 		{Rows: []ast.Row{
 			{Values: []ast.Value{
@@ -294,7 +276,7 @@ func TestExecuteAggregationFunctionStatement(t *testing.T) {
 		}},
 	}
 	table := make(map[string]string)
-	table["title"] = "title1"
+	table["title"] = title1
 	ret := executeAggregationFunctionStatement(&env, statement, &object, table)
 	if ret == nil {
 		t.Log("execute statement succeeded")
