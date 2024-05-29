@@ -20,9 +20,9 @@ func (d *DiagnosticReporter) ReportDiagnostic(query string, diagnostic *parser.D
 
 	if query != "" {
 		d.stdout.Printlnf("  |")
-		d.stdout.Printlnf(fmt.Sprintf("1 | %s", query))
+		d.stdout.Printlnf(fmt.Sprintf("1 | %s\n", query))
 		if diagnostic.DiaLocation().Start >= 0 && diagnostic.DiaLocation().End >= 0 {
-			d.stdout.Printf("  | ")
+			d.stdout.Printf("  | ") // NOTE: d.stdout.Printf appends line break
 			d.stdout.Printf(d.repeat("-", diagnostic.DiaLocation().Start))
 			d.stdout.SetColor(Yellow)
 			d.stdout.Printlnf(d.repeat("^", d.max(1, diagnostic.DiaLocation().End-diagnostic.DiaLocation().Start)))

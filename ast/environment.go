@@ -21,6 +21,9 @@ type Environment struct {
 }
 
 func (e *Environment) Define(str string, dataType DataType) {
+	if e.Scopes == nil {
+		e.Scopes = make(map[string]DataType)
+	}
 	e.Scopes[str] = dataType
 }
 

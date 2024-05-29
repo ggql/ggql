@@ -1357,9 +1357,7 @@ func TestParseFactorExpression(t *testing.T) {
 	}
 
 	position := 0
-	fmt.Println("===1")
 	_, err := ParseFactorExpression(&context, &env, &tokens, &position)
-	fmt.Println("===2")
 	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}

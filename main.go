@@ -86,7 +86,7 @@ func executeGitqlQuery(
 ) {
 	frontStart := time.Now()
 	tokens, err := parser.Tokenize(query)
-	if err != nil {
+	if err.Message != "" {
 		reporter.ReportDiagnostic(query, err)
 		return
 	}
@@ -96,7 +96,7 @@ func executeGitqlQuery(
 	}
 
 	queryNode, err1 := parser.ParserGql(tokens, env)
-	if &err1 != nil {
+	if err1.Message != "" {
 		reporter.ReportDiagnostic(query, &err1)
 		return
 	}
@@ -110,6 +110,7 @@ func executeGitqlQuery(
 		return
 	}
 
+	// NOTE: evaluationResult.SelectedGroups.Obj.Len() == 0 is invalid
 	if evaluationResult.SelectedGroups.Obj.Len() != 0 {
 		groups := evaluationResult
 		hiddenSelection := err2
