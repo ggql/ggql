@@ -1645,7 +1645,7 @@ func CheckFunctionCallArguments(env *ast.Environment, arguments *[]ast.Expressio
 
 func TypeCheckSelectedFields(env *ast.Environment, tableName string, fieldNames *[]string, tokens *[]Token, position int) Diagnostic {
 	for _, fieldName := range *fieldNames {
-		if dataType, err := env.ResolveType(fieldName); err != nil {
+		if dataType, err := env.ResolveType(fieldName); err == nil {
 			if dataType.IsUndefined() {
 				return *NewError(fmt.Sprintf("No field with name `%s`", fieldName)).WithLocation(GetSafeLocation(tokens, position))
 			}

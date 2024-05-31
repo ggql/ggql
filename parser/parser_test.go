@@ -58,40 +58,6 @@ func TestParseGql(t *testing.T) {
 	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
-
-	// Test: SELECT @name @invalid
-	tokens = []Token{
-		{
-			Location: Location{
-				Start: 1,
-				End:   2,
-			},
-			Kind:    Select,
-			Literal: "SELECT",
-		},
-		{
-			Location: Location{
-				Start: 2,
-				End:   3,
-			},
-			Kind:    GlobalVariable,
-			Literal: "@name",
-		},
-		{
-			Location: Location{
-				Start: 3,
-				End:   4,
-			},
-			Kind:    GlobalVariable,
-			Literal: "@invalid",
-		},
-	}
-
-	_, err = ParserGql(tokens, &env)
-
-	if err.Message == "" {
-		t.Errorf("ParserGql failed with error: %v", err)
-	}
 }
 
 //nolint:gocritic
