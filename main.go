@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -109,61 +108,59 @@ func executeGitqlQuery(
 		reporter.ReportDiagnostic(query, &parser.Diagnostic{Message: err2.Error()})
 		return
 	}
-
-	// NOTE: evaluationResult.SelectedGroups.Obj.Len() == 0 is invalid
 	if evaluationResult.SelectedGroups.Obj.Len() != 0 {
-		groups := evaluationResult
-		hiddenSelection := err2
+		groups := evaluationResult.SelectedGroups.Obj
+		hiddenselection := evaluationResult.SelectedGroups.Str
 		switch args.OutputFormat {
 		case cli.Render:
-			err := cli.RenderObjects(&groups.SelectedGroups.Obj, []string{hiddenSelection.Error()}, args.Pagination, args.PageSize)
+			err := cli.RenderObjects(&groups, hiddenselection, args.Pagination, args.PageSize)
 			if err != nil {
 				fmt.Println(err)
 			}
 		case cli.JSON:
 			var indexes []int
-			for index, title := range groups.SelectedGroups.Obj.Titles {
-				if strings.Contains(hiddenSelection.Error(), title) {
+			for index, title := range groups.Titles {
+				if contains(hiddenselection, title) {
 					indexes = append([]int{index}, indexes...)
 				}
 			}
 
-			if groups.SelectedGroups.Obj.Len() > 1 {
-				groups.SelectedGroups.Obj.Flat()
+			if groups.Len() > 1 {
+				groups.Flat()
 			}
 
 			for _, index := range indexes {
-				groups.SelectedGroups.Obj.Titles = append(groups.SelectedGroups.Obj.Titles[:index], groups.SelectedGroups.Obj.Titles[index+1:]...)
+				groups.Titles = append(groups.Titles[:index], groups.Titles[index+1:]...)
 
-				for _, row := range groups.SelectedGroups.Obj.Groups[0].Rows {
+				for _, row := range groups.Groups[0].Rows {
 					row.Values = append(row.Values[:index], row.Values[index+1:]...)
 				}
 			}
 
-			if json, err := groups.SelectedGroups.Obj.AsJson(); err == nil {
+			if json, err := groups.AsJson(); err == nil {
 				fmt.Println(json)
 			}
 		case cli.CSV:
 			indexes := []int{}
-			for index, title := range groups.SelectedGroups.Obj.Titles {
-				if strings.Contains(hiddenSelection.Error(), title) {
+			for index, title := range groups.Titles {
+				if contains(hiddenselection, title) {
 					indexes = append([]int{index}, indexes...)
 				}
 			}
 
-			if len(groups.SelectedGroups.Obj.Groups) > 1 {
-				groups.SelectedGroups.Obj.Flat()
+			if groups.Len() > 1 {
+				groups.Flat()
 			}
 
 			for _, index := range indexes {
-				groups.SelectedGroups.Obj.Titles = append(groups.SelectedGroups.Obj.Titles[:index], groups.SelectedGroups.Obj.Titles[index+1:]...)
+				groups.Titles = append(groups.Titles[:index], groups.Titles[index+1:]...)
 
-				for _, row := range groups.SelectedGroups.Obj.Groups[0].Rows {
+				for _, row := range groups.Groups[0].Rows {
 					row.Values = append(row.Values[:index], row.Values[index+1:]...)
 				}
 			}
 
-			if csv, err := groups.SelectedGroups.Obj.AsCsv(); err == nil {
+			if csv, err := groups.AsCsv(); err == nil {
 				fmt.Println(csv)
 			}
 		}
@@ -200,6 +197,17 @@ func isTerminal(f *os.File) bool {
 	// Check file descriptor if used as terminal or not with os.Isatty()
 	if stat, err := f.Stat(); err == nil {
 		return (stat.Mode() & os.ModeCharDevice) != 0
+	}
+	return false
+}
+
+func contains(arr []string, items ...string) bool {
+	for _, item := range items {
+		for _, a := range arr {
+			if item == a {
+				return true
+			}
+		}
 	}
 	return false
 }

@@ -32,7 +32,7 @@ type EvaluationResult struct {
 
 func Evaluate(env *ast.Environment, repos []*git.Repository, query ast.Query) (EvaluationResult, error) {
 	if query.Select != nil {
-		return EvaluateSelectQuery(env, repos, ast.GQLQuery{})
+		return EvaluateSelectQuery(env, repos, *query.Select)
 	}
 
 	if query.GlobalVariableDeclaration != nil {
