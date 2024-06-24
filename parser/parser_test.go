@@ -1939,14 +1939,16 @@ func TestRegisterCurrentTableFieldsTypes(t *testing.T) {
 
 //nolint:gocritic
 func TestSelectAllTableFields(t *testing.T) {
-	// Test: commits
-	table_name := "commits"
-	selected_fields := []string{"name", "title"}
-	fields_names := []string{}
-	fields_values := []ast.Expression{}
+	var selectedFields []string
+	var fieldsNames []string
+	var fieldsValues []ast.Expression
 
-	SelectAllTableFields(table_name, selected_fields, fields_names, fields_values)
-	assert.Equal(t, len(ast.TablesFieldsNames[table_name])-7, len(selected_fields)-2)
+	tableName := "branches"
+	SelectAllTableFields(tableName, &selectedFields, &fieldsNames, &fieldsValues)
+
+	assert.Equal(t, len(selectedFields), 5)
+	assert.Equal(t, len(fieldsNames), 5)
+	assert.Equal(t, len(fieldsValues), 5)
 }
 
 func TestConsumeKind(t *testing.T) {

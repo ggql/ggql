@@ -324,9 +324,9 @@ func ParseSelectStatement(context *ParserContext, env *ast.Environment, tokens *
 	if isSelectAll {
 		SelectAllTableFields(
 			tableName,
-			context.SelectedFields,
-			fieldsNames,
-			fieldsValues,
+			&context.SelectedFields,
+			&fieldsNames,
+			&fieldsValues,
 		)
 	}
 
@@ -1739,16 +1739,16 @@ func RegisterCurrentTableFieldsTypes(tableName string, symbolTable ast.Environme
 	}
 }
 
-func SelectAllTableFields(tableName string, selectedFields, fieldsNames []string, fieldsValues []ast.Expression) {
+func SelectAllTableFields(tableName string, selectedFields, fieldsNames *[]string, fieldsValues *[]ast.Expression) {
 	if tableFields, ok := ast.TablesFieldsNames[tableName]; ok {
 		for _, field := range tableFields {
-			if !contains(fieldsNames, field) {
-				fieldsNames = append(fieldsNames, field)
-				selectedFields = append(selectedFields, field)
+			if !contains(*fieldsNames, field) {
+				*selectedFields = append(*selectedFields, field)
+				*fieldsNames = append(*fieldsNames, field)
 				literalExpr := &ast.SymbolExpression{
 					Value: field,
 				}
-				fieldsValues = append(fieldsValues, literalExpr)
+				*fieldsValues = append(*fieldsValues, literalExpr)
 			}
 		}
 	}
