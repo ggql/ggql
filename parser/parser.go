@@ -307,7 +307,7 @@ func ParseSelectStatement(context *ParserContext, env *ast.Environment, tokens *
 			return nil, *NewError("Unresolved table name").AddHelp("Check the documentations to see available tables").WithLocation(GetSafeLocation(tokens, *position))
 		}
 
-		RegisterCurrentTableFieldsTypes(tableName, *env)
+		RegisterCurrentTableFieldsTypes(tableName, env)
 	}
 
 	// Make sure `SELECT *` used with specific table
@@ -1731,7 +1731,7 @@ func GetExpressionName(expression ast.Expression) (string, error) {
 	return "", fmt.Errorf("unsupported expression type")
 }
 
-func RegisterCurrentTableFieldsTypes(tableName string, symbolTable ast.Environment) {
+func RegisterCurrentTableFieldsTypes(tableName string, symbolTable *ast.Environment) {
 	tableFieldsNames := ast.TablesFieldsNames[tableName]
 	for _, fieldName := range tableFieldsNames {
 		fieldType := ast.TablesFieldsTypes[fieldName]

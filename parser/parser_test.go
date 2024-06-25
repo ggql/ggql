@@ -1933,7 +1933,7 @@ func TestRegisterCurrentTableFieldsTypes(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
-	RegisterCurrentTableFieldsTypes(table_name, env)
+	RegisterCurrentTableFieldsTypes(table_name, &env)
 	assert.Equal(t, ast.Text{}, env.Scopes["commit_id"])
 }
 
