@@ -238,7 +238,7 @@ func selectBranches(
 				commitCount := helper(ref)
 				values = append(values, ast.IntegerValue{Value: commitCount})
 			case "is_head":
-				isHead := ref.Hash().String() == headRef.Hash().String()
+				isHead := ref.Name().IsBranch() && (ref.Hash().String() == headRef.Hash().String())
 				values = append(values, ast.BooleanValue{Value: isHead})
 			case "is_remote":
 				isRemote := ref.Name().IsRemote()
