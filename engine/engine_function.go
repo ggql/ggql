@@ -186,12 +186,17 @@ func selectBranches(
 ) (*ast.Group, error) {
 	helper := func(ref *plumbing.Reference) int64 {
 		var count int64
-		commit, _ := repo.CommitObject(ref.Hash())
+		commit, err := repo.CommitObject(ref.Hash())
+		if err != nil {
+			return -1
+		}
 		commitIter := object.NewCommitIterCTime(commit, nil, nil)
-		_ = commitIter.ForEach(func(c *object.Commit) error {
+		if err = commitIter.ForEach(func(c *object.Commit) error {
 			count++
 			return nil
-		})
+		}); err != nil {
+			return -1
+		}
 		return count
 	}
 
@@ -200,7 +205,7 @@ func selectBranches(
 	storer, _ := repo.Storer.(*filesystem.Storage)
 	repoPath := storer.Filesystem().Root()
 
-	localAndRemoteBranches, _ := repo.Branches()
+	localAndRemoteBranches, _ := repo.References()
 	headRef, _ := repo.Head()
 
 	namesLen := int64(len(fieldsNames))
@@ -208,6 +213,12 @@ func selectBranches(
 	padding := namesLen - valuesLen
 
 	_ = localAndRemoteBranches.ForEach(func(ref *plumbing.Reference) error {
+		if ref.Type() == plumbing.InvalidReference {
+			return nil
+		}
+		if !ref.Name().IsBranch() && !ref.Name().IsRemote() {
+			return nil
+		}
 		var values []ast.Value
 		for index := int64(0); index < namesLen; index++ {
 			fieldName := fieldsNames[index]
@@ -221,15 +232,11 @@ func selectBranches(
 			}
 			switch fieldName {
 			case "name":
-				if ref.Name().IsBranch() || ref.Name().IsRemote() {
-					branchName := ref.Name().String()
-					values = append(values, ast.TextValue{Value: branchName})
-				}
+				branchName := ref.Name().String()
+				values = append(values, ast.TextValue{Value: branchName})
 			case "commit_count":
-				if ref.Name().IsBranch() || ref.Name().IsRemote() {
-					commitCount := helper(ref)
-					values = append(values, ast.IntegerValue{Value: commitCount})
-				}
+				commitCount := helper(ref)
+				values = append(values, ast.IntegerValue{Value: commitCount})
 			case "is_head":
 				isHead := ref.Hash().String() == headRef.Hash().String()
 				values = append(values, ast.BooleanValue{Value: isHead})
