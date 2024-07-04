@@ -36,7 +36,7 @@ make build
 
 # Mutate
 ./bin/ggql -m "update project set name=test" -r /path/to/git/repo
-./bin/ggql -m "insert into project (change_id, name) values (1, project)" -r /path/to/git/repo
+./bin/ggql -m "insert into project (change_id, name) values (1, test)" -r /path/to/git/repo
 ./bin/ggql -m "delete from change where change_id=1" -r /path/to/git/repo
 ```
 
