@@ -12,9 +12,9 @@
 
 *ggql* is forked from [GQL](https://github.com/AmrDeveloper/GQL) and written in Go.
 
-+ggql is a query and mutate language with a syntax very similar to SQL with a tiny engine to
-+perform queries or mutation on .git files instance of database files, note that all keywords
-+in ggql are case-insensitive similar to SQL.
+ggql is a query and mutate language with a syntax very similar to SQL with a tiny engine to
+perform queries or mutation on .git files instance of database files, note that all keywords
+in ggql are case-insensitive similar to SQL.
 
 
 
