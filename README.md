@@ -27,6 +27,7 @@ in ggql are case-insensitive similar to SQL.
 ## Run
 
 ```bash
+# Build
 make build
 
 # Query
