@@ -39,6 +39,10 @@ type Command struct {
 		Query     string
 		Arguments Arguments
 	}
+	MutateMode struct {
+		Mutate    string
+		Arguments Arguments
+	}
 	Help    bool
 	Version string
 	Error   string
@@ -69,6 +73,7 @@ func ParseArguments(args []string) Command {
 	}
 
 	var optionalQuery string
+	var optionalMutate string
 	arguments := NewArguments()
 
 	argIndex := 1
@@ -98,6 +103,13 @@ func ParseArguments(args []string) Command {
 				return Command{Error: fmt.Sprintf("Argument %s must be followed by the query", arg)}
 			}
 			optionalQuery = args[argIndex]
+			argIndex++
+		case "--mutate", "-m":
+			argIndex++
+			if argIndex >= argsLen {
+				return Command{Error: fmt.Sprintf("Argument %s must be followed by the mutate", arg)}
+			}
+			optionalMutate = args[argIndex]
 			argIndex++
 		case "--analysis", "-a":
 			arguments.Analysis = true
@@ -159,18 +171,31 @@ func ParseArguments(args []string) Command {
 		}
 	}
 
+	if optionalMutate != "" {
+		return Command{
+			MutateMode: struct {
+				Mutate    string
+				Arguments Arguments
+			}{
+				Mutate:    optionalMutate,
+				Arguments: arguments,
+			},
+		}
+	}
+
 	return Command{ReplMode: arguments}
 }
 
 // PrintHelpList prints the help message for GitQL
 func PrintHelpList() {
-	fmt.Println("GitQL is a SQL like query language to run on local repositories")
+	fmt.Println("ggql is a SQL like query and mutate language to run on local repositories")
 	fmt.Println()
 	fmt.Println("Usage: ggql [OPTIONS]")
 	fmt.Println()
 	fmt.Println("Options:")
 	fmt.Println("-r,  --repos <REPOS>        Path for local repositories to run query on")
 	fmt.Println("-q,  --query <GQL Query>    GitQL query to run on selected repositories")
+	fmt.Println("-m,  --mutate <GQL Mutate>  GitQL mutate to run on selected repositories")
 	fmt.Println("-p,  --pagination           Enable print result with pagination")
 	fmt.Println("-ps, --pagesize             Set pagination page size [default: 10]")
 	fmt.Println("-o,  --output               Set output format [render, json, csv]")

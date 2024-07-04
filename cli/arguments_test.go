@@ -57,6 +57,21 @@ func TestQueryArguments(t *testing.T) {
 	assert.Equal(t, true, ret)
 }
 
+func TestMutateArguments(t *testing.T) {
+	actual := ParseArguments([]string{"ggql", "--mutate", "Update project set name=test"})
+	expected := Command{
+		MutateMode: struct {
+			Mutate    string
+			Arguments Arguments
+		}{
+			Mutate: "Update project set name=test",
+		},
+	}
+
+	ret := reflect.DeepEqual(actual.MutateMode.Mutate, expected.MutateMode.Mutate)
+	assert.Equal(t, true, ret)
+}
+
 func TestPaginationArguments(t *testing.T) {
 	t.Skip("Skipping TestPaginationArguments.")
 }
