@@ -124,9 +124,9 @@ func DateToMonthName(date int64) string {
 	return monthName
 }
 
-func TimeStampFromYearAndDay(year int, dayOfYear uint) int64 {
+func TimeStampFromYearAndDay(year, dayOfYear int) int64 {
 	t := time.Date(year, 1, 0, 0, 0, 0, 0, time.UTC)
-	t = t.AddDate(0, 0, int(dayOfYear))
+	t = t.AddDate(0, 0, dayOfYear)
 
 	return t.Unix()
 }
