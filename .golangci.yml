@@ -45,9 +45,9 @@ linters-settings:
 linters:
   disable-all: true
   enable:
+    - copyloopvar
     - dogsled
     - errcheck
-    - exportloopref
     - funlen
     - gochecknoinits
     - goconst
