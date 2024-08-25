@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -9,6 +10,16 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 
 	"github.com/ggql/ggql/ast"
+)
+
+const (
+	changeIdPrefix   = "Change-Id:"
+	messageDelimiter = "\n"
+)
+
+var (
+	changeIdPattern    = regexp.MustCompile("(" + changeIdPrefix + " *I[a-f0-9]{40})")
+	trailingWhitespace = regexp.MustCompile("\\s+$")
 )
 
 func SelectGQLObjects(
@@ -143,9 +154,12 @@ func selectCommits(
 				}
 			}
 			switch fieldName {
+			case "change_id":
+				changeId := GetChangeIdFromCommitMessageFooter(commit.Message)
+				values = append(values, ast.TextValue{Value: changeId})
 			case "commit_id":
-				commitID := commit.ID().String()
-				values = append(values, ast.TextValue{Value: commitID})
+				commitId := commit.ID().String()
+				values = append(values, ast.TextValue{Value: commitId})
 			case "name":
 				name := commit.Author.Name
 				values = append(values, ast.TextValue{Value: name})
@@ -293,9 +307,12 @@ func selectDiffs(
 				}
 			}
 			switch fieldName {
+			case "change_id":
+				changeId := GetChangeIdFromCommitMessageFooter(commit.Message)
+				values = append(values, ast.TextValue{Value: changeId})
 			case "commit_id":
-				commitID := commit.ID().String()
-				values = append(values, ast.TextValue{Value: commitID})
+				commitId := commit.ID().String()
+				values = append(values, ast.TextValue{Value: commitId})
 			case "name":
 				name := commit.Author.Name
 				values = append(values, ast.TextValue{Value: name})
@@ -420,4 +437,57 @@ func GetColumnName(aliasTable map[string]string, name string) string {
 	}
 
 	return name
+}
+
+// GetChangeIdFromCommitMessageFooter
+// https://gerrit-review.googlesource.com/Documentation/user-changeid.html
+// https://gerrit.googlesource.com/gerrit/+/refs/heads/master/java/com/google/gerrit/server/util/CommitMessageUtil.java
+// https://github.com/eclipse-jgit/jgit/blob/master/org.eclipse.jgit/src/org/eclipse/jgit/util/ChangeIdUtil.java
+// https://github.com/eclipse-jgit/jgit/blob/master/org.eclipse.jgit.test/tst/org/eclipse/jgit/util/ChangeIdUtilTest.java
+func GetChangeIdFromCommitMessageFooter(message string) string {
+	isEmptyLine := func(line string) bool {
+		return strings.TrimSpace(line) == ""
+	}
+
+	trimRight := func(s string) string {
+		return trailingWhitespace.ReplaceAllString(s, "")
+	}
+
+	indexOfChangeId := func(message, delimiter string) int {
+		lines := strings.Split(message, delimiter)
+		if len(lines) == 0 {
+			return -1
+		}
+		indexOfChangeIdLine := 0
+		inFooter := false
+		for i := len(lines) - 1; i >= 0; i-- {
+			if !inFooter && isEmptyLine(lines[i]) {
+				continue
+			}
+			inFooter = true
+			if changeIdPattern.MatchString(trimRight(lines[i])) {
+				indexOfChangeIdLine = i
+				break
+			} else if isEmptyLine(lines[i]) || i == 0 {
+				return -1
+			}
+		}
+		indexOfChangeIdLineInString := 0
+		for i := 0; i < indexOfChangeIdLine; i++ {
+			indexOfChangeIdLineInString += len(lines[i]) + len(delimiter)
+		}
+		return indexOfChangeIdLineInString + strings.Index(lines[indexOfChangeIdLine], changeIdPrefix)
+	}
+
+	index := indexOfChangeId(message, messageDelimiter)
+	if index == -1 {
+		return ""
+	}
+
+	matches := changeIdPattern.FindAllString(message[index:], -1)
+	if len(matches) == 0 {
+		return ""
+	}
+
+	return strings.TrimSpace(strings.TrimPrefix(matches[0], changeIdPrefix))
 }

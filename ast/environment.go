@@ -8,9 +8,9 @@ import (
 
 var TablesFieldsNames = map[string][]string{
 	"refs":     {"name", "full_name", "type", "repo"},
-	"commits":  {"commit_id", "title", "message", "name", "email", "datetime", "repo"},
+	"commits":  {"change_id", "commit_id", "title", "message", "name", "email", "datetime", "repo"},
 	"branches": {"name", "commit_count", "is_head", "is_remote", "repo"},
-	"diffs":    {"commit_id", "name", "email", "insertions", "deletions", "files_changed", "repo"},
+	"diffs":    {"change_id", "commit_id", "name", "email", "insertions", "deletions", "files_changed", "repo"},
 	"tags":     {"name", "repo"},
 }
 

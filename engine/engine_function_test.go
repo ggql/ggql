@@ -117,7 +117,7 @@ func TestSelectCommits(t *testing.T) {
 	repo := newFunctionRepo()
 	defer deleteFunctionRepo()
 
-	fieldsNames := []string{"commit_id", "name", "email", "title", "message", "datetime", "repo"}
+	fieldsNames := []string{"change_id", "commit_id", "name", "email", "title", "message", "datetime", "repo"}
 	titles := []string{"title"}
 	fieldsValues := []ast.Expression{
 		&ast.SymbolExpression{
@@ -165,7 +165,7 @@ func TestSelectDiffs(t *testing.T) {
 	repo := newFunctionRepo()
 	defer deleteFunctionRepo()
 
-	fieldsNames := []string{"commit_id", "name", "email", "repo", "insertions", "deletions", "files_changed"}
+	fieldsNames := []string{"change_id", "commit_id", "name", "email", "repo", "insertions", "deletions", "files_changed"}
 	titles := []string{"title"}
 	fieldsValues := []ast.Expression{
 		&ast.SymbolExpression{
@@ -234,4 +234,64 @@ func TestGetColumnName(t *testing.T) {
 	name = "invalid"
 	ret = GetColumnName(aliasTable, name)
 	assert.Equal(t, name, ret)
+}
+
+func TestGetChangeIdFromCommitMessageFooter(t *testing.T) {
+	changeId := "Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b"
+
+	commitMessage := `
+commit 29a6bb1a059aef021ac39d342499191278518d1d
+Author: A. U. Thor <author@example.com>
+Date: Thu Aug 20 12:46:50 2009 -0700
+
+Improve foo widget by attaching a bar.
+
+We want a bar, because it improves the foo by providing more
+wizbangery to the dowhatimeanery.
+
+Bug: #42
+Change-Id: Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b
+Signed-off-by: A. U. Thor <author@example.com>
+CC: R. E. Viewer <reviewer@example.com>`
+
+	ret := GetChangeIdFromCommitMessageFooter(commitMessage)
+	assert.Equal(t, changeId, ret)
+
+	commitMessage = `
+commit 29a6bb1a059aef021ac39d342499191278518d1d
+Author: A. U. Thor <author@example.com>
+Date: Thu Aug 20 12:46:50 2009 -0700
+
+Improve foo widget by attaching a bar.
+
+We want a bar, because it improves the foo by providing more
+wizbangery to the dowhatimeanery.
+
+Bug: #42
+Change-Id: I3b7e4e16b503ce00f07ba6ad01d97a356dad7701
+Change-Id: Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b
+Signed-off-by: A. U. Thor <author@example.com>
+CC: R. E. Viewer <reviewer@example.com>`
+
+	ret = GetChangeIdFromCommitMessageFooter(commitMessage)
+	assert.Equal(t, changeId, ret)
+
+	commitMessage = `
+commit 29a6bb1a059aef021ac39d342499191278518d1d
+Author: A. U. Thor <author@example.com>
+Date: Thu Aug 20 12:46:50 2009 -0700
+
+Improve foo widget by attaching a bar.
+
+We want a bar, because it improves the foo by providing more
+wizbangery to the dowhatimeanery.
+
+Bug: #42
+Change-Id: Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b
+Change-Id: I3b7e4e16b503ce00f07ba6ad01d97a356dad7701
+Signed-off-by: A. U. Thor <author@example.com>
+CC: R. E. Viewer <reviewer@example.com>`
+
+	ret = GetChangeIdFromCommitMessageFooter(commitMessage)
+	assert.NotEqual(t, changeId, ret)
 }

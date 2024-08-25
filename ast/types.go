@@ -41,6 +41,7 @@ type Optional struct{ DataType }
 type Varargs struct{ DataType }
 
 var TablesFieldsTypes = map[string]DataType{
+	"change_id":     Text{},
 	"commit_id":     Text{},
 	"title":         Text{},
 	"message":       Text{},

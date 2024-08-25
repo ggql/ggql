@@ -36,7 +36,7 @@ func TestExecuteStatement(t *testing.T) {
 
 	statement := &ast.SelectStatement{
 		TableName:    "commits",
-		FieldsNames:  []string{"commit_id", "title", "message", "name", "email", "datetime", "repo"},
+		FieldsNames:  []string{"change_id", "commit_id", "title", "message", "name", "email", "datetime", "repo"},
 		FieldsValues: []ast.Expression{},
 		AliasTable:   make(map[string]string),
 		IsDistinct:   false,
@@ -66,7 +66,7 @@ func TestExecuteSelectStatement(t *testing.T) {
 
 	statement := &ast.SelectStatement{
 		TableName:    "commits",
-		FieldsNames:  []string{"commit_id", "title", "message", "name", "email", "datetime", "repo"},
+		FieldsNames:  []string{"change_id", "commit_id", "title", "message", "name", "email", "datetime", "repo"},
 		FieldsValues: []ast.Expression{},
 		AliasTable:   make(map[string]string),
 		IsDistinct:   false,
