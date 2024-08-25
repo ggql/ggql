@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -103,10 +102,10 @@ func TestParseSetQuery(t *testing.T) {
 			Literal: "1",
 		},
 	}
+
 	position := 0
 
-	ret, err := ParseSetQuery(&env, &tokens, &position)
-	fmt.Println(ret)
+	_, err := ParseSetQuery(&env, &tokens, &position)
 	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
@@ -195,6 +194,7 @@ func TestParseSelectStatement(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: SELECT
@@ -208,6 +208,7 @@ func TestParseSelectStatement(t *testing.T) {
 			Literal: "SELECT",
 		},
 	}
+
 	position := 1
 
 	_, err := ParseSelectStatement(&context, &env, &tokens, &position)
@@ -223,6 +224,7 @@ func TestParseWhereStatement(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: WHERE
@@ -236,6 +238,7 @@ func TestParseWhereStatement(t *testing.T) {
 			Literal: "WHERE",
 		},
 	}
+
 	position := 0
 
 	_, err := ParseWhereStatement(&context, &env, &tokens, &position)
@@ -251,6 +254,7 @@ func TestParseGroupByStatement(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: WHERE
@@ -280,6 +284,7 @@ func TestParseGroupByStatement(t *testing.T) {
 			Literal: "name",
 		},
 	}
+
 	env.DefineGlobal("name", ast.Text{})
 	position := 0
 
@@ -296,6 +301,7 @@ func TestParseHavingStatement(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: Having is_head = "true"
@@ -409,6 +415,7 @@ func TestParseOrderByStatement(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: ORDER BY name
@@ -454,6 +461,7 @@ func TestParseExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > -1
@@ -499,6 +507,7 @@ func TestParseAssignmentExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count := 1
@@ -544,6 +553,7 @@ func TestParseIsNullExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: 1 IS NULL
@@ -589,6 +599,7 @@ func TestParseInExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: "One" IN ("One", "Two")
@@ -666,6 +677,7 @@ func TestParseBetweenExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count BETWEEN 2 .. 30000
@@ -727,6 +739,7 @@ func TestParseLogicalOrExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0 || commit_count < 0
@@ -804,6 +817,7 @@ func TestParseLogicalAndExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0 && commit_count < 0
@@ -881,6 +895,7 @@ func TestParseBitwiseOrExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0 | commit_count < 0
@@ -958,6 +973,7 @@ func TestParseLogicalXorExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0 ^ commit_count < 0
@@ -1035,6 +1051,7 @@ func TestParseBitwiseAndExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0 & commit_count < 0
@@ -1112,6 +1129,7 @@ func TestParseEqualityExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count = 0
@@ -1157,6 +1175,7 @@ func TestParseComparisonExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0
@@ -1202,6 +1221,7 @@ func TestParseBitwiseShiftExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count << 1
@@ -1247,6 +1267,7 @@ func TestParseTermExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: commit_count > 0
@@ -1292,6 +1313,7 @@ func TestParseFactorExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: 1 * 2
@@ -1323,6 +1345,7 @@ func TestParseFactorExpression(t *testing.T) {
 	}
 
 	position := 0
+
 	_, err := ParseFactorExpression(&context, &env, &tokens, &position)
 	if err.Message != "" {
 		t.Errorf("ParserGql failed with error: %v", err)
@@ -1336,6 +1359,7 @@ func TestParseLikeExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: "10 usd" LIKE "[0-9]* usd"
@@ -1381,6 +1405,7 @@ func TestParseGLobExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: "Git Query Language" GLOB "Git*"
@@ -1426,6 +1451,7 @@ func TestParseUnaryExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: !1
@@ -1463,6 +1489,7 @@ func TestParseFunctionCallExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: lower(name)
@@ -1516,6 +1543,7 @@ func TestParseArgumentsExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: (name)
@@ -1561,6 +1589,7 @@ func TestParsePrimaryExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: CASE WHEN isRemote THEN 1 ELSE 0 END
@@ -1646,6 +1675,7 @@ func TestParseGroupExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: ("One")
@@ -1691,6 +1721,7 @@ func TestParseCaseExpression(t *testing.T) {
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	context := ParserContext{}
 
 	// Test: CASE WHEN isRemote THEN 1 ELSE 0 END
@@ -1781,8 +1812,10 @@ func TestCheckFunctionCallExpression(t *testing.T) {
 	arguments := []ast.Expression{&ast.SymbolExpression{
 		Value: "name",
 	}}
+
 	parameters := []ast.DataType{ast.Text{}}
 	function_name := "lower"
+
 	location := Location{
 		Start: 1,
 		End:   2,
@@ -1805,6 +1838,7 @@ func TestTypeCheckSelectedFields(t *testing.T) {
 	// Test: invalid
 	table_name := "invalid"
 	fields_names := []string{"invalid"}
+
 	tokens := []Token{
 		{
 			Location: Location{
@@ -1821,6 +1855,7 @@ func TestTypeCheckSelectedFields(t *testing.T) {
 	for k := range env.Scopes {
 		delete(env.Scopes, k)
 	}
+
 	env.Scopes["commit_id"] = ast.Text{}
 
 	err := TypeCheckSelectedFields(&env, table_name, &fields_names, &tokens, position)
@@ -1842,6 +1877,7 @@ func TestUnExpectedStatementError(t *testing.T) {
 			Literal: "select",
 		},
 	}
+
 	position := 0
 
 	err := UnExpectedStatementError(&tokens, &position)
@@ -1861,13 +1897,14 @@ func TestUnExpectedExpressionError(t *testing.T) {
 			Literal: "select",
 		},
 	}
+
 	position := 0
 
 	err := UnExpectedExpressionError(&tokens, &position)
 	assert.Equal(t, "Can't complete parsing this expression", err.Message)
 
 	// Test: current.kind == =
-	tokens2 := []Token{
+	tokens = []Token{
 		{
 			Location: Location{
 				Start: 1,
@@ -1886,16 +1923,17 @@ func TestUnExpectedExpressionError(t *testing.T) {
 		},
 	}
 
-	position2 := 1
+	position = 1
 
-	err2 := UnExpectedExpressionError(&tokens2, &position2)
-	assert.Equal(t, "Unexpected `==`, Just use `=` to check equality", err2.Message)
+	err = UnExpectedExpressionError(&tokens, &position)
+	assert.Equal(t, "Unexpected `==`, Just use `=` to check equality", err.Message)
 }
 
 //nolint:gocritic
 func TestUnExpectedContentAfterCorrectStatement(t *testing.T) {
 	// Test: invalid
 	statement_name := "invalid"
+
 	tokens := []Token{
 		{
 			Location: Location{
@@ -1906,6 +1944,7 @@ func TestUnExpectedContentAfterCorrectStatement(t *testing.T) {
 			Literal: "invalid",
 		},
 	}
+
 	position := 0
 
 	err := UnExpectedContentAfterCorrectStatement(&statement_name, &tokens, &position)
@@ -1918,6 +1957,7 @@ func TestGetExpressionName(t *testing.T) {
 	expression := ast.SymbolExpression{
 		Value: "symbol",
 	}
+
 	statement, _ := GetExpressionName(&expression)
 	if statement == "" {
 		assert.Equal(t, "symbol", statement)
@@ -1928,11 +1968,13 @@ func TestGetExpressionName(t *testing.T) {
 func TestRegisterCurrentTableFieldsTypes(t *testing.T) {
 	// Test: commits
 	table_name := "commits"
+
 	env := ast.Environment{
 		Globals:      map[string]ast.Value{},
 		GlobalsTypes: map[string]ast.DataType{},
 		Scopes:       map[string]ast.DataType{},
 	}
+
 	RegisterCurrentTableFieldsTypes(table_name, &env)
 	assert.Equal(t, ast.Text{}, env.Scopes["commit_id"])
 }
@@ -1963,11 +2005,12 @@ func TestConsumeKind(t *testing.T) {
 			Literal: "select",
 		},
 	}
+
 	position := 1
 	kind := Symbol
 
 	_, err := ConsumeKind(tokens, position, kind)
-	if err.Error() == "" {
+	if err == nil || err.Error() == "" {
 		t.Errorf("ParserGql failed with error: %v", err)
 	}
 }
@@ -2067,6 +2110,7 @@ func TestIsComparisonOperator(t *testing.T) {
 		Kind:    Symbol,
 		Literal: "select",
 	}
+
 	status := IsComparisonOperator(&tokens)
 	assert.Equal(t, false, status)
 }
@@ -2082,6 +2126,7 @@ func TestIsFactorOperator(t *testing.T) {
 		Kind:    Symbol,
 		Literal: "select",
 	}
+
 	status := IsFactorOperator(&tokens)
 	assert.Equal(t, false, status)
 }
@@ -2097,6 +2142,7 @@ func TestIsAscOrDesc(t *testing.T) {
 		Kind:    Symbol,
 		Literal: "select",
 	}
+
 	status := IsAscOrDesc(&tokens)
 	assert.Equal(t, false, status)
 }
@@ -2106,6 +2152,7 @@ func TestTypeMismatchError(t *testing.T) {
 		Start: 1,
 		End:   2,
 	}
+
 	expected := ast.Text{}
 	actual := ast.Integer{}
 
