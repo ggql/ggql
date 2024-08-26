@@ -16,6 +16,7 @@ const (
 	GroupBy
 	AggregateFunction
 	GlobalVariable
+	Insert
 )
 
 type Statement interface {
@@ -43,12 +44,39 @@ type SelectStatement struct {
 	IsDistinct   bool
 }
 
+type Mutate struct {
+	Insert                    *GQLMutate
+	GlobalVariableDeclaration *GlobalVariableStatement
+}
+
+type GQLMutate struct {
+	Statements             map[string]Statement
+	HasAggregationFunction bool
+	HasGroupByStatement    bool
+}
+
+type InsertStatement struct {
+	TableName    string
+	FieldsNames  []string
+	FieldsValues []Expression
+	AliasTable   map[string]string
+	IsDistinct   bool
+}
+
 func (s *SelectStatement) AsAny() reflect.Value {
 	return reflect.ValueOf(s)
 }
 
 func (s *SelectStatement) Kind() StatementKind {
 	return Select
+}
+
+func (i *InsertStatement) AsAny() reflect.Value {
+	return reflect.ValueOf(i)
+}
+
+func (i *InsertStatement) Kind() StatementKind {
+	return Insert
 }
 
 type WhereStatement struct {

@@ -9,16 +9,19 @@ import (
 	"github.com/ggql/ggql/ast"
 )
 
-func ParserGql(tokens []Token, env *ast.Environment) (ast.Query, Diagnostic) {
+func ParserGql(tokens []Token, env *ast.Environment) (ast.Query, ast.Mutate, Diagnostic) {
 	position := 0
 	firstToken := tokens[position]
 	var queryResult ast.Query
+	var mutateResult ast.Mutate
 	var err Diagnostic
 	switch firstToken.Kind {
 	case Set:
 		queryResult, err = ParseSetQuery(env, &tokens, &position)
 	case Select:
 		queryResult, err = ParseSelectQuery(env, &tokens, &position)
+	case Insert:
+		mutateResult, err = ParseInsertMutate(env, &tokens, &position)
 	default:
 		err = UnExpectedStatementError(&tokens, &position)
 	}
@@ -38,7 +41,7 @@ func ParserGql(tokens []Token, env *ast.Environment) (ast.Query, Diagnostic) {
 		)
 	}
 
-	return queryResult, err
+	return queryResult, mutateResult, err
 }
 
 // nolint:lll
@@ -198,6 +201,10 @@ func ParseSelectQuery(env *ast.Environment, tokens *[]Token, position *int) (ast
 			HiddenSelections:       hiddenSelections,
 		},
 	}, Diagnostic{}
+}
+
+func ParseInsertMutate(env *ast.Environment, tokens *[]Token, position *int) (ast.Mutate, Diagnostic) {
+	// TBD: FIXME
 }
 
 // nolint:funlen,gocyclo,lll

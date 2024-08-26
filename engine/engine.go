@@ -13,6 +13,7 @@ import (
 
 var gqlCommandsInOrder = []string{
 	"select",
+	"insert",
 	"where",
 	"group",
 	"aggregation",
@@ -30,9 +31,13 @@ type EvaluationResult struct {
 	SetGlobalVariable bool
 }
 
-func Evaluate(env *ast.Environment, repos []*git.Repository, query ast.Query) (EvaluationResult, error) {
+func Evaluate(env *ast.Environment, repos []*git.Repository, query ast.Query, mutate ast.Mutate) (EvaluationResult, error) {
 	if query.Select != nil {
 		return EvaluateSelectQuery(env, repos, *query.Select)
+	}
+
+	if mutate.Insert != nil {
+		return EvaluateInsertMutate(env, repos, *mutate.Insert)
 	}
 
 	if query.GlobalVariableDeclaration != nil {
@@ -144,6 +149,14 @@ func EvaluateSelectQuery(
 		Str: hiddenSelections,
 	},
 	}, nil
+}
+
+func EvaluateInsertMutate(
+	env *ast.Environment,
+	repos []*git.Repository,
+	mutate ast.GQLMutate,
+) (EvaluationResult, error) {
+	// TBD: FIXME
 }
 
 func ApplyDistinctOnObjectsGroup(gitqlObject *ast.GitQLObject, hiddenSelections []string) {

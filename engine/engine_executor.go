@@ -24,6 +24,12 @@ func ExecuteStatement(
 			aliasTable[alias] = alias
 		}
 		return executeSelectStatement(env, selectStatement, repo, gitqlObject, hiddenSelection)
+	case ast.Insert:
+		insertStatement := statement.(*ast.InsertStatement)
+		for _, alias := range insertStatement.AliasTable {
+			aliasTable[alias] = alias
+		}
+		return executeInsertStatement(env, insertStatement, repo, gitqlObject, hiddenSelection)
 	case ast.Where:
 		whereStatement := statement.(*ast.WhereStatement)
 		return executeWhereStatement(env, whereStatement, gitqlObject)
@@ -85,6 +91,16 @@ func executeSelectStatement(
 	}
 
 	return nil
+}
+
+func executeInsertStatement(
+	env *ast.Environment,
+	statement *ast.InsertStatement,
+	repo *git.Repository,
+	gitqlObject *ast.GitQLObject,
+	hiddenSelections []string,
+) error {
+	// TBD: FIXME
 }
 
 func executeWhereStatement(

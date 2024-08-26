@@ -8,6 +8,10 @@ func TestSelectStatementKind(t *testing.T) {
 	t.Skip("Skipping TestSelectStatementKind.")
 }
 
+func TestInsertStatementKind(t *testing.T) {
+	t.Skip("Skipping TestInsertStatementKind.")
+}
+
 func TestWhereStatementKind(t *testing.T) {
 	t.Skip("Skipping TestWhereStatementKind.")
 }

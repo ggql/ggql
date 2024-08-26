@@ -46,6 +46,17 @@ func SelectGQLObjects(
 	}
 }
 
+func InsertGQLObjects(
+	env *ast.Environment,
+	repo *git.Repository,
+	table string,
+	fieldsNames []string,
+	titles []string,
+	fieldsValues []ast.Expression,
+) (*ast.Group, error) {
+	// TBD: FIXME
+}
+
 // nolint:goconst
 func selectReferences(
 	env *ast.Environment,

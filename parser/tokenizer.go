@@ -25,6 +25,7 @@ const (
 	Not
 	Like
 	Glob
+	Insert
 
 	Case
 	When
@@ -783,6 +784,8 @@ func resolveSymbolKind(literal string) TokenKind {
 		return Like
 	case "glob":
 		return Glob
+	case "insert":
+		return Insert
 	// Logical Operators
 	case "or":
 		return LogicalOr
