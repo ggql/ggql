@@ -141,7 +141,7 @@ func executeGitqlQuery(
 				fmt.Println(json)
 			}
 		case cli.CSV:
-			indexes := []int{}
+			var indexes []int
 			for index, title := range groups.Titles {
 				if contains(hiddenselection, title) {
 					indexes = append([]int{index}, indexes...)
